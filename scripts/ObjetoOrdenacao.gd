@@ -47,8 +47,19 @@ func verificar_soltura():
 				slot_atual = area
 				travado = true # Trava a peça
 				
+				# === A SUA IMPLEMENTAÇÃO AQUI ===
+				var posicao_final = area.global_position
+				
+				# Puxa a altura personalizada do slot (se ela existir no script do slot)
+				if "altura_da_peca" in area:
+					posicao_final.y -= area.altura_da_peca
+				else:
+					# Valor padrão de segurança caso o script do slot falte
+					posicao_final.y -= 40.0 
+					
 				var tween = create_tween()
-				tween.tween_property(self, "global_position", area.global_position, 0.1)
+				tween.tween_property(self, "global_position", posicao_final, 0.1)
+				# ================================
 				
 				if owner.has_method("tocar_som_acerto"):
 					owner.tocar_som_acerto()

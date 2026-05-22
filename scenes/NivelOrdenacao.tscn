@@ -2,9 +2,12 @@
 
 [ext_resource type="Script" uid="uid://c0dyg7qjky5p5" path="res://scripts/NivelOrdenacao.gd" id="1_d7h3i"]
 [ext_resource type="Texture2D" uid="uid://d4ay707cb7k1g" path="res://assets/kenney_animal-pack-redux/kenney_platformer-pack-redux/PNG/Backgrounds/land_background.png" id="1_vavxv"]
-[ext_resource type="Texture2D" uid="uid://be2e5ajchisi6" path="res://assets/kenney_shape-characters/PNG/Default/tile_grey.png" id="2_p01kx"]
+[ext_resource type="Texture2D" uid="uid://cg3mvopclwqrx" path="res://assets/podio/podio_1.png" id="3_750mx"]
 [ext_resource type="Texture2D" uid="uid://cccr20xto1mga" path="res://assets/fruits/itch/pngs/red-apple.png" id="3_d7h3i"]
+[ext_resource type="Script" uid="uid://i7ufcoh86f8j" path="res://scripts/slotpodio.gd" id="3_jsddy"]
 [ext_resource type="Script" uid="uid://d0d3aqh81brjm" path="res://scripts/ObjetoOrdenacao.gd" id="3_p01kx"]
+[ext_resource type="Texture2D" uid="uid://b1kdbwi5ea2pt" path="res://assets/podio/podio_2.png" id="4_jsddy"]
+[ext_resource type="Texture2D" uid="uid://n47panb6t3me" path="res://assets/podio/podio_3.png" id="5_4q42b"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="6_jyglv"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="7_ys8by"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="8_xd076"]
@@ -15,7 +18,13 @@
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="13_750mx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iyi0d"]
-size = Vector2(78, 78)
+size = Vector2(166, 188)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_750mx"]
+size = Vector2(166, 172)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jsddy"]
+size = Vector2(166, 130)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qdpox"]
 radius = 32.0
@@ -45,41 +54,50 @@ texture = ExtResource("1_vavxv")
 position = Vector2(43, 0)
 
 [node name="Slot_1" type="Area2D" parent="Slots" unique_id=1444274278]
-position = Vector2(553, 306)
+position = Vector2(105, 367)
+script = ExtResource("3_jsddy")
+altura_da_peca = 115.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_1" unique_id=1345467890]
-texture = ExtResource("2_p01kx")
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("3_750mx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_1" unique_id=1409343768]
-position = Vector2(0, -1)
+position = Vector2(-1, -32)
 shape = SubResource("RectangleShape2D_iyi0d")
 
 [node name="Slot_2" type="Area2D" parent="Slots" unique_id=378940139]
-position = Vector2(384, 299)
+position = Vector2(344, 376)
+script = ExtResource("3_jsddy")
+altura_da_peca = 80.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_2" unique_id=904653791]
-texture = ExtResource("2_p01kx")
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("4_jsddy")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_2" unique_id=1068175518]
-position = Vector2(0, -1)
-shape = SubResource("RectangleShape2D_iyi0d")
+position = Vector2(0, -40)
+shape = SubResource("RectangleShape2D_750mx")
 
 [node name="Slot_3" type="Area2D" parent="Slots" unique_id=512252722]
-position = Vector2(186, 292)
+position = Vector2(557, 379)
+script = ExtResource("3_jsddy")
+altura_da_peca = 60.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_3" unique_id=1169450602]
-texture = ExtResource("2_p01kx")
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("5_4q42b")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_3" unique_id=1201976580]
-position = Vector2(0, -1)
-shape = SubResource("RectangleShape2D_iyi0d")
+position = Vector2(0, -29)
+shape = SubResource("RectangleShape2D_jsddy")
 
 [node name="Pecas" type="Node2D" parent="." unique_id=1056027670]
 
 [node name="Peca_Pequena" type="Area2D" parent="Pecas" unique_id=1179492280]
-position = Vector2(188, 664)
+position = Vector2(355, 677)
 script = ExtResource("3_p01kx")
-nome_do_slot_correto = "Slot_1"
+nome_do_slot_correto = "Slot_3"
 
 [node name="Sprite2D" type="Sprite2D" parent="Pecas/Peca_Pequena" unique_id=129265803]
 scale = Vector2(0.09, 0.09)
@@ -90,7 +108,7 @@ position = Vector2(0, 7)
 shape = SubResource("CapsuleShape2D_qdpox")
 
 [node name="Peca_Media" type="Area2D" parent="Pecas" unique_id=833207892]
-position = Vector2(338, 664)
+position = Vector2(355, 823)
 script = ExtResource("3_p01kx")
 nome_do_slot_correto = "Slot_2"
 
@@ -103,9 +121,9 @@ position = Vector2(0, 10)
 shape = SubResource("CapsuleShape2D_jyglv")
 
 [node name="Peca_Grande" type="Area2D" parent="Pecas" unique_id=1987383513]
-position = Vector2(500, 661)
+position = Vector2(355, 1027)
 script = ExtResource("3_p01kx")
-nome_do_slot_correto = "Slot_3"
+nome_do_slot_correto = "Slot_1"
 
 [node name="Sprite2D" type="Sprite2D" parent="Pecas/Peca_Grande" unique_id=443917524]
 scale = Vector2(0.2, 0.2)
@@ -141,7 +159,7 @@ texture = ExtResource("11_v5gq8")
 script = ExtResource("12_mhen2")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=538418862]
-position = Vector2(382, 391)
+position = Vector2(388, 200)
 emitting = false
 amount = 50
 texture = ExtResource("13_750mx")

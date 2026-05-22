@@ -12,8 +12,14 @@
 [ext_resource type="Texture2D" uid="uid://bxqud5wedktcn" path="res://assets/kenney_ui-pack/PNG/Red/Default/slide_vertical_color.png" id="10_k8ouq"]
 [ext_resource type="Texture2D" uid="uid://b744kd2jtive1" path="res://assets/kenney_ui-pack/PNG/Green/Default/slide_horizontal_color.png" id="11_vidof"]
 [ext_resource type="Texture2D" uid="uid://dt6anyjhp5q6d" path="res://assets/kenney_ui-pack/PNG/Yellow/Default/slide_horizontal_color.png" id="12_luar6"]
+[ext_resource type="Texture2D" uid="uid://dxkbr0omj0gjd" path="res://assets/kenney_ui-pack/PNG/Blue/Default/button_rectangle_border.png" id="13_geufk"]
 [ext_resource type="Texture2D" uid="uid://db0bu8wytm78m" path="res://assets/kenney_ui-pack/PNG/Red/Default/button_rectangle_border.png" id="13_vidof"]
 [ext_resource type="Texture2D" uid="uid://ca47cksfc0gtv" path="res://assets/kenney_ui-pack/PNG/Extra/Default/home_light.png" id="14_luar6"]
+[ext_resource type="Texture2D" uid="uid://diefvex3fiq12" path="res://assets/kenney_ui-pack/PNG/Red/Default/arrow_basic_e.png" id="14_rbffo"]
+[ext_resource type="Texture2D" uid="uid://b6cy4133dndcu" path="res://assets/kenney_ui-pack/PNG/Green/Default/arrow_basic_e.png" id="15_fvg58"]
+[ext_resource type="Texture2D" uid="uid://br6l2ppdaqwhu" path="res://assets/kenney_ui-pack/PNG/Green/Default/arrow_basic_n.png" id="16_h27qw"]
+[ext_resource type="Texture2D" uid="uid://dpit43eo2onsq" path="res://assets/kenney_ui-pack/PNG/Yellow/Default/arrow_basic_w.png" id="17_jqlm5"]
+[ext_resource type="Texture2D" uid="uid://ceh4bc17b5cx0" path="res://assets/kenney_ui-pack/PNG/Yellow/Default/arrow_basic_e.png" id="18_fpsne"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_h2tru"]
 font = ExtResource("3_fin3h")
@@ -214,44 +220,79 @@ anchor_left = 3.0
 anchor_top = 16.5
 anchor_right = 14.225
 anchor_bottom = 19.225
-texture_normal = ExtResource("4_eh27v")
+texture_normal = ExtResource("13_geufk")
 stretch_mode = 0
 metadata/_edit_use_anchors_ = true
 
 [node name="TextureRect" type="TextureRect" parent="BtnOrdenar" unique_id=230527183]
 modulate = Color(0.69411767, 0, 0.16470589, 1)
 layout_mode = 0
-offset_left = 179.0
+offset_left = 202.0
 offset_top = 30.0
-offset_right = 210.763
+offset_right = 233.763
 offset_bottom = 126.0
 rotation = 1.5707964
 mouse_filter = 2
-texture = ExtResource("10_k8ouq")
+texture = ExtResource("14_rbffo")
+expand_mode = 1
+stretch_mode = 3
+
+[node name="TextureRect" type="TextureRect" parent="BtnOrdenar/TextureRect" unique_id=1123631042]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 72.0
+offset_right = 95.763
+offset_bottom = 168.0
+rotation = 1.5707964
+mouse_filter = 2
+texture = ExtResource("14_rbffo")
 expand_mode = 1
 stretch_mode = 3
 
 [node name="TextureRect2" type="TextureRect" parent="BtnOrdenar" unique_id=1249574649]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.40089086
-anchor_top = 0.34862384
-anchor_right = 0.6146993
-anchor_bottom = 0.4954129
+anchor_left = 0.42316258
+anchor_top = 0.25688073
+anchor_right = 0.63697106
+anchor_bottom = 0.5504587
 offset_right = -1.5258789e-05
 mouse_filter = 2
-texture = ExtResource("11_vidof")
-expand_mode = 1
+texture = ExtResource("15_fvg58")
+stretch_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="BtnOrdenar/TextureRect2" unique_id=424874362]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.39583346
+anchor_right = 0.729167
+anchor_bottom = 1.000001
+offset_right = -1.5258789e-05
+mouse_filter = 2
+texture = ExtResource("16_h27qw")
+stretch_mode = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="TextureRect3" type="TextureRect" parent="BtnOrdenar" unique_id=1225255016]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.6169265
-anchor_top = 0.23853211
-anchor_right = 0.83073497
-anchor_bottom = 0.60550445
-texture = ExtResource("12_luar6")
+anchor_left = 0.53006685
+anchor_top = 0.2293578
+anchor_right = 0.74387527
+anchor_bottom = 0.5963301
+texture = ExtResource("17_jqlm5")
+stretch_mode = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect3" type="TextureRect" parent="BtnOrdenar/TextureRect3" unique_id=510734671]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7395833
+anchor_top = 0.075000554
+anchor_right = 1.077603
+anchor_bottom = 0.8750009
+texture = ExtResource("18_fpsne")
 stretch_mode = 3
 metadata/_edit_use_anchors_ = true
 
@@ -262,9 +303,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -160.5
+offset_left = -173.5
 offset_top = -4.5
-offset_right = 160.5
+offset_right = 178.5
 offset_bottom = 55.5
 grow_horizontal = 2
 grow_vertical = 2
@@ -274,7 +315,7 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8392157)
 theme_override_fonts/normal_font = ExtResource("8_vidof")
 theme_override_font_sizes/normal_font_size = 35
 bbcode_enabled = true
-text = "[center][color=b1002a]LIGUE[/color] [color=16bb77]OS[/color] [color=ffcc00]PONTOS[/color][/center]"
+text = "[center][color=b1002a]HORA[/color] [color=16bb77]DE[/color] [color=ffcc00]ORGANIZAR[/color][/center]"
 horizontal_alignment = 1
 vertical_alignment = 1
 

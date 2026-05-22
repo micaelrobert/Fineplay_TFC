@@ -38,18 +38,12 @@ func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
 	return false
 
 func verificar_vitoria():
-	# Só checa se todas as 3 peças estão em algum slot
-	if peca_p.slot_atual and peca_m.slot_atual and peca_g.slot_atual:
-		
-		# A Lógica de Seriação: P -> 1, M -> 2, G -> 3
-		var ordem_correta = (
-			peca_p.slot_atual.name == "Slot_1" and
-			peca_m.slot_atual.name == "Slot_2" and
-			peca_g.slot_atual.name == "Slot_3"
-		)
-		
-		if ordem_correta:
-			vitoria()
+	# Como a própria peça já rejeita o slot errado e volta para o início,
+	# se as três peças estão travadas em um slot, significa que o jogador venceu!
+	var todas_acertaram = peca_p.slot_atual != null and peca_m.slot_atual != null and peca_g.slot_atual != null
+	
+	if todas_acertaram:
+		vitoria()
 
 func vitoria():
 	print("Vitória! Ordenação concluída.")
