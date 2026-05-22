@@ -1,0 +1,197 @@
+[gd_scene load_steps=14 format=3 uid="uid://hb4cso6yhj23"]
+
+[ext_resource type="Script" uid="uid://duogqvf71eha0" path="res://scripts/nivel_ligar.gd" id="1_pnsl6"]
+[ext_resource type="Texture2D" uid="uid://dtawjepmad8im" path="res://assets/kenney_platformer-pack-redux/PNG/Backgrounds/blue_plantio.png" id="2_ibvs2"]
+[ext_resource type="PackedScene" uid="uid://dc3pof8r7xo10" path="res://scenes/generico/Ponto.tscn" id="3_8xnct"]
+[ext_resource type="Texture2D" uid="uid://cbdum7ggn8tak" path="res://assets/fruits/itch/pngs/banana.png" id="4_w0tjx"]
+[ext_resource type="Texture2D" uid="uid://c8nfs7um37kr8" path="res://assets/fruits/itch/pngs/coconut.png" id="5_rserd"]
+[ext_resource type="Texture2D" uid="uid://q4pum7aby72a" path="res://assets/fruits/itch/pngs/lemon.png" id="6_mgvjo"]
+[ext_resource type="Texture2D" uid="uid://dth35jovxd5wh" path="res://assets/fruits/itch/pngs/orange.png" id="7_2pnpc"]
+[ext_resource type="Texture2D" uid="uid://bt1g1vlrbml15" path="res://assets/fruits/itch/pngs/strawberry.png" id="8_c2p07"]
+[ext_resource type="Texture2D" uid="uid://p3hqgbdceuj8" path="res://assets/fruits/itch/pngs/watermelon.png" id="9_iqc7q"]
+[ext_resource type="Texture2D" uid="uid://eagcdci0j8o4" path="res://assets/fruits/itch/pngs/green-grape.png" id="10_cg2n5"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="11_c2p07"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="12_iqc7q"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="13_cg2n5"]
+
+[node name="NivelLigar" type="Node2D"]
+script = ExtResource("1_pnsl6")
+total_objetivos = 7
+proxima_fase_cena = "uid://dby2myb7cu1tn"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(360.00006, 585)
+scale = Vector2(0.7138672, 0.7373047)
+texture = ExtResource("2_ibvs2")
+
+[node name="Banana" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(96, 149)
+id_par = 1
+
+[node name="Sprite2D" parent="Banana" index="0"]
+position = Vector2(2, 13.999999)
+
+[node name="CollisionShape2D" parent="Banana" index="1"]
+position = Vector2(-20, -10)
+
+[node name="Sprite2D2" parent="Banana" index="2"]
+position = Vector2(-26.000002, -16)
+scale = Vector2(0.1435043, 0.117771596)
+texture = ExtResource("4_w0tjx")
+
+[node name="Coco" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(75, 272)
+id_par = 2
+
+[node name="Sprite2D2" parent="Coco" index="2"]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("5_rserd")
+
+[node name="CocoPreto" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(627, 265)
+id_par = 2
+tipo = 1
+
+[node name="Sprite2D2" parent="CocoPreto" index="2"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("5_rserd")
+
+[node name="BananaPreta" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(648, 149)
+id_par = 1
+tipo = 1
+
+[node name="Sprite2D" parent="BananaPreta" index="0"]
+position = Vector2(-4, 13.999999)
+
+[node name="CollisionShape2D" parent="BananaPreta" index="1"]
+position = Vector2(-20, -10)
+
+[node name="Sprite2D2" parent="BananaPreta" index="2"]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(-26.000002, -16)
+scale = Vector2(0.1435043, 0.117771596)
+texture = ExtResource("4_w0tjx")
+
+[node name="Limao" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(75, 401)
+id_par = 3
+
+[node name="Sprite2D2" parent="Limao" index="2"]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("6_mgvjo")
+
+[node name="LimaoPreto" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(627, 399)
+id_par = 3
+tipo = 1
+
+[node name="Sprite2D2" parent="LimaoPreto" index="2"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("6_mgvjo")
+
+[node name="Laranja" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(75, 531)
+id_par = 4
+
+[node name="Sprite2D2" parent="Laranja" index="2"]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("7_2pnpc")
+
+[node name="LaranjaPreta" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(627, 528)
+id_par = 4
+tipo = 1
+
+[node name="Sprite2D2" parent="LaranjaPreta" index="2"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("7_2pnpc")
+
+[node name="Morango" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(75, 670)
+id_par = 5
+
+[node name="Sprite2D2" parent="Morango" index="2"]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("8_c2p07")
+
+[node name="MorangoPreto" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(627, 659)
+id_par = 5
+tipo = 1
+
+[node name="Sprite2D2" parent="MorangoPreto" index="2"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("8_c2p07")
+
+[node name="Melancia" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(75, 802)
+id_par = 6
+
+[node name="Sprite2D2" parent="Melancia" index="2"]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("9_iqc7q")
+
+[node name="MelanciaPreta" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(627, 791)
+id_par = 6
+tipo = 1
+
+[node name="Sprite2D2" parent="MelanciaPreta" index="2"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("9_iqc7q")
+
+[node name="Uva" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(75, 937)
+id_par = 7
+
+[node name="Sprite2D2" parent="Uva" index="2"]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("10_cg2n5")
+
+[node name="UvaPreta" parent="." instance=ExtResource("3_8xnct")]
+position = Vector2(627, 924)
+id_par = 7
+tipo = 1
+
+[node name="Sprite2D2" parent="UvaPreta" index="2"]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("10_cg2n5")
+
+[node name="SonsLocais" type="Node" parent="."]
+
+[node name="SomClickObjeto" type="AudioStreamPlayer2D" parent="SonsLocais"]
+stream = ExtResource("11_c2p07")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais"]
+stream = ExtResource("12_iqc7q")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais"]
+stream = ExtResource("13_cg2n5")
+
+[editable path="Banana"]
+[editable path="Coco"]
+[editable path="CocoPreto"]
+[editable path="BananaPreta"]
+[editable path="Limao"]
+[editable path="LimaoPreto"]
+[editable path="Laranja"]
+[editable path="LaranjaPreta"]
+[editable path="Morango"]
+[editable path="MorangoPreto"]
+[editable path="Melancia"]
+[editable path="MelanciaPreta"]
+[editable path="Uva"]
+[editable path="UvaPreta"]

@@ -1,0 +1,235 @@
+[gd_scene load_steps=9 format=3 uid="uid://cnt5wbkfygc4v"]
+
+[ext_resource type="Script" uid="uid://duogqvf71eha0" path="res://scripts/nivel_ligar.gd" id="1_174is"]
+[ext_resource type="Texture2D" uid="uid://d0vtgdyaftyva" path="res://assets/kenney_platformer-pack-redux/PNG/Backgrounds/blue_school.png" id="2_jl056"]
+[ext_resource type="PackedScene" uid="uid://dc3pof8r7xo10" path="res://scenes/generico/Ponto.tscn" id="3_btiya"]
+[ext_resource type="Texture2D" uid="uid://dfffl80s0fvd0" path="res://assets/kenney_ui-pack/PNG/Blue/Default/button_round_line.png" id="4_btiya"]
+[ext_resource type="FontFile" uid="uid://cqxjmhdvoxh1s" path="res://assets/kenney_kenney-fonts/Fonts/Kenney Blocks.ttf" id="5_w146j"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="6_syp62"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="7_dixt7"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="8_s3x8e"]
+
+[node name="NivelLigar" type="Node2D"]
+script = ExtResource("1_174is")
+modo_atual = 1
+total_objetivos = 9
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(360.00006, 585)
+scale = Vector2(0.7138672, 0.7373047)
+texture = ExtResource("2_jl056")
+
+[node name="Ponto" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(61, 133)
+valor_numero = 1
+
+[node name="Sprite2D2" parent="Ponto" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "1"
+
+[node name="Ponto2" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(624, 133)
+valor_numero = 2
+
+[node name="Sprite2D2" parent="Ponto2" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto2"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "2"
+
+[node name="Ponto3" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(250, 302)
+valor_numero = 3
+
+[node name="Sprite2D2" parent="Ponto3" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto3"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "3"
+
+[node name="Ponto4" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(433, 308)
+id_par = 4
+valor_numero = 4
+
+[node name="Sprite2D2" parent="Ponto4" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto4"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "4"
+
+[node name="Ponto5" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(153, 483)
+id_par = 5
+valor_numero = 5
+
+[node name="Sprite2D2" parent="Ponto5" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto5"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "5"
+
+[node name="Ponto6" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(572, 485)
+id_par = 6
+valor_numero = 6
+
+[node name="Sprite2D2" parent="Ponto6" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto6"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "6"
+
+[node name="Ponto7" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(332, 672)
+valor_numero = 7
+
+[node name="Sprite2D2" parent="Ponto7" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto7"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "7"
+
+[node name="Ponto8" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(622, 679)
+valor_numero = 8
+
+[node name="Sprite2D2" parent="Ponto8" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto8"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "8"
+
+[node name="Ponto9" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(136, 844)
+valor_numero = 9
+
+[node name="Sprite2D2" parent="Ponto9" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto9"]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "9"
+
+[node name="Ponto10" parent="." instance=ExtResource("3_btiya")]
+position = Vector2(431, 854)
+valor_numero = 10
+
+[node name="Sprite2D2" parent="Ponto10" index="2"]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_btiya")
+
+[node name="Label" type="Label" parent="Ponto10"]
+offset_left = -30.0
+offset_top = -39.0
+offset_right = 53.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.41960785, 0.78039217, 0.9490196, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 45
+text = "10"
+
+[node name="SonsLocais" type="Node" parent="."]
+
+[node name="SomClickObjeto" type="AudioStreamPlayer2D" parent="SonsLocais"]
+stream = ExtResource("6_syp62")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais"]
+stream = ExtResource("7_dixt7")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais"]
+stream = ExtResource("8_s3x8e")
+
+[editable path="Ponto"]
+[editable path="Ponto2"]
+[editable path="Ponto3"]
+[editable path="Ponto4"]
+[editable path="Ponto5"]
+[editable path="Ponto6"]
+[editable path="Ponto7"]
+[editable path="Ponto8"]
+[editable path="Ponto9"]
+[editable path="Ponto10"]

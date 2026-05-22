@@ -1,0 +1,192 @@
+[gd_scene format=3 uid="uid://d11c0bkyw8ouf"]
+
+[ext_resource type="Script" uid="uid://07sysplyowfl" path="res://scripts/tela_vitoria.gd" id="1_1p2iu"]
+[ext_resource type="FontFile" uid="uid://0e71nn3mgypk" path="res://assets/kenney_kenney-fonts/Fonts/Kenney Mini.ttf" id="3_7gu33"]
+[ext_resource type="Texture2D" uid="uid://boe6eeyeqo2gu" path="res://assets/kenney_ui-pack/PNG/Yellow/Default/button_rectangle_depth_line.png" id="4_7gu33"]
+[ext_resource type="FontFile" uid="uid://bam6gmob6827t" path="res://font/Baloo_2/static/Baloo2-Bold.ttf" id="5_7v1cn"]
+[ext_resource type="Texture2D" uid="uid://bwd2o4sxeh5pb" path="res://assets/kenney_ui-pack/PNG/Extra/Default/icon_play_light.png" id="5_y1lns"]
+[ext_resource type="Texture2D" uid="uid://dc47wfkf3dce7" path="res://assets/kenney_ui-pack/PNG/Green/Double/button_rectangle_depth_line.png" id="6_4kvob"]
+[ext_resource type="Texture2D" uid="uid://cjyp4aq0rylmg" path="res://assets/kenney_ui-pack/PNG/Extra/Default/icon_repeat_light.png" id="7_4kvob"]
+[ext_resource type="Texture2D" uid="uid://ca47cksfc0gtv" path="res://assets/kenney_ui-pack/PNG/Extra/Default/home_light.png" id="8_u0a2f"]
+[ext_resource type="Texture2D" uid="uid://dk6niq1mv8a1u" path="res://assets/kenney_ui-pack/PNG/Red/Default/button_rectangle_depth_line.png" id="9_u0a2f"]
+[ext_resource type="Texture2D" uid="uid://bd854oe3eiahf" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_behindBack.png" id="10_4kvob"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_sxa2i"]
+font = ExtResource("5_7v1cn")
+font_size = 35
+font_color = Color(0.9882353, 0.8039216, 0.07450981, 1)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.8392157)
+
+[sub_resource type="LabelSettings" id="LabelSettings_crc7k"]
+font = ExtResource("5_7v1cn")
+font_size = 35
+font_color = Color(0.18431373, 0.84313726, 0.57254905, 1)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.8392157)
+
+[sub_resource type="LabelSettings" id="LabelSettings_4kvob"]
+font = ExtResource("5_7v1cn")
+font_size = 35
+font_color = Color(1, 0.38431373, 0.48235294, 1)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.8392157)
+
+[node name="TelaVitoria" type="CanvasLayer" unique_id=1669804]
+script = ExtResource("1_1p2iu")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=417750045]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.5882353)
+
+[node name="Panel" type="Panel" parent="." unique_id=1617798762]
+modulate = Color(0.47843137, 0.53333336, 1, 1)
+offset_left = 46.0
+offset_top = 118.0
+offset_right = 679.0
+offset_bottom = 1086.0
+
+[node name="Label" type="Label" parent="." unique_id=1241718057]
+offset_left = 226.0
+offset_top = 168.0
+offset_right = 705.0
+offset_bottom = 260.0
+theme_override_colors/font_color = Color(1, 0.4992829, 0.1390031, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8392157)
+theme_override_fonts/font = ExtResource("3_7gu33")
+theme_override_font_sizes/font_size = 50
+text = "MUITO BEM!"
+
+[node name="BtnProximo" type="TextureButton" parent="." unique_id=812118266]
+anchors_preset = -1
+anchor_left = 0.119444445
+anchor_top = 0.25703126
+anchor_right = 0.87916666
+anchor_bottom = 0.35390624
+texture_normal = ExtResource("4_7gu33")
+stretch_mode = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="BtnProximo" unique_id=80954255]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.5
+offset_top = -6.0
+offset_right = 121.5
+offset_bottom = 51.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "AVANÇAR NÍVEL"
+label_settings = SubResource("LabelSettings_sxa2i")
+
+[node name="TextureRect" type="TextureRect" parent="BtnProximo" unique_id=1641038004]
+modulate = Color(0.9882353, 0.8039216, 0.07450981, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.45521024
+anchor_top = 0.16129032
+anchor_right = 0.5283364
+anchor_bottom = 0.48387095
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_y1lns")
+metadata/_edit_use_anchors_ = true
+
+[node name="BtnReiniciar" type="TextureButton" parent="." unique_id=2072310469]
+anchors_preset = -1
+anchor_left = 0.119444445
+anchor_top = 0.3828125
+anchor_right = 0.87916666
+anchor_bottom = 0.4796875
+texture_normal = ExtResource("6_4kvob")
+stretch_mode = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="BtnReiniciar" unique_id=1801755391]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.5
+offset_top = -7.0
+offset_right = 159.5
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "JOGAR NOVAMENTE"
+label_settings = SubResource("LabelSettings_crc7k")
+
+[node name="TextureRect" type="TextureRect" parent="BtnReiniciar" unique_id=1151770258]
+modulate = Color(0.18431373, 0.84313726, 0.57254905, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46252286
+anchor_top = 0.16935484
+anchor_right = 0.53747714
+anchor_bottom = 0.4919355
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_4kvob")
+metadata/_edit_use_anchors_ = true
+
+[node name="BtnMenu" type="TextureButton" parent="." unique_id=1334193254]
+offset_left = 86.0
+offset_top = 651.0
+offset_right = 633.0
+offset_bottom = 775.0
+texture_normal = ExtResource("9_u0a2f")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="BtnMenu" unique_id=1180935031]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25776964
+anchor_top = 0.43548387
+anchor_right = 0.7605119
+anchor_bottom = 0.8951613
+grow_horizontal = 2
+grow_vertical = 2
+text = "VOLTAR AO MENU"
+label_settings = SubResource("LabelSettings_4kvob")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="BtnMenu" unique_id=540208856]
+modulate = Color(1, 0.38431373, 0.48235294, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.42413166
+anchor_top = 0.024193548
+anchor_right = 0.59232175
+anchor_bottom = 0.6935484
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_u0a2f")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=2057497359]
+offset_left = 298.0
+offset_top = 198.0
+offset_right = 394.0
+offset_bottom = 326.0
+texture = ExtResource("10_4kvob")
+
+[connection signal="mouse_entered" from="BtnProximo" to="." method="_on_btn_proximo_mouse_entered"]
+[connection signal="mouse_exited" from="BtnProximo" to="." method="_on_btn_proximo_mouse_exited"]
+[connection signal="pressed" from="BtnProximo" to="." method="_on_btn_proximo_pressed"]
+[connection signal="mouse_entered" from="BtnReiniciar" to="." method="_on_btn_reiniciar_mouse_entered"]
+[connection signal="mouse_exited" from="BtnReiniciar" to="." method="_on_btn_reiniciar_mouse_exited"]
+[connection signal="pressed" from="BtnReiniciar" to="." method="_on_btn_reiniciar_pressed"]
+[connection signal="mouse_entered" from="BtnMenu" to="." method="_on_btn_menu_mouse_entered"]
+[connection signal="mouse_exited" from="BtnMenu" to="." method="_on_btn_menu_mouse_exited"]
+[connection signal="pressed" from="BtnMenu" to="." method="_on_btn_menu_pressed"]
