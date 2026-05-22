@@ -1,0 +1,208 @@
+[gd_scene format=3 uid="uid://yuqulfsu4cc"]
+
+[ext_resource type="Texture2D" uid="uid://d4ay707cb7k1g" path="res://assets/kenney_animal-pack-redux/kenney_platformer-pack-redux/PNG/Backgrounds/land_background.png" id="1_rtctj"]
+[ext_resource type="Script" uid="uid://dyk06omxsiufs" path="res://scenes/nivel_ordenar_invertido.gd" id="1_tr7wt"]
+[ext_resource type="Script" uid="uid://i7ufcoh86f8j" path="res://scripts/slotpodio.gd" id="2_tr7wt"]
+[ext_resource type="Texture2D" uid="uid://jxo8wkyi5lv3" path="res://assets/podio/podio_4.png" id="3_ue27r"]
+[ext_resource type="Texture2D" uid="uid://n47panb6t3me" path="res://assets/podio/podio_3.png" id="4_sgq2v"]
+[ext_resource type="Texture2D" uid="uid://e0gv85kp7u5f" path="res://assets/podio/podio_2_inverso.png" id="5_fiumj"]
+[ext_resource type="Texture2D" uid="uid://du23n6kud1744" path="res://assets/podio/podio_1_inverso.png" id="6_k2s5q"]
+[ext_resource type="Script" uid="uid://d0d3aqh81brjm" path="res://scripts/ObjetoOrdenacao.gd" id="7_nwypg"]
+[ext_resource type="Texture2D" uid="uid://tse7b52dyd0b" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/rabbit.png" id="9_tr7wt"]
+[ext_resource type="Texture2D" uid="uid://dkx5d5ibl524y" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/pig.png" id="10_ue27r"]
+[ext_resource type="Texture2D" uid="uid://dyokny10ha7pf" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/horse.png" id="11_sgq2v"]
+[ext_resource type="Texture2D" uid="uid://i84o24oniff2" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/giraffe.png" id="12_fiumj"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="12_ttq8x"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="13_cwqat"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="14_yhuxe"]
+[ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="15_2qyfm"]
+[ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="16_rjggn"]
+[ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="17_jnytx"]
+[ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/professor_robo.gd" id="18_n2jfa"]
+[ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="19_0biwr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1unmf"]
+size = Vector2(166, 188)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qp2rx"]
+size = Vector2(166, 172)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ttlku"]
+size = Vector2(166, 130)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d60x6"]
+radius = 39.0
+height = 92.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_rl86s"]
+radius = 54.0
+height = 108.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_v2r3p"]
+radius = 71.0
+height = 142.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ia1qi"]
+radius = 84.0
+height = 188.0
+
+[sub_resource type="Gradient" id="Gradient_v0147"]
+offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
+colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
+
+[node name="NivelOrdenarInvertido" type="Node2D" unique_id=2140990494]
+script = ExtResource("1_tr7wt")
+
+[node name="LandBackground" type="Sprite2D" parent="." unique_id=559018245]
+position = Vector2(290, 630.00006)
+scale = Vector2(1.0701754, 1.0661882)
+texture = ExtResource("1_rtctj")
+
+[node name="Slots" type="Node2D" parent="." unique_id=1666661308]
+position = Vector2(43, 0)
+
+[node name="Slot_4" type="Area2D" parent="Slots" unique_id=1193245526]
+position = Vector2(105, 367)
+scale = Vector2(0.9, 0.9)
+script = ExtResource("2_tr7wt")
+altura_da_peca = 115.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_4" unique_id=871791581]
+scale = Vector2(0.18, 0.18)
+texture = ExtResource("3_ue27r")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_4" unique_id=1437345882]
+position = Vector2(-1, -32)
+shape = SubResource("RectangleShape2D_1unmf")
+
+[node name="Slot_3" type="Area2D" parent="Slots" unique_id=1467898865]
+position = Vector2(338, 376)
+scale = Vector2(1.25, 1.25)
+script = ExtResource("2_tr7wt")
+altura_da_peca = 100.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_3" unique_id=1524445064]
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("4_sgq2v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_3" unique_id=1253352290]
+position = Vector2(0, -40)
+shape = SubResource("RectangleShape2D_qp2rx")
+
+[node name="Slot_2" type="Area2D" parent="Slots" unique_id=942940915]
+position = Vector2(557, 371)
+script = ExtResource("2_tr7wt")
+altura_da_peca = 70.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_2" unique_id=471188768]
+scale = Vector2(0.14, 0.14)
+texture = ExtResource("5_fiumj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_2" unique_id=1881451879]
+position = Vector2(0, -29)
+shape = SubResource("RectangleShape2D_ttlku")
+
+[node name="Slot_1" type="Area2D" parent="Slots" unique_id=103562952]
+position = Vector2(101, 543)
+script = ExtResource("2_tr7wt")
+altura_da_peca = 60.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Slots/Slot_1" unique_id=2137413642]
+scale = Vector2(0.13, 0.13)
+texture = ExtResource("6_k2s5q")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slots/Slot_1" unique_id=1515268070]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_ttlku")
+
+[node name="Pecas" type="Node2D" parent="." unique_id=133996493]
+
+[node name="Peca_Pequena" type="Area2D" parent="Pecas" unique_id=1929076300]
+position = Vector2(167, 823)
+script = ExtResource("7_nwypg")
+nome_do_slot_correto = "Slot_1"
+
+[node name="Sprite2D" type="Sprite2D" parent="Pecas/Peca_Pequena" unique_id=358660521]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("9_tr7wt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pecas/Peca_Pequena" unique_id=1797661755]
+position = Vector2(0, 10)
+shape = SubResource("CapsuleShape2D_d60x6")
+
+[node name="Peca_Media" type="Area2D" parent="Pecas" unique_id=230123052]
+position = Vector2(556, 823)
+script = ExtResource("7_nwypg")
+nome_do_slot_correto = "Slot_2"
+
+[node name="Sprite2D" type="Sprite2D" parent="Pecas/Peca_Media" unique_id=954463997]
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("10_ue27r")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pecas/Peca_Media" unique_id=1062884132]
+shape = SubResource("CapsuleShape2D_rl86s")
+
+[node name="Peca_Grande" type="Area2D" parent="Pecas" unique_id=1342260599]
+position = Vector2(167, 1027)
+script = ExtResource("7_nwypg")
+nome_do_slot_correto = "Slot_3"
+
+[node name="Sprite2D" type="Sprite2D" parent="Pecas/Peca_Grande" unique_id=62931233]
+texture = ExtResource("11_sgq2v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pecas/Peca_Grande" unique_id=979747491]
+position = Vector2(0, 3)
+shape = SubResource("CapsuleShape2D_v2r3p")
+
+[node name="Peca_Gigante" type="Area2D" parent="Pecas" unique_id=1494131814]
+position = Vector2(556, 1027)
+script = ExtResource("7_nwypg")
+nome_do_slot_correto = "Slot_4"
+
+[node name="Sprite2D" type="Sprite2D" parent="Pecas/Peca_Gigante" unique_id=1698164995]
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("12_fiumj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pecas/Peca_Gigante" unique_id=1583352100]
+position = Vector2(0, 7)
+shape = SubResource("CapsuleShape2D_ia1qi")
+
+[node name="SonsLocais" type="Node" parent="." unique_id=584591454]
+
+[node name="SomClickObjeto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=2084781893]
+stream = ExtResource("12_ttq8x")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1535484252]
+stream = ExtResource("13_cwqat")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=118825835]
+stream = ExtResource("14_yhuxe")
+
+[node name="SomClick" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1959985631]
+stream = ExtResource("15_2qyfm")
+
+[node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1171203139]
+stream = ExtResource("16_rjggn")
+
+[node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1244370229]
+stream = ExtResource("12_ttq8x")
+
+[node name="ProfessorRobo" type="Sprite2D" parent="." unique_id=993348338]
+position = Vector2(663, 122)
+texture = ExtResource("17_jnytx")
+script = ExtResource("18_n2jfa")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=1674708965]
+position = Vector2(388, 200)
+emitting = false
+amount = 50
+texture = ExtResource("19_0biwr")
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(9.8, 980)
+initial_velocity_min = 300.0
+initial_velocity_max = 300.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_v0147")

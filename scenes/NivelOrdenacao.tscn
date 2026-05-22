@@ -44,6 +44,7 @@ colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055
 
 [node name="NivelOrdenacao" type="Node2D" unique_id=1131932877]
 script = ExtResource("1_d7h3i")
+proxima_fase_cena = "uid://do08eyjdm3u4b"
 
 [node name="LandBackground" type="Sprite2D" parent="." unique_id=729202061]
 position = Vector2(290, 630.00006)
