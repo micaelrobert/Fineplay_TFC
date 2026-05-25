@@ -7,14 +7,27 @@ const BASE_SIZE := Vector2(720, 1280)
 
 var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 
-@export var cor_linha: Color = Color.WHITE
-@export var cor_certa: Color = Color.GREEN
+# ==========================================
+# CONFIGURAÇÃO VISUAL DAS LINHAS
+# ==========================================
+@export var cor_linha_preview: Color = Color(1.0, 1.0, 1.0, 0.72)
+@export var cor_linha_preview_sombra: Color = Color(0.0, 0.0, 0.0, 0.18)
+
+@export var cor_linha_final: Color = Color(0.20, 0.85, 0.45, 0.42)
+@export var cor_linha_final_sombra: Color = Color(0.0, 0.0, 0.0, 0.10)
+
+@export var largura_linha_preview: float = 8.0
+@export var largura_linha_preview_sombra: float = 16.0
+
+@export var largura_linha_final: float = 5.0
+@export var largura_linha_final_sombra: float = 10.0
 
 # ==========================================
 # RESPONSIVIDADE
 # ==========================================
 @onready var fundo_responsivo: Sprite2D = $FundoResponsivo
 @onready var area_jogo: Node2D = $AreaJogo
+@onready var camada_linhas: Node2D = $CamadaLinhas
 
 # ==========================================
 # REFERÊNCIAS DE FEEDBACK
@@ -30,6 +43,7 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 
 var ponto_inicial = null
 var linha_atual: Line2D = null
+var linha_sombra_atual: Line2D = null
 var acertos := 0
 
 
@@ -52,6 +66,9 @@ func _ajustar_responsivo() -> void:
 
 	# Centraliza a área lógica 720x1280 dentro da tela real.
 	area_jogo.position = (tamanho_tela - BASE_SIZE) / 2.0
+
+	# A camada de linhas fica no root usando coordenadas globais.
+	camada_linhas.position = Vector2.ZERO
 
 	# Faz o fundo cobrir toda a tela real.
 	if fundo_responsivo and fundo_responsivo.texture:
@@ -117,7 +134,12 @@ func _input(event) -> void:
 			tentar_iniciar_linha(ponto)
 
 	elif event is InputEventMouseMotion and linha_atual:
-		linha_atual.set_point_position(1, get_global_mouse_position())
+		var pos_mouse := get_global_mouse_position()
+
+		linha_atual.set_point_position(1, pos_mouse)
+
+		if linha_sombra_atual:
+			linha_sombra_atual.set_point_position(1, pos_mouse)
 
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		if linha_atual:
@@ -156,19 +178,57 @@ func tentar_iniciar_linha(ponto) -> void:
 
 
 func criar_visual_linha(pos_inicial: Vector2) -> void:
+	# Linha de sombra: cria profundidade sem poluir visualmente.
+	linha_sombra_atual = Line2D.new()
+	linha_sombra_atual.width = largura_linha_preview_sombra
+	linha_sombra_atual.default_color = cor_linha_preview_sombra
+	linha_sombra_atual.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	linha_sombra_atual.end_cap_mode = Line2D.LINE_CAP_ROUND
+	linha_sombra_atual.joint_mode = Line2D.LINE_JOINT_ROUND
+	linha_sombra_atual.z_index = 5
+	linha_sombra_atual.add_point(pos_inicial)
+	linha_sombra_atual.add_point(get_global_mouse_position())
+	camada_linhas.add_child(linha_sombra_atual)
+
+	# Linha principal: visível durante o arrasto, mas sem brilho excessivo.
 	linha_atual = Line2D.new()
-	linha_atual.width = 12.0
-	linha_atual.default_color = cor_linha
+	linha_atual.width = largura_linha_preview
+	linha_atual.default_color = cor_linha_preview
 	linha_atual.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	linha_atual.end_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_atual.z_index = 50
-
-	# A linha fica no root usando coordenadas globais.
-	# Isso evita desalinhamento depois que a AreaJogo é centralizada.
+	linha_atual.joint_mode = Line2D.LINE_JOINT_ROUND
+	linha_atual.z_index = 6
 	linha_atual.add_point(pos_inicial)
 	linha_atual.add_point(get_global_mouse_position())
+	camada_linhas.add_child(linha_atual)
 
-	add_child(linha_atual)
+
+func transformar_linha_em_acerto(pos_final: Vector2) -> void:
+	if linha_sombra_atual:
+		linha_sombra_atual.set_point_position(1, pos_final)
+		linha_sombra_atual.width = largura_linha_final_sombra
+		linha_sombra_atual.default_color = cor_linha_final_sombra
+		linha_sombra_atual.z_index = 1
+
+	if linha_atual:
+		linha_atual.set_point_position(1, pos_final)
+		linha_atual.width = largura_linha_final
+		linha_atual.default_color = cor_linha_final
+		linha_atual.z_index = 2
+
+	linha_sombra_atual = null
+	linha_atual = null
+
+
+func apagar_linha_atual() -> void:
+	if linha_sombra_atual:
+		linha_sombra_atual.queue_free()
+
+	if linha_atual:
+		linha_atual.queue_free()
+
+	linha_sombra_atual = null
+	linha_atual = null
 
 
 func finalizar_linha() -> void:
@@ -182,8 +242,7 @@ func finalizar_linha() -> void:
 				acertou = true
 
 	if acertou:
-		linha_atual.set_point_position(1, ponto_final.global_position)
-		linha_atual.default_color = cor_certa
+		transformar_linha_em_acerto(ponto_final.global_position)
 
 		ponto_inicial.esta_conectado_saida = true
 		ponto_final.esta_conectado_chegada = true
@@ -191,7 +250,6 @@ func finalizar_linha() -> void:
 		if som_acerto:
 			som_acerto.play()
 
-		linha_atual = null
 		ponto_inicial = null
 
 		verificar_vitoria()
@@ -200,8 +258,7 @@ func finalizar_linha() -> void:
 			if som_erro:
 				som_erro.play()
 
-		linha_atual.queue_free()
-		linha_atual = null
+		apagar_linha_atual()
 		ponto_inicial = null
 
 

@@ -229,6 +229,8 @@ scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_5eqga")
 
+[node name="CamadaLinhas" type="Node2D" parent="." unique_id=1066483978]
+
 [editable path="AreaJogo/Banana"]
 [editable path="AreaJogo/BananaPreta"]
 [editable path="AreaJogo/Coco"]
