@@ -22,6 +22,8 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 @export var largura_linha_final: float = 5.0
 @export var largura_linha_final_sombra: float = 10.0
 
+@export var distancia_minima_arrasto: float = 18.0
+
 # ==========================================
 # RESPONSIVIDADE
 # ==========================================
@@ -44,7 +46,10 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 var ponto_inicial = null
 var linha_atual: Line2D = null
 var linha_sombra_atual: Line2D = null
+
 var acertos := 0
+var arrastou_linha := false
+var pos_inicio_interacao := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -130,7 +135,17 @@ func randomizar_posicoes() -> void:
 func _input(event) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var ponto = buscar_ponto_sob_mouse()
+
+		# Se já existe uma linha aberta, o próximo clique pode finalizar a ligação.
+		if linha_atual:
+			if ponto and ponto != ponto_inicial:
+				finalizar_linha_com_ponto(ponto)
+			return
+
+		# Se ainda não existe linha aberta, tenta iniciar uma nova.
 		if ponto:
+			pos_inicio_interacao = get_global_mouse_position()
+			arrastou_linha = false
 			tentar_iniciar_linha(ponto)
 
 	elif event is InputEventMouseMotion and linha_atual:
@@ -141,8 +156,13 @@ func _input(event) -> void:
 		if linha_sombra_atual:
 			linha_sombra_atual.set_point_position(1, pos_mouse)
 
+		if pos_mouse.distance_to(pos_inicio_interacao) >= distancia_minima_arrasto:
+			arrastou_linha = true
+
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		if linha_atual:
+		# Se arrastou, finaliza ao soltar.
+		# Se foi só clique, mantém a linha aberta aguardando o segundo ponto.
+		if linha_atual and arrastou_linha:
 			finalizar_linha()
 
 
@@ -233,6 +253,16 @@ func apagar_linha_atual() -> void:
 
 func finalizar_linha() -> void:
 	var ponto_final = buscar_ponto_sob_mouse()
+
+	if ponto_final:
+		finalizar_linha_com_ponto(ponto_final)
+	else:
+		apagar_linha_atual()
+		ponto_inicial = null
+		arrastou_linha = false
+
+
+func finalizar_linha_com_ponto(ponto_final) -> void:
 	var acertou := false
 
 	if ponto_final and ponto_final != ponto_inicial:
@@ -251,6 +281,7 @@ func finalizar_linha() -> void:
 			som_acerto.play()
 
 		ponto_inicial = null
+		arrastou_linha = false
 
 		verificar_vitoria()
 	else:
@@ -260,6 +291,7 @@ func finalizar_linha() -> void:
 
 		apagar_linha_atual()
 		ponto_inicial = null
+		arrastou_linha = false
 
 
 func verificar_vitoria() -> void:

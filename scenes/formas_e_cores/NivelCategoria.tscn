@@ -25,6 +25,7 @@
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="24_y80la"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="25_rpuow"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="26_sftqj"]
+[ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="27_1r2tf"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="27_m7hl2"]
 
 [sub_resource type="Gradient" id="Gradient_65tx0"]
@@ -241,6 +242,8 @@ position = Vector2(0, 0)
 position = Vector2(663, 122)
 texture = ExtResource("18_374w3")
 script = ExtResource("19_6wpb1")
+
+[node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("27_1r2tf")]
 
 [editable path="AreaJogo/ObjetoArrastavel"]
 [editable path="AreaJogo/ObjetoArrastavel8"]

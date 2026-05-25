@@ -19,6 +19,7 @@
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="14_ab8er"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="15_wrl74"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_fkv7b"]
+[ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="20_tst06"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jyl56"]
 radius = 59.5399
@@ -186,6 +187,8 @@ initial_velocity_max = 300.0
 scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_65tx0")
+
+[node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("20_tst06")]
 
 [editable path="AreaJogo/ObjetoArrastavel"]
 [editable path="AreaJogo/ObjetoArrastavel2"]

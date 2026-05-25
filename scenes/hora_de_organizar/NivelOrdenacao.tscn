@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="14_3knis"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="15_cx8dd"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="16_3sg5h"]
+[ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="17_cbwia"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iyi0d"]
 size = Vector2(166, 188)
@@ -175,3 +176,5 @@ initial_velocity_max = 300.0
 scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_jsddy")
+
+[node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("17_cbwia")]

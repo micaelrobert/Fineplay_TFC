@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="15_0b30w"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="16_wgyqq"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="17_p1nwr"]
+[ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="18_xlh6m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wuhy0"]
 size = Vector2(132.94116, 116)
@@ -230,6 +231,8 @@ scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_5eqga")
 
 [node name="CamadaLinhas" type="Node2D" parent="." unique_id=1066483978]
+
+[node name="BotaoVoltarFase" parent="CamadaLinhas" unique_id=1138187997 instance=ExtResource("18_xlh6m")]
 
 [editable path="AreaJogo/Banana"]
 [editable path="AreaJogo/BananaPreta"]

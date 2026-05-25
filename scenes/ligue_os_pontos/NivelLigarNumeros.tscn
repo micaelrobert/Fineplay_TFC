@@ -21,6 +21,7 @@
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="18_vbbpp"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="19_vbbpp"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_rfjyx"]
+[ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="22_3frem"]
 
 [sub_resource type="Gradient" id="Gradient_h83n1"]
 offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
@@ -267,6 +268,8 @@ scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_h83n1")
 
 [node name="CamadaLinhas" type="Node2D" parent="." unique_id=1216902111]
+
+[node name="BotaoVoltarFase" parent="CamadaLinhas" unique_id=1138187997 instance=ExtResource("22_3frem")]
 
 [editable path="AreaJogo/Ponto"]
 [editable path="AreaJogo/Ponto2"]

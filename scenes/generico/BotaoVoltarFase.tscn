@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://duu08rukk8b82"]
+
+[ext_resource type="Script" uid="uid://bfj0umpsh0acu" path="res://scripts/generic/botao_voltar_fase.gd" id="1_d72pk"]
+[ext_resource type="Texture2D" uid="uid://ca47cksfc0gtv" path="res://assets/kenney_ui-pack/PNG/Extra/Default/home_light.png" id="7_83u2t"]
+
+[node name="BotaoVoltarFase" type="CanvasLayer" unique_id=1138187997]
+script = ExtResource("1_d72pk")
+
+[node name="UIResponsiva" type="Control" parent="." unique_id=905320614]
+custom_minimum_size = Vector2(720, 1280)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 720.0
+offset_bottom = 1280.0
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UIResponsiva" unique_id=2057785835]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="AreaJogo" type="Control" parent="UIResponsiva/CenterContainer" unique_id=1503616086]
+custom_minimum_size = Vector2(720, 1280)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="BtnVoltarFase" type="TextureButton" parent="UIResponsiva/CenterContainer/AreaJogo" unique_id=1254030946]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 7.0
+offset_right = 120.0
+offset_bottom = 110.0
+texture_normal = ExtResource("7_83u2t")
+ignore_texture_size = true
+stretch_mode = 0
+
+[connection signal="mouse_entered" from="UIResponsiva/CenterContainer/AreaJogo/BtnVoltarFase" to="." method="_on_btn_voltar_fase_mouse_entered"]
+[connection signal="mouse_exited" from="UIResponsiva/CenterContainer/AreaJogo/BtnVoltarFase" to="." method="_on_btn_voltar_fase_mouse_exited"]
+[connection signal="pressed" from="UIResponsiva/CenterContainer/AreaJogo/BtnVoltarFase" to="." method="_on_btn_voltar_fase_pressed"]
