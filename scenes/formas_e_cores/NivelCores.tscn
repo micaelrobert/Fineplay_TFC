@@ -1,0 +1,206 @@
+[gd_scene format=3 uid="uid://ee8gmbyfucag"]
+
+[ext_resource type="Script" uid="uid://b6gofs1linp4" path="res://scripts/formas_e_cores/nivel_cores.gd" id="1_uwl6c"]
+[ext_resource type="Texture2D" uid="uid://cctocy5rnc7h1" path="res://assets/kenney_platformer-pack-redux/PNG/Backgrounds/news/colored_colors.png" id="2_mj23w"]
+[ext_resource type="Texture2D" uid="uid://cgmc1j0rm6mjm" path="res://assets/kenney_shape-characters/PNG/Default/red_body_square.png" id="3_uwl6c"]
+[ext_resource type="Texture2D" uid="uid://xmb5148mplj8" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_square.png" id="3_xfnar"]
+[ext_resource type="PackedScene" uid="uid://brrtkn3hdao4i" path="res://scenes/formas_e_cores/ObjetoArrastavel.tscn" id="4_53orq"]
+[ext_resource type="Texture2D" uid="uid://71emhwlyq7i5" path="res://assets/kenney_shape-characters/PNG/Default/face_brava.png" id="5_1xre3"]
+[ext_resource type="Texture2D" uid="uid://dlvmwhtvaksw2" path="res://assets/kenney_shape-characters/PNG/Default/face_feliz.png" id="6_yiw0n"]
+[ext_resource type="Texture2D" uid="uid://cogmhb8gd0ory" path="res://assets/kenney_shape-characters/PNG/Default/red_body_rhombus.png" id="7_rlxj8"]
+[ext_resource type="Texture2D" uid="uid://c1afblr4c5veh" path="res://assets/kenney_shape-characters/PNG/Default/face_f.png" id="8_vfawh"]
+[ext_resource type="Texture2D" uid="uid://cwo5a1negkaeb" path="res://assets/kenney_shape-characters/PNG/Default/red_body_circle.png" id="9_jg25f"]
+[ext_resource type="Texture2D" uid="uid://dp11eip0610cg" path="res://assets/kenney_shape-characters/PNG/Default/face_a.png" id="10_ghu7h"]
+[ext_resource type="Texture2D" uid="uid://wwem30g3af0w" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_rhombus.png" id="11_vtl1x"]
+[ext_resource type="Texture2D" uid="uid://ch4gtnidag8v4" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="12_kgh8n"]
+[ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="13_sc7ks"]
+[ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="14_qloip"]
+[ext_resource type="AudioStream" uid="uid://bdp3cstl6wrsd" path="res://music/Fineplay.mp3" id="16_kofl6"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="17_l3ewq"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="18_0heme"]
+[ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="19_k6lnc"]
+[ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="20_r6lu0"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="21_m4hpg"]
+[ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="22_n3ei2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ln2lh"]
+size = Vector2(111, 104)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kt1b1"]
+size = Vector2(110, 108)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ln2lh"]
+radius = 60.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xrfph"]
+radius = 63.1981
+
+[sub_resource type="Gradient" id="Gradient_65tx0"]
+offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
+colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
+
+[node name="NivelCores" type="Node2D" unique_id=1712084664]
+script = ExtResource("1_uwl6c")
+proxima_fase_cena = "uid://cyfni3cibs6cp"
+
+[node name="FundoResponsivo" type="Sprite2D" parent="." unique_id=1630728694]
+position = Vector2(363.00003, 572)
+scale = Vector2(1.3301436, 1.3645437)
+texture = ExtResource("2_mj23w")
+
+[node name="SonsLocais" type="Node" parent="." unique_id=106124536]
+
+[node name="MusicaFundo" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1231522212]
+stream = ExtResource("16_kofl6")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=54503146]
+stream = ExtResource("17_l3ewq")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1463778123]
+stream = ExtResource("18_0heme")
+
+[node name="SomClick" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1842103634]
+stream = ExtResource("19_k6lnc")
+
+[node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=107758879]
+stream = ExtResource("20_r6lu0")
+
+[node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1794983944]
+stream = ExtResource("21_m4hpg")
+
+[node name="AreaJogo" type="Node2D" parent="." unique_id=1284791405]
+
+[node name="SlotVermelho" type="Area2D" parent="AreaJogo" unique_id=930317747 groups=["slots"]]
+modulate = Color(0.8745098, 0, 0, 1)
+position = Vector2(136, 354)
+
+[node name="Sprite2D" type="Sprite2D" parent="AreaJogo/SlotVermelho" unique_id=1299873200]
+modulate = Color(1, 0, 0, 1)
+z_index = 1
+position = Vector2(0, 1)
+scale = Vector2(1.466, 1.413)
+texture = ExtResource("3_uwl6c")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaJogo/SlotVermelho" unique_id=168724394]
+position = Vector2(0, 1)
+shape = SubResource("RectangleShape2D_ln2lh")
+
+[node name="SlotAzul" type="Area2D" parent="AreaJogo" unique_id=1092729531 groups=["slots"]]
+modulate = Color(0, 0.2509804, 0.8235294, 1)
+position = Vector2(614, 352)
+
+[node name="Sprite2D" type="Sprite2D" parent="AreaJogo/SlotAzul" unique_id=648298350]
+modulate = Color(0, 0, 1, 1)
+position = Vector2(-1, 1.5258789e-05)
+scale = Vector2(1.45, 1.4125)
+texture = ExtResource("3_xfnar")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaJogo/SlotAzul" unique_id=679810127]
+modulate = Color(0.18039216, 0.52156866, 0.5882353, 0.9254902)
+position = Vector2(1, 0)
+shape = SubResource("RectangleShape2D_kt1b1")
+debug_color = Color(0, 0.5176471, 0.8392157, 0)
+
+[node name="ObjetoArrastavel" parent="AreaJogo" unique_id=2004090775 groups=["pecas"] instance=ExtResource("4_53orq")]
+position = Vector2(268, 1078)
+slot_correto_nome = "SlotVermelho"
+textura_brava = ExtResource("5_1xre3")
+textura_feliz = ExtResource("6_yiw0n")
+
+[node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel" index="0" unique_id=1498252683]
+modulate = Color(1, 0, 0, 1)
+z_index = 1
+position = Vector2(0, -1)
+scale = Vector2(1.4625, 1.4375)
+texture = ExtResource("7_rlxj8")
+
+[node name="CollisionShape2D" parent="AreaJogo/ObjetoArrastavel" index="1" unique_id=763962380]
+position = Vector2(0, 0)
+
+[node name="Rosto" type="Sprite2D" parent="AreaJogo/ObjetoArrastavel" unique_id=851313742]
+z_index = 1
+texture = ExtResource("5_1xre3")
+
+[node name="ObjetoArrastavel2" parent="AreaJogo" unique_id=124720534 groups=["pecas"] instance=ExtResource("4_53orq")]
+position = Vector2(627, 1074)
+slot_correto_nome = "SlotVermelho"
+textura_brava = ExtResource("5_1xre3")
+textura_feliz = ExtResource("8_vfawh")
+
+[node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel2" index="0" unique_id=1498252683]
+modulate = Color(1, 0, 0, 1)
+z_index = 1
+position = Vector2(-2.0000305, 3.0000038)
+scale = Vector2(1.5124992, 1.4515624)
+texture = ExtResource("9_jg25f")
+
+[node name="CollisionShape2D" parent="AreaJogo/ObjetoArrastavel2" index="1" unique_id=763962380]
+modulate = Color(0.9254902, 0.09803922, 0.15294118, 1)
+position = Vector2(0, 2)
+shape = SubResource("CircleShape2D_ln2lh")
+
+[node name="Rosto" type="Sprite2D" parent="AreaJogo/ObjetoArrastavel2" unique_id=1197911504]
+z_index = 1
+texture = ExtResource("5_1xre3")
+
+[node name="ObjetoArrastavel3" parent="AreaJogo" unique_id=9908497 groups=["pecas"] instance=ExtResource("4_53orq")]
+position = Vector2(100, 1079)
+slot_correto_nome = "SlotAzul"
+textura_brava = ExtResource("5_1xre3")
+textura_feliz = ExtResource("10_ghu7h")
+
+[node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel3" index="0" unique_id=1498252683]
+modulate = Color(0, 0, 1, 1)
+position = Vector2(1.9998779, 1.9073486e-06)
+scale = Vector2(1.45, 1.60625)
+texture = ExtResource("11_vtl1x")
+
+[node name="CollisionShape2D" parent="AreaJogo/ObjetoArrastavel3" index="1" unique_id=763962380]
+position = Vector2(0, -4)
+shape = SubResource("CircleShape2D_xrfph")
+
+[node name="Rosto" type="Sprite2D" parent="AreaJogo/ObjetoArrastavel3" unique_id=977882303]
+texture = ExtResource("5_1xre3")
+
+[node name="ObjetoArrastavel4" parent="AreaJogo" unique_id=1355868750 groups=["pecas"] instance=ExtResource("4_53orq")]
+position = Vector2(454, 1078)
+slot_correto_nome = "SlotAzul"
+textura_brava = ExtResource("5_1xre3")
+textura_feliz = ExtResource("6_yiw0n")
+
+[node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel4" index="0" unique_id=1498252683]
+modulate = Color(0, 0, 1, 1)
+position = Vector2(0, -1)
+scale = Vector2(1.4625, 1.4375)
+texture = ExtResource("12_kgh8n")
+
+[node name="CollisionShape2D" parent="AreaJogo/ObjetoArrastavel4" index="1" unique_id=763962380]
+position = Vector2(0, 0)
+
+[node name="Rosto" type="Sprite2D" parent="AreaJogo/ObjetoArrastavel4" unique_id=1582648152]
+texture = ExtResource("5_1xre3")
+
+[node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=1682739646]
+position = Vector2(663, 122)
+texture = ExtResource("13_sc7ks")
+script = ExtResource("14_qloip")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=297247541]
+position = Vector2(382, 391)
+emitting = false
+amount = 50
+texture = ExtResource("22_n3ei2")
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(9.8, 980)
+initial_velocity_min = 300.0
+initial_velocity_max = 300.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_65tx0")
+
+[editable path="AreaJogo/ObjetoArrastavel"]
+[editable path="AreaJogo/ObjetoArrastavel2"]
+[editable path="AreaJogo/ObjetoArrastavel3"]
+[editable path="AreaJogo/ObjetoArrastavel4"]

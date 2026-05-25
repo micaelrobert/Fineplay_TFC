@@ -1,25 +1,25 @@
-[gd_scene load_steps=5 format=3 uid="uid://dc3pof8r7xo10"]
+[gd_scene format=3 uid="uid://dc3pof8r7xo10"]
 
-[ext_resource type="Script" uid="uid://tja8vy2ytxv4" path="res://scripts/ponto.gd" id="1_gsocy"]
+[ext_resource type="Script" uid="uid://tja8vy2ytxv4" path="res://scripts/generic/ponto.gd" id="1_gsocy"]
 [ext_resource type="Texture2D" uid="uid://g5d3cmd3f7cp" path="res://assets/kenney_ui-pack/PNG/Blue/Default/button_round_depth_flat.png" id="1_lygq8"]
 [ext_resource type="Texture2D" uid="uid://cp1a246jldjbc" path="res://assets/kenney_animal-pack-redux/PNG/Round/bear.png" id="2_gsocy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ts74w"]
-size = Vector2(105, 116)
+size = Vector2(103.52942, 116)
 
-[node name="Ponto" type="Area2D" groups=["pontos"]]
+[node name="Ponto" type="Area2D" unique_id=993975072 groups=["pontos"]]
 script = ExtResource("1_gsocy")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1244287027]
 position = Vector2(1, -7.1054274e-15)
 scale = Vector2(0.19531249, 0.19531251)
 texture = ExtResource("1_lygq8")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1646985666]
 position = Vector2(1, -1)
 shape = SubResource("RectangleShape2D_ts74w")
 
-[node name="Sprite2D2" type="Sprite2D" parent="."]
+[node name="Sprite2D2" type="Sprite2D" parent="." unique_id=357826492]
 position = Vector2(-1, -1)
 scale = Vector2(0.6818182, 0.70075756)
 texture = ExtResource("2_gsocy")

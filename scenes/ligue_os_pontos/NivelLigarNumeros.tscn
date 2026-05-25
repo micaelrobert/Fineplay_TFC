@@ -1,0 +1,278 @@
+[gd_scene format=3 uid="uid://cnt5wbkfygc4v"]
+
+[ext_resource type="Script" uid="uid://bwhmorbee6htw" path="res://scripts/ligue_os_pontos/nivel_ligar_numeros.gd" id="1_vbbpp"]
+[ext_resource type="Texture2D" uid="uid://c412r5cw7mo7c" path="res://assets/kenney_platformer-pack-redux/PNG/Backgrounds/news/colored_school.png" id="2_u670g"]
+[ext_resource type="PackedScene" uid="uid://dc3pof8r7xo10" path="res://scenes/generico/Ponto.tscn" id="3_btiya"]
+[ext_resource type="Texture2D" uid="uid://ck58j4a7kpvgx" path="res://assets/kenney_ui-pack/PNG/Red/Default/button_round_border.png" id="4_6470d"]
+[ext_resource type="FontFile" uid="uid://cqxjmhdvoxh1s" path="res://assets/kenney_kenney-fonts/Fonts/Kenney Blocks.ttf" id="5_w146j"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="6_syp62"]
+[ext_resource type="Texture2D" uid="uid://xjp1xo0gwoyh" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_roxa.png" id="6_tvc8x"]
+[ext_resource type="Texture2D" uid="uid://bh1am83jtq3w0" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_laranja.png" id="7_coq2q"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="7_dixt7"]
+[ext_resource type="Texture2D" uid="uid://dt28l5k47d31d" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_preta.png" id="8_b1ymn"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="8_s3x8e"]
+[ext_resource type="Texture2D" uid="uid://ciw2g22newaiw" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_verde.png" id="9_m3wkg"]
+[ext_resource type="Texture2D" uid="uid://rqxbg05bchrq" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_ciano.png" id="10_s1n0v"]
+[ext_resource type="Texture2D" uid="uid://dvj21ktscram1" path="res://assets/kenney_ui-pack/PNG/Grey/Default/button_round_border.png" id="11_coq2q"]
+[ext_resource type="Texture2D" uid="uid://3oatvwx7g3do" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_marrom.png" id="12_coq2q"]
+[ext_resource type="Texture2D" uid="uid://bsit2biyfu1su" path="res://assets/kenney_ui-pack/PNG/Blue/Default/button_round_border.png" id="13_b1ymn"]
+[ext_resource type="Texture2D" uid="uid://cblsx8q7xc8ay" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_rosa.png" id="14_m3wkg"]
+[ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="18_s1n0v"]
+[ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="18_vbbpp"]
+[ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="19_vbbpp"]
+[ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_rfjyx"]
+
+[sub_resource type="Gradient" id="Gradient_h83n1"]
+offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
+colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
+
+[node name="NivelLigar" type="Node2D" unique_id=1931865823]
+script = ExtResource("1_vbbpp")
+
+[node name="FundoResponsivo" type="Sprite2D" parent="." unique_id=1630688205]
+position = Vector2(348, 597)
+scale = Vector2(1.1658692, 1.2384372)
+texture = ExtResource("2_u670g")
+
+[node name="SonsLocais" type="Node" parent="." unique_id=2059553741]
+
+[node name="SomClickObjeto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1203856467]
+stream = ExtResource("6_syp62")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=637192287]
+stream = ExtResource("7_dixt7")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=804514418]
+stream = ExtResource("8_s3x8e")
+
+[node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=979637792]
+stream = ExtResource("18_vbbpp")
+
+[node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1833308105]
+stream = ExtResource("6_syp62")
+
+[node name="AreaJogo" type="Node2D" parent="." unique_id=1166639759]
+
+[node name="Ponto" parent="AreaJogo" unique_id=363203372 instance=ExtResource("3_btiya")]
+position = Vector2(61, 272)
+valor_numero = 1
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("4_6470d")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto" unique_id=1810757940]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.7254902, 0.24313726, 0.32156864, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "1"
+
+[node name="Ponto2" parent="AreaJogo" unique_id=1349422404 instance=ExtResource("3_btiya")]
+position = Vector2(624, 298)
+valor_numero = 2
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto2" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("6_tvc8x")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto2" unique_id=1369848315]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.627451, 0.15294118, 0.8666667, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "2"
+
+[node name="Ponto3" parent="AreaJogo" unique_id=1141572722 instance=ExtResource("3_btiya")]
+position = Vector2(250, 375)
+valor_numero = 3
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto3" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("7_coq2q")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto3" unique_id=270678738]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.9882353, 0.6784314, 0.36862746, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "3"
+
+[node name="Ponto4" parent="AreaJogo" unique_id=1532677773 instance=ExtResource("3_btiya")]
+position = Vector2(433, 424)
+id_par = 4
+valor_numero = 4
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto4" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("8_b1ymn")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto4" unique_id=624920424]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.2627451, 0.2627451, 0.2627451, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "4"
+
+[node name="Ponto5" parent="AreaJogo" unique_id=2009323598 instance=ExtResource("3_btiya")]
+position = Vector2(153, 615)
+id_par = 5
+valor_numero = 5
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto5" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("9_m3wkg")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto5" unique_id=540848405]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.28235295, 0.96862745, 0.28235295, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "5"
+
+[node name="Ponto6" parent="AreaJogo" unique_id=322690589 instance=ExtResource("3_btiya")]
+position = Vector2(572, 567)
+id_par = 6
+valor_numero = 6
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto6" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("10_s1n0v")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto6" unique_id=1656956554]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.2627451, 0.9647059, 0.9647059, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "6"
+
+[node name="Ponto7" parent="AreaJogo" unique_id=522145859 instance=ExtResource("3_btiya")]
+position = Vector2(332, 766)
+valor_numero = 7
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto7" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("11_coq2q")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto7" unique_id=1593706642]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.88235295, 0.8862745, 0.92156863, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "7"
+
+[node name="Ponto8" parent="AreaJogo" unique_id=974583713 instance=ExtResource("3_btiya")]
+position = Vector2(622, 797)
+valor_numero = 8
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto8" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("12_coq2q")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto8" unique_id=1375477736]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.80784315, 0.54509807, 0.32941177, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "8"
+
+[node name="Ponto9" parent="AreaJogo" unique_id=736025310 instance=ExtResource("3_btiya")]
+position = Vector2(136, 1007)
+valor_numero = 9
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto9" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("13_b1ymn")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto9" unique_id=909591851]
+offset_left = -17.0
+offset_top = -45.0
+offset_right = 24.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.12156863, 0.63529414, 0.85490197, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 55
+text = "9"
+
+[node name="Ponto10" parent="AreaJogo" unique_id=1932290127 instance=ExtResource("3_btiya")]
+position = Vector2(431, 979)
+valor_numero = 10
+
+[node name="Sprite2D2" parent="AreaJogo/Ponto10" index="2" unique_id=357826492]
+position = Vector2(1.0000019, -1.0000014)
+scale = Vector2(1.546875, 1.515625)
+texture = ExtResource("14_m3wkg")
+
+[node name="Label" type="Label" parent="AreaJogo/Ponto10" unique_id=1110478721]
+offset_left = -30.0
+offset_top = -39.0
+offset_right = 53.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.98039216, 0.3529412, 0.6666667, 1)
+theme_override_fonts/font = ExtResource("5_w146j")
+theme_override_font_sizes/font_size = 45
+text = "10"
+
+[node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=1213904615]
+position = Vector2(663, 122)
+texture = ExtResource("18_s1n0v")
+script = ExtResource("19_vbbpp")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=587418008]
+position = Vector2(388, 200)
+emitting = false
+amount = 50
+texture = ExtResource("20_rfjyx")
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(9.8, 980)
+initial_velocity_min = 300.0
+initial_velocity_max = 300.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_h83n1")
+
+[editable path="AreaJogo/Ponto"]
+[editable path="AreaJogo/Ponto2"]
+[editable path="AreaJogo/Ponto3"]
+[editable path="AreaJogo/Ponto4"]
+[editable path="AreaJogo/Ponto5"]
+[editable path="AreaJogo/Ponto6"]
+[editable path="AreaJogo/Ponto7"]
+[editable path="AreaJogo/Ponto8"]
+[editable path="AreaJogo/Ponto9"]
+[editable path="AreaJogo/Ponto10"]

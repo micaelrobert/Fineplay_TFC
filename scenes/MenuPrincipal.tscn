@@ -24,55 +24,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_cjknc")
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=1124263764]
-layout_mode = 0
-offset_left = -163.0
-offset_top = -9.0
-offset_right = 861.0
-offset_bottom = 1280.0
-texture = ExtResource("2_f5jwn")
-
-[node name="Label" type="Label" parent="." unique_id=1405273323]
-layout_mode = 0
-offset_left = 224.0
-offset_top = 330.0
-offset_right = 524.0
-offset_bottom = 443.0
-text = "FINEPLAY"
-label_settings = SubResource("LabelSettings_4togl")
-
-[node name="Botao_Jogar" type="Button" parent="." unique_id=313585312]
-layout_mode = 0
-offset_left = 216.0
-offset_top = 1034.0
-offset_right = 535.0
-offset_bottom = 1171.0
-theme_override_fonts/font = ExtResource("3_4o3yp")
-theme_override_font_sizes/font_size = 36
-
-[node name="TextureRect" type="TextureRect" parent="Botao_Jogar" unique_id=1249910487]
-layout_mode = 0
-offset_left = 325.0
-offset_top = -5.0
-offset_right = 421.0
-offset_bottom = 123.0
-texture = ExtResource("4_8ytrl")
-
-[node name="TextureRect2" type="TextureRect" parent="Botao_Jogar" unique_id=1739959316]
-modulate = Color(0.5019608, 0.74509805, 0.12156863, 1)
+[node name="FundoResponsivo" type="TextureRect" parent="." unique_id=1124263764]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("8_iiinc")
+texture = ExtResource("2_f5jwn")
+stretch_mode = 6
 
 [node name="GerenciadorDeSons" type="Node" parent="." unique_id=1256433243]
 
@@ -82,4 +42,66 @@ stream = ExtResource("5_4o3yp")
 [node name="SomClick" type="AudioStreamPlayer2D" parent="GerenciadorDeSons" unique_id=1789925977]
 stream = ExtResource("6_8ytrl")
 
-[connection signal="pressed" from="Botao_Jogar" to="." method="_on_botao_jogar_pressed"]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=451200400]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AreaJogo" type="Control" parent="CenterContainer" unique_id=1395526267]
+custom_minimum_size = Vector2(720, 1280)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/AreaJogo" unique_id=1405273323]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -340.0
+offset_right = 150.0
+offset_bottom = -227.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "FINEPLAY"
+label_settings = SubResource("LabelSettings_4togl")
+
+[node name="Botao_Jogar" type="Button" parent="CenterContainer/AreaJogo" unique_id=313585312]
+layout_mode = 0
+anchor_left = 0.3
+anchor_top = 0.8078125
+anchor_right = 0.7430556
+anchor_bottom = 0.91484374
+offset_left = -1.5258789e-05
+theme_override_fonts/font = ExtResource("3_4o3yp")
+theme_override_font_sizes/font_size = 36
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/AreaJogo/Botao_Jogar" unique_id=1249910487]
+layout_mode = 0
+anchor_left = 1.0188087
+anchor_top = -0.03649635
+anchor_right = 1.3197492
+anchor_bottom = 0.8978102
+offset_left = 3.0517578e-05
+texture = ExtResource("4_8ytrl")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="CenterContainer/AreaJogo/Botao_Jogar" unique_id=1739959316]
+modulate = Color(0.5019608, 0.74509805, 0.12156863, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.43730408
+anchor_top = 0.3540146
+anchor_right = 0.5626959
+anchor_bottom = 0.6459854
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_iiinc")
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="CenterContainer/AreaJogo/Botao_Jogar" to="." method="_on_botao_jogar_pressed"]

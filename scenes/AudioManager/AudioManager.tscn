@@ -1,15 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://sdo6pyf1dngc"]
+[gd_scene format=3 uid="uid://sdo6pyf1dngc"]
 
-[ext_resource type="Script" uid="uid://ge6y80cj3uyw" path="res://scripts/audio_manager.gd" id="1_kr7s0"]
+[ext_resource type="Script" uid="uid://ge6y80cj3uyw" path="res://scripts/generic/audio_manager.gd" id="1_kr7s0"]
 [ext_resource type="AudioStream" uid="uid://bdp3cstl6wrsd" path="res://music/Fineplay.mp3" id="2_awb8w"]
 [ext_resource type="AudioStream" uid="uid://bf8uy1mes1obm" path="res://assets/kenney_interface-sounds/Audio/click_003.ogg" id="3_prrev"]
 
-[node name="AudioManager" type="Node"]
+[node name="AudioManager" type="Node" unique_id=11449962]
 script = ExtResource("1_kr7s0")
 
-[node name="MusicaFundo" type="AudioStreamPlayer2D" parent="."]
+[node name="MusicaFundo" type="AudioStreamPlayer2D" parent="." unique_id=2107636117]
 stream = ExtResource("2_awb8w")
 autoplay = true
 
-[node name="SomClickUI" type="AudioStreamPlayer2D" parent="."]
+[node name="SomClickUI" type="AudioStreamPlayer2D" parent="." unique_id=1098074419]
 stream = ExtResource("3_prrev")

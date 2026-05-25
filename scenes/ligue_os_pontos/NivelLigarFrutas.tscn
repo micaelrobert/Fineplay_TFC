@@ -1,0 +1,245 @@
+[gd_scene format=3 uid="uid://hb4cso6yhj23"]
+
+[ext_resource type="Script" uid="uid://duogqvf71eha0" path="res://scripts/ligue_os_pontos/nivel_ligar_pares.gd" id="1_pnsl6"]
+[ext_resource type="Texture2D" uid="uid://bcbicin7t5j16" path="res://assets/kenney_platformer-pack-redux/PNG/Backgrounds/news/colored_fruits.png" id="2_wuhy0"]
+[ext_resource type="PackedScene" uid="uid://dc3pof8r7xo10" path="res://scenes/generico/Ponto.tscn" id="3_8xnct"]
+[ext_resource type="Texture2D" uid="uid://cbdum7ggn8tak" path="res://assets/fruits/itch/pngs/banana.png" id="4_w0tjx"]
+[ext_resource type="Texture2D" uid="uid://c8nfs7um37kr8" path="res://assets/fruits/itch/pngs/coconut.png" id="5_rserd"]
+[ext_resource type="Texture2D" uid="uid://q4pum7aby72a" path="res://assets/fruits/itch/pngs/lemon.png" id="6_mgvjo"]
+[ext_resource type="Texture2D" uid="uid://dth35jovxd5wh" path="res://assets/fruits/itch/pngs/orange.png" id="7_2pnpc"]
+[ext_resource type="Texture2D" uid="uid://bt1g1vlrbml15" path="res://assets/fruits/itch/pngs/strawberry.png" id="8_c2p07"]
+[ext_resource type="Texture2D" uid="uid://p3hqgbdceuj8" path="res://assets/fruits/itch/pngs/watermelon.png" id="9_iqc7q"]
+[ext_resource type="Texture2D" uid="uid://eagcdci0j8o4" path="res://assets/fruits/itch/pngs/green-grape.png" id="10_cg2n5"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="11_c2p07"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="12_iqc7q"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="13_cg2n5"]
+[ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="14_iqc7q"]
+[ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="15_0b30w"]
+[ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="16_wgyqq"]
+[ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="17_p1nwr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wuhy0"]
+size = Vector2(132.94116, 116)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xlh6m"]
+size = Vector2(130.58829, 116)
+
+[sub_resource type="Gradient" id="Gradient_5eqga"]
+offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
+colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
+
+[node name="NivelLigar" type="Node2D" unique_id=1498967667]
+script = ExtResource("1_pnsl6")
+total_objetivos = 7
+proxima_fase_cena = "uid://dby2myb7cu1tn"
+
+[node name="FundoResponsivo" type="Sprite2D" parent="." unique_id=234035901]
+position = Vector2(358.49997, 630.50006)
+scale = Vector2(0.9880382, 1.069378)
+texture = ExtResource("2_wuhy0")
+
+[node name="SonsLocais" type="Node" parent="." unique_id=152432296]
+
+[node name="SomClickObjeto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=2020069503]
+stream = ExtResource("11_c2p07")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1803064444]
+stream = ExtResource("12_iqc7q")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1088215364]
+stream = ExtResource("13_cg2n5")
+
+[node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=837643258]
+stream = ExtResource("14_iqc7q")
+
+[node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=493796655]
+stream = ExtResource("11_c2p07")
+
+[node name="AreaJogo" type="Node2D" parent="." unique_id=1299357801]
+
+[node name="Banana" parent="AreaJogo" unique_id=1592493080 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 325)
+scale = Vector2(0.85, 0.85)
+id_par = 1
+
+[node name="Sprite2D" parent="AreaJogo/Banana" index="0" unique_id=1244287027]
+position = Vector2(2, 13.999999)
+
+[node name="CollisionShape2D" parent="AreaJogo/Banana" index="1" unique_id=1646985666]
+position = Vector2(1.7646942, -10)
+scale = Vector2(1.0000002, 1.0000002)
+shape = SubResource("RectangleShape2D_wuhy0")
+
+[node name="Sprite2D2" parent="AreaJogo/Banana" index="2" unique_id=357826492]
+position = Vector2(3, -16)
+scale = Vector2(0.1435043, 0.117771596)
+texture = ExtResource("4_w0tjx")
+
+[node name="BananaPreta" parent="AreaJogo" unique_id=1107751177 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 325)
+scale = Vector2(0.85, 0.85)
+id_par = 1
+tipo = 1
+
+[node name="Sprite2D" parent="AreaJogo/BananaPreta" index="0" unique_id=1244287027]
+position = Vector2(-4, 13.999999)
+
+[node name="CollisionShape2D" parent="AreaJogo/BananaPreta" index="1" unique_id=1646985666]
+position = Vector2(2.9412842, -9.411774)
+scale = Vector2(1.0000002, 1.0000002)
+shape = SubResource("RectangleShape2D_xlh6m")
+
+[node name="Sprite2D2" parent="AreaJogo/BananaPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(3, -16)
+scale = Vector2(0.1435043, 0.117771596)
+texture = ExtResource("4_w0tjx")
+
+[node name="Coco" parent="AreaJogo" unique_id=142151099 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 448)
+id_par = 2
+
+[node name="Sprite2D2" parent="AreaJogo/Coco" index="2" unique_id=357826492]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("5_rserd")
+
+[node name="CocoPreto" parent="AreaJogo" unique_id=1868375492 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 441)
+id_par = 2
+tipo = 1
+
+[node name="Sprite2D2" parent="AreaJogo/CocoPreto" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("5_rserd")
+
+[node name="Limao" parent="AreaJogo" unique_id=922676512 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 577)
+id_par = 3
+
+[node name="Sprite2D2" parent="AreaJogo/Limao" index="2" unique_id=357826492]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("6_mgvjo")
+
+[node name="LimaoPreto" parent="AreaJogo" unique_id=1115213689 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 575)
+id_par = 3
+tipo = 1
+
+[node name="Sprite2D2" parent="AreaJogo/LimaoPreto" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("6_mgvjo")
+
+[node name="Laranja" parent="AreaJogo" unique_id=1001352418 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 707)
+id_par = 4
+
+[node name="Sprite2D2" parent="AreaJogo/Laranja" index="2" unique_id=357826492]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("7_2pnpc")
+
+[node name="LaranjaPreta" parent="AreaJogo" unique_id=346746565 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 704)
+id_par = 4
+tipo = 1
+
+[node name="Sprite2D2" parent="AreaJogo/LaranjaPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("7_2pnpc")
+
+[node name="Morango" parent="AreaJogo" unique_id=46549404 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 846)
+id_par = 5
+
+[node name="Sprite2D2" parent="AreaJogo/Morango" index="2" unique_id=357826492]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("8_c2p07")
+
+[node name="MorangoPreto" parent="AreaJogo" unique_id=17713541 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 835)
+id_par = 5
+tipo = 1
+
+[node name="Sprite2D2" parent="AreaJogo/MorangoPreto" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("8_c2p07")
+
+[node name="Melancia" parent="AreaJogo" unique_id=1630900840 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 978)
+id_par = 6
+
+[node name="Sprite2D2" parent="AreaJogo/Melancia" index="2" unique_id=357826492]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("9_iqc7q")
+
+[node name="MelanciaPreta" parent="AreaJogo" unique_id=1232886076 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 967)
+id_par = 6
+tipo = 1
+
+[node name="Sprite2D2" parent="AreaJogo/MelanciaPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("9_iqc7q")
+
+[node name="Uva" parent="AreaJogo" unique_id=1707446928 instance=ExtResource("3_8xnct")]
+position = Vector2(83, 1113)
+id_par = 7
+
+[node name="Sprite2D2" parent="AreaJogo/Uva" index="2" unique_id=357826492]
+position = Vector2(3.0000005, -2)
+scale = Vector2(0.1267079, 0.14039342)
+texture = ExtResource("10_cg2n5")
+
+[node name="UvaPreta" parent="AreaJogo" unique_id=439987825 instance=ExtResource("3_8xnct")]
+position = Vector2(635, 1100)
+id_par = 7
+tipo = 1
+
+[node name="Sprite2D2" parent="AreaJogo/UvaPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.136, 0.14)
+texture = ExtResource("10_cg2n5")
+
+[node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=2109505641]
+position = Vector2(663, 122)
+texture = ExtResource("15_0b30w")
+script = ExtResource("16_wgyqq")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=1189976734]
+position = Vector2(388, 200)
+emitting = false
+amount = 50
+texture = ExtResource("17_p1nwr")
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(9.8, 980)
+initial_velocity_min = 300.0
+initial_velocity_max = 300.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_5eqga")
+
+[editable path="AreaJogo/Banana"]
+[editable path="AreaJogo/BananaPreta"]
+[editable path="AreaJogo/Coco"]
+[editable path="AreaJogo/CocoPreto"]
+[editable path="AreaJogo/Limao"]
+[editable path="AreaJogo/LimaoPreto"]
+[editable path="AreaJogo/Laranja"]
+[editable path="AreaJogo/LaranjaPreta"]
+[editable path="AreaJogo/Morango"]
+[editable path="AreaJogo/MorangoPreto"]
+[editable path="AreaJogo/Melancia"]
+[editable path="AreaJogo/MelanciaPreta"]
+[editable path="AreaJogo/Uva"]
+[editable path="AreaJogo/UvaPreta"]

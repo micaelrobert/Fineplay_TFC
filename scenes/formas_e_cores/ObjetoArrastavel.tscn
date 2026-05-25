@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://brrtkn3hdao4i"]
+
+[ext_resource type="Script" uid="uid://xayon81lc2jk" path="res://scripts/formas_e_cores/objeto_arrastavel.gd" id="1_wgiaw"]
+[ext_resource type="Texture2D" uid="uid://xmb5148mplj8" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_square.png" id="2_wsd4f"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_evff5"]
+size = Vector2(113.5, 114.5)
+
+[node name="ObjetoArrastavel" type="Area2D" unique_id=789340539]
+script = ExtResource("1_wgiaw")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1498252683]
+texture = ExtResource("2_wsd4f")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=763962380]
+position = Vector2(1, -0.5)
+shape = SubResource("RectangleShape2D_evff5")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]

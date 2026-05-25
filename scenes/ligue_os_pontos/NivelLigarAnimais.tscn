@@ -1,0 +1,296 @@
+[gd_scene format=3 uid="uid://dby2myb7cu1tn"]
+
+[ext_resource type="Script" uid="uid://duogqvf71eha0" path="res://scripts/ligue_os_pontos/nivel_ligar_pares.gd" id="1_ymqve"]
+[ext_resource type="Texture2D" uid="uid://ce4m3b108i2kr" path="res://assets/kenney_platformer-pack-redux/PNG/Backgrounds/news/colored_green_animals.png" id="2_lfi46"]
+[ext_resource type="PackedScene" uid="uid://dc3pof8r7xo10" path="res://scenes/generico/Ponto.tscn" id="3_klubm"]
+[ext_resource type="Texture2D" uid="uid://nhi6evw271qp" path="res://assets/kenney_animal-pack-redux/PNG/Round/chick.png" id="4_koxun"]
+[ext_resource type="Texture2D" uid="uid://b8bcmunuuvme2" path="res://assets/kenney_animal-pack-redux/PNG/Round/chicken.png" id="5_0mate"]
+[ext_resource type="Texture2D" uid="uid://cqqpcehjgoj28" path="res://assets/kenney_animal-pack-redux/PNG/Round/cow.png" id="6_yuqwp"]
+[ext_resource type="Texture2D" uid="uid://dkk1dj8jj3wcb" path="res://assets/kenney_animal-pack-redux/PNG/Round/elephant.png" id="7_0nudm"]
+[ext_resource type="Texture2D" uid="uid://dtxpnvth31cas" path="res://assets/kenney_animal-pack-redux/PNG/Round/dog.png" id="8_rsh0i"]
+[ext_resource type="Texture2D" uid="uid://cg66jtlcmksn5" path="res://assets/kenney_animal-pack-redux/PNG/Round/zebra.png" id="9_5auuk"]
+[ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="10_0nudm"]
+[ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="11_rsh0i"]
+[ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="12_5auuk"]
+[ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="13_rsh0i"]
+[ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="14_f7ddl"]
+[ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="15_6kgn1"]
+[ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="16_7ka50"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_koxun"]
+radius = 44.102154
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0mate"]
+radius = 41.59327
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_yuqwp"]
+radius = 41.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0nudm"]
+radius = 43.011627
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rsh0i"]
+radius = 42.047592
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5auuk"]
+radius = 43.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8vlbk"]
+radius = 44.553337
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_f7ddl"]
+radius = 46.173584
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6kgn1"]
+radius = 44.102154
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7ka50"]
+radius = 50.159744
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8pf32"]
+radius = 46.010868
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4aomk"]
+radius = 46.389652
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fk1ub"]
+radius = 43.046486
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2ef7u"]
+radius = 44.0
+
+[sub_resource type="Gradient" id="Gradient_8pf32"]
+offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
+colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
+
+[node name="NivelLigar" type="Node2D" unique_id=2120145044]
+script = ExtResource("1_ymqve")
+total_objetivos = 7
+proxima_fase_cena = "uid://cnt5wbkfygc4v"
+
+[node name="FundoResponsivo" type="Sprite2D" parent="." unique_id=682733365]
+position = Vector2(224.42937, 693.99615)
+scale = Vector2(1.1809081, 1.2695314)
+texture = ExtResource("2_lfi46")
+
+[node name="SonsLocais" type="Node" parent="." unique_id=2103971345]
+
+[node name="SomClickObjeto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=311939158]
+stream = ExtResource("10_0nudm")
+
+[node name="SomAcerto" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=543915213]
+stream = ExtResource("11_rsh0i")
+
+[node name="SomVitoria" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=33422922]
+stream = ExtResource("12_5auuk")
+
+[node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1016992848]
+stream = ExtResource("13_rsh0i")
+
+[node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1656460192]
+stream = ExtResource("10_0nudm")
+
+[node name="AreaJogo" type="Node2D" parent="." unique_id=1320183413]
+
+[node name="Urso" parent="AreaJogo" unique_id=299927185 instance=ExtResource("3_klubm")]
+position = Vector2(89.42932, 273.99615)
+id_par = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/Urso" index="1" unique_id=1646985666]
+position = Vector2(-1, -1)
+shape = SubResource("CircleShape2D_koxun")
+
+[node name="Pintinho" parent="AreaJogo" unique_id=717875223 instance=ExtResource("3_klubm")]
+position = Vector2(90.42932, 394.99615)
+id_par = 2
+
+[node name="CollisionShape2D" parent="AreaJogo/Pintinho" index="1" unique_id=1646985666]
+shape = SubResource("CircleShape2D_0mate")
+
+[node name="Sprite2D2" parent="AreaJogo/Pintinho" index="2" unique_id=357826492]
+texture = ExtResource("4_koxun")
+
+[node name="UrsoPreto" parent="AreaJogo" unique_id=2130685024 instance=ExtResource("3_klubm")]
+position = Vector2(637.4293, 275.99615)
+id_par = 1
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/UrsoPreto" index="1" unique_id=1646985666]
+shape = SubResource("CircleShape2D_yuqwp")
+
+[node name="Sprite2D2" parent="AreaJogo/UrsoPreto" index="2" unique_id=357826492]
+modulate = Color(0.002059164, 0.00027213615, 1.2986137e-05, 1)
+
+[node name="PintinhoPreto" parent="AreaJogo" unique_id=1295431641 instance=ExtResource("3_klubm")]
+position = Vector2(638.4293, 395.99615)
+id_par = 2
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/PintinhoPreto" index="1" unique_id=1646985666]
+shape = SubResource("CircleShape2D_0nudm")
+
+[node name="Sprite2D2" parent="AreaJogo/PintinhoPreto" index="2" unique_id=357826492]
+modulate = Color(0.0035191667, 0.0035191681, 0.0035191672, 1)
+texture = ExtResource("4_koxun")
+
+[node name="Galinha" parent="AreaJogo" unique_id=784470334 instance=ExtResource("3_klubm")]
+position = Vector2(90.42932, 520.99615)
+id_par = 3
+valor_numero = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/Galinha" index="1" unique_id=1646985666]
+position = Vector2(1, 4)
+shape = SubResource("CircleShape2D_rsh0i")
+
+[node name="Sprite2D2" parent="AreaJogo/Galinha" index="2" unique_id=357826492]
+texture = ExtResource("5_0mate")
+
+[node name="GalinhaPreta" parent="AreaJogo" unique_id=1518325360 instance=ExtResource("3_klubm")]
+position = Vector2(638.4293, 521.99615)
+id_par = 3
+valor_numero = 1
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/GalinhaPreta" index="1" unique_id=1646985666]
+position = Vector2(-2, 4)
+shape = SubResource("CircleShape2D_5auuk")
+
+[node name="Sprite2D2" parent="AreaJogo/GalinhaPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("5_0mate")
+
+[node name="Vaca" parent="AreaJogo" unique_id=1605650240 instance=ExtResource("3_klubm")]
+position = Vector2(92.42932, 652.99615)
+id_par = 4
+valor_numero = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/Vaca" index="1" unique_id=1646985666]
+shape = SubResource("CircleShape2D_8vlbk")
+
+[node name="Sprite2D2" parent="AreaJogo/Vaca" index="2" unique_id=357826492]
+texture = ExtResource("6_yuqwp")
+
+[node name="VacaPreta" parent="AreaJogo" unique_id=1637990579 instance=ExtResource("3_klubm")]
+position = Vector2(639.4293, 651.99615)
+id_par = 4
+valor_numero = 1
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/VacaPreta" index="1" unique_id=1646985666]
+shape = SubResource("CircleShape2D_f7ddl")
+
+[node name="Sprite2D2" parent="AreaJogo/VacaPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("6_yuqwp")
+
+[node name="Elefante" parent="AreaJogo" unique_id=548301469 instance=ExtResource("3_klubm")]
+position = Vector2(96.42932, 793.99615)
+id_par = 5
+valor_numero = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/Elefante" index="1" unique_id=1646985666]
+shape = SubResource("CircleShape2D_6kgn1")
+
+[node name="Sprite2D2" parent="AreaJogo/Elefante" index="2" unique_id=357826492]
+texture = ExtResource("7_0nudm")
+
+[node name="ElefantePreto" parent="AreaJogo" unique_id=1112916656 instance=ExtResource("3_klubm")]
+position = Vector2(636.4293, 796.99615)
+id_par = 5
+valor_numero = 1
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/ElefantePreto" index="1" unique_id=1646985666]
+position = Vector2(-3, -6)
+shape = SubResource("CircleShape2D_7ka50")
+
+[node name="Sprite2D2" parent="AreaJogo/ElefantePreto" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("7_0nudm")
+
+[node name="Cachorro" parent="AreaJogo" unique_id=1065452487 instance=ExtResource("3_klubm")]
+position = Vector2(94.42932, 939.99615)
+id_par = 6
+valor_numero = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/Cachorro" index="1" unique_id=1646985666]
+position = Vector2(0, 8)
+shape = SubResource("CircleShape2D_8pf32")
+
+[node name="Sprite2D2" parent="AreaJogo/Cachorro" index="2" unique_id=357826492]
+texture = ExtResource("8_rsh0i")
+
+[node name="CachorroPreto" parent="AreaJogo" unique_id=361147458 instance=ExtResource("3_klubm")]
+position = Vector2(637.4293, 946.99615)
+id_par = 6
+valor_numero = 1
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/CachorroPreto" index="1" unique_id=1646985666]
+position = Vector2(-2, 11)
+shape = SubResource("CircleShape2D_4aomk")
+
+[node name="Sprite2D2" parent="AreaJogo/CachorroPreto" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("8_rsh0i")
+
+[node name="Zebra" parent="AreaJogo" unique_id=147185743 instance=ExtResource("3_klubm")]
+position = Vector2(97.42932, 1107.9961)
+id_par = 7
+valor_numero = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/Zebra" index="1" unique_id=1646985666]
+position = Vector2(0, 3)
+shape = SubResource("CircleShape2D_fk1ub")
+
+[node name="Sprite2D2" parent="AreaJogo/Zebra" index="2" unique_id=357826492]
+texture = ExtResource("9_5auuk")
+
+[node name="ZebraPreta" parent="AreaJogo" unique_id=875444244 instance=ExtResource("3_klubm")]
+position = Vector2(637.4293, 1107.9961)
+id_par = 7
+valor_numero = 1
+tipo = 1
+
+[node name="CollisionShape2D" parent="AreaJogo/ZebraPreta" index="1" unique_id=1646985666]
+position = Vector2(-2, -1)
+shape = SubResource("CircleShape2D_2ef7u")
+
+[node name="Sprite2D2" parent="AreaJogo/ZebraPreta" index="2" unique_id=357826492]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("9_5auuk")
+
+[node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=2039673164]
+position = Vector2(663, 122)
+texture = ExtResource("14_f7ddl")
+script = ExtResource("15_6kgn1")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=948168193]
+position = Vector2(388, 200)
+emitting = false
+amount = 50
+texture = ExtResource("16_7ka50")
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(9.8, 980)
+initial_velocity_min = 300.0
+initial_velocity_max = 300.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_8pf32")
+
+[editable path="AreaJogo/Urso"]
+[editable path="AreaJogo/Pintinho"]
+[editable path="AreaJogo/UrsoPreto"]
+[editable path="AreaJogo/PintinhoPreto"]
+[editable path="AreaJogo/Galinha"]
+[editable path="AreaJogo/GalinhaPreta"]
+[editable path="AreaJogo/Vaca"]
+[editable path="AreaJogo/VacaPreta"]
+[editable path="AreaJogo/Elefante"]
+[editable path="AreaJogo/ElefantePreto"]
+[editable path="AreaJogo/Cachorro"]
+[editable path="AreaJogo/CachorroPreto"]
+[editable path="AreaJogo/Zebra"]
+[editable path="AreaJogo/ZebraPreta"]
