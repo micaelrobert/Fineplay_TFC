@@ -257,6 +257,12 @@ func finalizar_linha() -> void:
 	if ponto_final:
 		finalizar_linha_com_ponto(ponto_final)
 	else:
+		if som_erro:
+			som_erro.play()
+
+		if robo and robo.has_method("errar"):
+			robo.errar()
+
 		apagar_linha_atual()
 		ponto_inicial = null
 		arrastou_linha = false
@@ -266,7 +272,6 @@ func finalizar_linha_com_ponto(ponto_final) -> void:
 	var acertou := false
 
 	if ponto_final and ponto_final != ponto_inicial:
-		# Lógica exclusiva de pares: mesmo id_par.
 		if ponto_final.tipo == ponto_final.Tipo.CHEGADA and not ponto_final.esta_conectado_chegada:
 			if ponto_final.id_par == ponto_inicial.id_par:
 				acertou = true
@@ -289,6 +294,9 @@ func finalizar_linha_com_ponto(ponto_final) -> void:
 			if som_erro:
 				som_erro.play()
 
+			if robo and robo.has_method("errar"):
+				robo.errar()
+
 		apagar_linha_atual()
 		ponto_inicial = null
 		arrastou_linha = false
@@ -297,9 +305,6 @@ func finalizar_linha_com_ponto(ponto_final) -> void:
 func verificar_vitoria() -> void:
 	acertos += 1
 
-	if robo and robo.has_method("comemorar"):
-		robo.comemorar()
-
 	if acertos >= total_objetivos:
 		if confetes:
 			confetes.emitting = true
@@ -307,8 +312,16 @@ func verificar_vitoria() -> void:
 		if som_vitoria:
 			som_vitoria.play()
 
+		if robo and robo.has_method("vitoria"):
+			robo.vitoria()
+		elif robo and robo.has_method("comemorar"):
+			robo.comemorar()
+
 		await get_tree().create_timer(1.0).timeout
 		mostrar_tela_vitoria()
+	else:
+		if robo and robo.has_method("comemorar"):
+			robo.comemorar()
 
 
 func mostrar_tela_vitoria() -> void:

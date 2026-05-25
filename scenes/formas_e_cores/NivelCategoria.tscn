@@ -5,13 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://cqns5e2e3qje4" path="res://assets/kenney_animal-pack-redux/PNG/Round/celeiro (1).png" id="3_3m0k0"]
 [ext_resource type="Texture2D" uid="uid://dmdjf6b7wv514" path="res://assets/kenney_generic-items/PNG/Colored/bau (1).png" id="4_oat7j"]
 [ext_resource type="PackedScene" uid="uid://brrtkn3hdao4i" path="res://scenes/formas_e_cores/ObjetoArrastavel.tscn" id="5_5ebb7"]
-[ext_resource type="Texture2D" uid="uid://71emhwlyq7i5" path="res://assets/kenney_shape-characters/PNG/Default/face_brava.png" id="6_smuph"]
-[ext_resource type="Texture2D" uid="uid://dlvmwhtvaksw2" path="res://assets/kenney_shape-characters/PNG/Default/face_feliz.png" id="7_ts84s"]
 [ext_resource type="Texture2D" uid="uid://cp1a246jldjbc" path="res://assets/kenney_animal-pack-redux/PNG/Round/bear.png" id="8_4scfk"]
 [ext_resource type="Texture2D" uid="uid://r84xa31lkv1o" path="res://assets/kenney_animal-pack-redux/PNG/Round/horse.png" id="9_ct0w5"]
-[ext_resource type="Texture2D" uid="uid://c1afblr4c5veh" path="res://assets/kenney_shape-characters/PNG/Default/face_f.png" id="10_30724"]
 [ext_resource type="Texture2D" uid="uid://b8bcmunuuvme2" path="res://assets/kenney_animal-pack-redux/PNG/Round/chicken.png" id="11_ym75o"]
-[ext_resource type="Texture2D" uid="uid://dp11eip0610cg" path="res://assets/kenney_shape-characters/PNG/Default/face_a.png" id="12_gp0yf"]
 [ext_resource type="Texture2D" uid="uid://cqqpcehjgoj28" path="res://assets/kenney_animal-pack-redux/PNG/Round/cow.png" id="13_vljmd"]
 [ext_resource type="Texture2D" uid="uid://di33qet0vj8rm" path="res://assets/kenney_generic-items/PNG/Colored/genericItem_color_023.png" id="14_hdk2a"]
 [ext_resource type="Texture2D" uid="uid://c0ntup2qagdn3" path="res://assets/kenney_generic-items/PNG/Colored/genericItem_color_005.png" id="15_plmd5"]
@@ -124,8 +120,6 @@ debug_color = Color(0, 0.5176471, 0.8392157, 0)
 [node name="ObjetoArrastavel" parent="AreaJogo" unique_id=1206372518 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(100, 941)
 slot_correto_nome = "SlotCeleiro"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("7_ts84s")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel" index="0" unique_id=1498252683]
 position = Vector2(0, -1)
@@ -139,8 +133,6 @@ shape = SubResource("CircleShape2D_32m3t")
 [node name="ObjetoArrastavel8" parent="AreaJogo" unique_id=1674776979 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(617, 945)
 slot_correto_nome = "SlotCeleiro"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("7_ts84s")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel8" index="0" unique_id=1498252683]
 position = Vector2(0, -1)
@@ -154,8 +146,6 @@ shape = SubResource("CircleShape2D_3t6qn")
 [node name="ObjetoArrastavel2" parent="AreaJogo" unique_id=1541743098 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(621, 1074)
 slot_correto_nome = "SlotCeleiro"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("10_30724")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel2" index="0" unique_id=1498252683]
 position = Vector2(-2.0000305, 3.0000038)
@@ -170,8 +160,6 @@ shape = SubResource("CircleShape2D_ln2lh")
 [node name="ObjetoArrastavel3" parent="AreaJogo" unique_id=421787055 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(100, 1079)
 slot_correto_nome = "SlotCeleiro"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("12_gp0yf")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel3" index="0" unique_id=1498252683]
 position = Vector2(1.9998779, 1.9073486e-06)
@@ -185,8 +173,6 @@ shape = SubResource("CircleShape2D_xrfph")
 [node name="ObjetoArrastavel4" parent="AreaJogo" unique_id=1373824332 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(454, 1078)
 slot_correto_nome = "SlotBau"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("7_ts84s")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel4" index="0" unique_id=1498252683]
 position = Vector2(0, -1)
@@ -199,8 +185,6 @@ position = Vector2(0, 0)
 [node name="ObjetoArrastavel5" parent="AreaJogo" unique_id=318927369 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(268, 945)
 slot_correto_nome = "SlotBau"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("7_ts84s")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel5" index="0" unique_id=1498252683]
 position = Vector2(0, -1)
@@ -213,8 +197,6 @@ position = Vector2(0, 0)
 [node name="ObjetoArrastavel6" parent="AreaJogo" unique_id=1658777489 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(268, 1078)
 slot_correto_nome = "SlotBau"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("7_ts84s")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel6" index="0" unique_id=1498252683]
 position = Vector2(0, -1)
@@ -227,8 +209,6 @@ position = Vector2(0, 0)
 [node name="ObjetoArrastavel7" parent="AreaJogo" unique_id=752807149 groups=["pecas"] instance=ExtResource("5_5ebb7")]
 position = Vector2(451, 945)
 slot_correto_nome = "SlotBau"
-textura_brava = ExtResource("6_smuph")
-textura_feliz = ExtResource("7_ts84s")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel7" index="0" unique_id=1498252683]
 position = Vector2(0, -1)

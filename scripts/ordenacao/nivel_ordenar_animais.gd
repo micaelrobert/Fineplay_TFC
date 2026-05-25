@@ -90,10 +90,13 @@ func verificar_vitoria() -> void:
 
 	if todas_acertaram:
 		vitoria()
+	else:
+		if robo and robo.has_method("comemorar"):
+			robo.comemorar()
 
 
 func vitoria() -> void:
-	print("Vitória! Ordenação 2 concluída.")
+	print("Vitória! Ordenação concluída.")
 
 	if confetes:
 		confetes.emitting = true
@@ -101,7 +104,9 @@ func vitoria() -> void:
 	if som_vitoria:
 		som_vitoria.play()
 
-	if robo and robo.has_method("comemorar"):
+	if robo and robo.has_method("vitoria"):
+		robo.vitoria()
+	elif robo and robo.has_method("comemorar"):
 		robo.comemorar()
 
 	await get_tree().create_timer(1.0).timeout
@@ -150,3 +155,6 @@ func tocar_som_acerto() -> void:
 func tocar_som_erro() -> void:
 	if som_erro:
 		som_erro.play()
+
+	if robo and robo.has_method("errar"):
+		robo.errar()

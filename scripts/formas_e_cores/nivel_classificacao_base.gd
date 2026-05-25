@@ -125,6 +125,9 @@ func _on_peca_errou() -> void:
 	if som_erro:
 		som_erro.play()
 
+	if robo and robo.has_method("errar"):
+		robo.errar()
+
 
 func _on_peca_acertou() -> void:
 	acertos_atuais += 1
@@ -132,10 +135,11 @@ func _on_peca_acertou() -> void:
 	if som_acerto:
 		som_acerto.play()
 
-	if robo:
-		robo.comemorar()
-
-	if acertos_atuais == total_pecas:
+	# Se ainda não terminou o nível, faz comemoração curta.
+	if acertos_atuais < total_pecas:
+		if robo and robo.has_method("comemorar"):
+			robo.comemorar()
+	else:
 		concluir_nivel()
 
 
@@ -147,6 +151,12 @@ func concluir_nivel() -> void:
 
 	if som_vitoria:
 		som_vitoria.play()
+
+	# Animação maior de vitória / passagem de fase.
+	if robo and robo.has_method("vitoria"):
+		robo.vitoria()
+	elif robo and robo.has_method("comemorar"):
+		robo.comemorar()
 
 	await get_tree().create_timer(1.0).timeout
 	mostrar_vitoria_padrao()

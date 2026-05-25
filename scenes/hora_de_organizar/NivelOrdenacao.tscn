@@ -158,7 +158,7 @@ position = Vector2(0, 13)
 shape = SubResource("CapsuleShape2D_ys8by")
 
 [node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=1751892901]
-position = Vector2(663, 122)
+position = Vector2(663, 98)
 texture = ExtResource("14_3knis")
 script = ExtResource("15_cx8dd")
 

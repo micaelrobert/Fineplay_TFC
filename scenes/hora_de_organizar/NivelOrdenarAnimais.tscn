@@ -191,11 +191,6 @@ texture = ExtResource("12_ijsjs")
 position = Vector2(1, 0)
 shape = SubResource("CapsuleShape2D_2oar2")
 
-[node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=594520532]
-position = Vector2(663, 122)
-texture = ExtResource("18_doa6q")
-script = ExtResource("19_05qig")
-
 [node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=1865655019]
 position = Vector2(388, 200)
 emitting = false
@@ -210,5 +205,10 @@ initial_velocity_max = 300.0
 scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_spiww")
+
+[node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=1081481888]
+position = Vector2(663, 86)
+texture = ExtResource("18_doa6q")
+script = ExtResource("19_05qig")
 
 [node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("21_cdo1m")]

@@ -6,15 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://ch4gtnidag8v4" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_circle.png" id="3_ln2lh"]
 [ext_resource type="Texture2D" uid="uid://wwem30g3af0w" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_rhombus.png" id="4_jyl56"]
 [ext_resource type="PackedScene" uid="uid://brrtkn3hdao4i" path="res://scenes/formas_e_cores/ObjetoArrastavel.tscn" id="5_ywf23"]
-[ext_resource type="Texture2D" uid="uid://dp11eip0610cg" path="res://assets/kenney_shape-characters/PNG/Default/face_a.png" id="7_x7vo1"]
-[ext_resource type="Texture2D" uid="uid://dlvmwhtvaksw2" path="res://assets/kenney_shape-characters/PNG/Default/face_feliz.png" id="8_ab8er"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="8_jyl56"]
-[ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="8_ywf23"]
 [ext_resource type="Texture2D" uid="uid://71emhwlyq7i5" path="res://assets/kenney_shape-characters/PNG/Default/face_brava.png" id="9_fkv7b"]
-[ext_resource type="Texture2D" uid="uid://c1afblr4c5veh" path="res://assets/kenney_shape-characters/PNG/Default/face_f.png" id="9_gdvrp"]
 [ext_resource type="AudioStream" uid="uid://bdp3cstl6wrsd" path="res://music/Fineplay.mp3" id="10_jyl56"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="11_gf60d"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="12_wrl74"]
+[ext_resource type="Texture2D" uid="uid://kskh8il84oow" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_idle.png" id="13_e7u2c"]
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="13_g83y3"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="14_ab8er"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="15_wrl74"]
@@ -102,8 +99,6 @@ shape = SubResource("CircleShape2D_pyn55")
 [node name="ObjetoArrastavel" parent="AreaJogo" unique_id=65236754 groups=["pecas"] instance=ExtResource("5_ywf23")]
 position = Vector2(353, 1078)
 slot_correto_nome = "SlotQuadrado"
-textura_brava = ExtResource("9_fkv7b")
-textura_feliz = ExtResource("8_ab8er")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel" index="0" unique_id=1498252683]
 modulate = Color(0.40392157, 1, 1, 1)
@@ -119,8 +114,6 @@ texture = ExtResource("9_fkv7b")
 [node name="ObjetoArrastavel2" parent="AreaJogo" unique_id=1877489443 groups=["pecas"] instance=ExtResource("5_ywf23")]
 position = Vector2(535, 1074)
 slot_correto_nome = "SlotCircular"
-textura_brava = ExtResource("9_fkv7b")
-textura_feliz = ExtResource("9_gdvrp")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel2" index="0" unique_id=1498252683]
 modulate = Color(1, 0.10980392, 0.3137255, 1)
@@ -139,8 +132,6 @@ texture = ExtResource("9_fkv7b")
 [node name="ObjetoArrastavel3" parent="AreaJogo" unique_id=1380636107 groups=["pecas"] instance=ExtResource("5_ywf23")]
 position = Vector2(169, 1079)
 slot_correto_nome = "SlotLosangular"
-textura_brava = ExtResource("9_fkv7b")
-textura_feliz = ExtResource("7_x7vo1")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel3" index="0" unique_id=1498252683]
 modulate = Color(0, 0.6367621, 0.27832672, 1)
@@ -157,7 +148,7 @@ texture = ExtResource("9_fkv7b")
 
 [node name="ProfessorRobo" type="Sprite2D" parent="AreaJogo" unique_id=2037412331]
 position = Vector2(663, 122)
-texture = ExtResource("8_ywf23")
+texture = ExtResource("13_e7u2c")
 script = ExtResource("8_jyl56")
 
 [node name="SlotQuadrado" type="Area2D" parent="AreaJogo" unique_id=137188477 groups=["slots"]]
