@@ -23,7 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="21_frqwn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1unmf"]
-size = Vector2(166, 188)
+size = Vector2(205.55554, 188)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qp2rx"]
 size = Vector2(166, 172)
@@ -85,7 +85,7 @@ stream = ExtResource("13_826hw")
 position = Vector2(43, 0)
 
 [node name="Slot_4" type="Area2D" parent="AreaJogo/Slots" unique_id=1193245526]
-position = Vector2(105, 367)
+position = Vector2(101, 632)
 scale = Vector2(0.9, 0.9)
 script = ExtResource("3_btejl")
 altura_da_peca = 115.0
@@ -95,11 +95,11 @@ scale = Vector2(0.18, 0.18)
 texture = ExtResource("4_e6qp5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaJogo/Slots/Slot_4" unique_id=1437345882]
-position = Vector2(-1, -32)
+position = Vector2(-2.777771, -32)
 shape = SubResource("RectangleShape2D_1unmf")
 
 [node name="Slot_3" type="Area2D" parent="AreaJogo/Slots" unique_id=1467898865]
-position = Vector2(338, 376)
+position = Vector2(557.00006, 367.00003)
 scale = Vector2(1.25, 1.25)
 script = ExtResource("3_btejl")
 altura_da_peca = 100.0
@@ -113,7 +113,7 @@ position = Vector2(0, -40)
 shape = SubResource("RectangleShape2D_qp2rx")
 
 [node name="Slot_2" type="Area2D" parent="AreaJogo/Slots" unique_id=942940915]
-position = Vector2(557, 371)
+position = Vector2(325, 364)
 script = ExtResource("3_btejl")
 altura_da_peca = 70.0
 
@@ -126,7 +126,7 @@ position = Vector2(0, -29)
 shape = SubResource("RectangleShape2D_ttlku")
 
 [node name="Slot_1" type="Area2D" parent="AreaJogo/Slots" unique_id=103562952]
-position = Vector2(101, 543)
+position = Vector2(94, 369)
 script = ExtResource("3_btejl")
 altura_da_peca = 60.0
 

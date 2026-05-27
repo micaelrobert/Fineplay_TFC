@@ -13,7 +13,10 @@
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="12_wrl74"]
 [ext_resource type="Texture2D" uid="uid://kskh8il84oow" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_idle.png" id="13_e7u2c"]
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="13_g83y3"]
+[ext_resource type="Texture2D" uid="uid://dlvmwhtvaksw2" path="res://assets/kenney_shape-characters/PNG/Default/face_feliz.png" id="13_tst06"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="14_ab8er"]
+[ext_resource type="Texture2D" uid="uid://dx2jsatlo6kpv" path="res://assets/kenney_shape-characters/PNG/Default/face_e.png" id="14_sffy3"]
+[ext_resource type="Texture2D" uid="uid://c1afblr4c5veh" path="res://assets/kenney_shape-characters/PNG/Default/face_f.png" id="15_mvmt7"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="15_wrl74"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_fkv7b"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="20_tst06"]
@@ -99,6 +102,8 @@ shape = SubResource("CircleShape2D_pyn55")
 [node name="ObjetoArrastavel" parent="AreaJogo" unique_id=65236754 groups=["pecas"] instance=ExtResource("5_ywf23")]
 position = Vector2(353, 1078)
 slot_correto_nome = "SlotQuadrado"
+textura_brava = ExtResource("9_fkv7b")
+textura_feliz = ExtResource("13_tst06")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel" index="0" unique_id=1498252683]
 modulate = Color(0.40392157, 1, 1, 1)
@@ -114,6 +119,8 @@ texture = ExtResource("9_fkv7b")
 [node name="ObjetoArrastavel2" parent="AreaJogo" unique_id=1877489443 groups=["pecas"] instance=ExtResource("5_ywf23")]
 position = Vector2(535, 1074)
 slot_correto_nome = "SlotCircular"
+textura_brava = ExtResource("9_fkv7b")
+textura_feliz = ExtResource("14_sffy3")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel2" index="0" unique_id=1498252683]
 modulate = Color(1, 0.10980392, 0.3137255, 1)
@@ -132,6 +139,8 @@ texture = ExtResource("9_fkv7b")
 [node name="ObjetoArrastavel3" parent="AreaJogo" unique_id=1380636107 groups=["pecas"] instance=ExtResource("5_ywf23")]
 position = Vector2(169, 1079)
 slot_correto_nome = "SlotLosangular"
+textura_brava = ExtResource("9_fkv7b")
+textura_feliz = ExtResource("15_mvmt7")
 
 [node name="Sprite2D" parent="AreaJogo/ObjetoArrastavel3" index="0" unique_id=1498252683]
 modulate = Color(0, 0.6367621, 0.27832672, 1)
