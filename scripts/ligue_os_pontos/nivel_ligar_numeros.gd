@@ -8,23 +8,6 @@ const BASE_SIZE := Vector2(720, 1280)
 var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 
 # ==========================================
-# CONFIGURAÇÃO VISUAL DAS LINHAS
-# ==========================================
-@export var cor_linha_preview: Color = Color(1.0, 1.0, 1.0, 0.72)
-@export var cor_linha_preview_sombra: Color = Color(0.0, 0.0, 0.0, 0.18)
-
-@export var cor_linha_final: Color = Color(0.20, 0.85, 0.45, 0.42)
-@export var cor_linha_final_sombra: Color = Color(0.0, 0.0, 0.0, 0.10)
-
-@export var largura_linha_preview: float = 8.0
-@export var largura_linha_preview_sombra: float = 16.0
-
-@export var largura_linha_final: float = 5.0
-@export var largura_linha_final_sombra: float = 10.0
-
-@export var distancia_minima_arrasto: float = 18.0
-
-# ==========================================
 # RESPONSIVIDADE
 # ==========================================
 @onready var fundo_responsivo: Sprite2D = $FundoResponsivo
@@ -32,24 +15,38 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 @onready var camada_linhas: Node2D = $CamadaLinhas
 
 # ==========================================
-# REFERÊNCIAS DE FEEDBACK
+# MANAGERS
 # ==========================================
-@onready var som_click_objeto = $SonsLocais/SomClickObjeto
-@onready var som_click_forma = $SonsLocais/SomClickNaForma
-@onready var som_acerto = $SonsLocais/SomAcerto
-@onready var som_erro = $SonsLocais/SomErro
-@onready var som_vitoria = $SonsLocais/SomVitoria
+@onready var hint_manager: Node = get_node_or_null("HintManager")
+@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+@onready var line_renderer: Node = get_node_or_null("LineRenderer")
 
+# ==========================================
+# REFERÊNCIAS DA FASE
+# ==========================================
 @onready var robo = $AreaJogo/ProfessorRobo
 @onready var confetes = $AreaJogo/CPUParticles2D
 
-var ponto_inicial = null
-var linha_atual: Line2D = null
-var linha_sombra_atual: Line2D = null
+# ==========================================
+# FALLBACK DE SONS
+# Usado apenas se o FeedbackAudio não estiver configurado.
+# ==========================================
+@onready var som_click_objeto = get_node_or_null("SonsLocais/SomClickObjeto")
+@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
 
+# ==========================================
+# CONTROLE DO JOGO
+# ==========================================
+var ponto_inicial = null
 var acertos := 0
 var arrastou_linha := false
 var pos_inicio_interacao := Vector2.ZERO
+var nivel_concluido := false
+
+@export var distancia_minima_arrasto: float = 18.0
 
 
 func _ready() -> void:
@@ -59,23 +56,68 @@ func _ready() -> void:
 	_ajustar_responsivo()
 
 	randomizar_posicoes()
-
-	if has_node("/root/AudioManager"):
-		var musica = get_node("/root/AudioManager/MusicaFundo")
-		if not musica.playing:
-			musica.play()
+	configurar_managers()
+	iniciar_musica_fundo()
 
 
+# ==========================================
+# CONFIGURAÇÃO DOS MANAGERS
+# ==========================================
+func configurar_managers() -> void:
+	if hint_manager and hint_manager.has_method("reiniciar_sistema"):
+		hint_manager.reiniciar_sistema()
+
+	if not hint_manager:
+		push_warning("HintManager não encontrado. O minigame funciona, mas sem pistas progressivas.")
+
+	if not feedback_audio:
+		push_warning("FeedbackAudio não encontrado. O minigame usará sons diretos de SonsLocais.")
+
+	if not line_renderer:
+		push_warning("LineRenderer não encontrado. As linhas não serão desenhadas corretamente.")
+
+
+func registrar_interacao_no_hint() -> void:
+	if hint_manager and hint_manager.has_method("registrar_interacao"):
+		hint_manager.registrar_interacao()
+
+
+func resetar_timer_hint_sem_limpar_visual() -> void:
+	if hint_manager and hint_manager.has_method("resetar_timer_sem_limpar_visual"):
+		hint_manager.resetar_timer_sem_limpar_visual()
+
+
+func pausar_hint_manager() -> void:
+	if hint_manager and hint_manager.has_method("pausar_pistas"):
+		hint_manager.pausar_pistas()
+
+
+func retomar_hint_manager() -> void:
+	if hint_manager and hint_manager.has_method("retomar_pistas"):
+		hint_manager.retomar_pistas()
+
+
+func finalizar_hint_manager() -> void:
+	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+		hint_manager.finalizar_nivel()
+
+
+func existe_linha_aberta() -> bool:
+	if line_renderer and line_renderer.has_method("existe_linha_aberta"):
+		return line_renderer.existe_linha_aberta()
+
+	return false
+
+
+# ==========================================
+# RESPONSIVIDADE
+# ==========================================
 func _ajustar_responsivo() -> void:
 	var tamanho_tela: Vector2 = get_viewport().get_visible_rect().size
 
-	# Centraliza a área lógica 720x1280 dentro da tela real.
 	area_jogo.position = (tamanho_tela - BASE_SIZE) / 2.0
-
-	# A camada de linhas fica no root usando coordenadas globais.
 	camada_linhas.position = Vector2.ZERO
 
-	# Faz o fundo cobrir toda a tela real.
 	if fundo_responsivo and fundo_responsivo.texture:
 		var tamanho_textura: Vector2 = fundo_responsivo.texture.get_size()
 
@@ -89,6 +131,59 @@ func _ajustar_responsivo() -> void:
 		fundo_responsivo.scale = Vector2(escala_final, escala_final)
 
 
+func iniciar_musica_fundo() -> void:
+	if has_node("/root/AudioManager"):
+		var musica = get_node("/root/AudioManager/MusicaFundo")
+		if not musica.playing:
+			musica.play()
+
+
+# ==========================================
+# ÁUDIO
+# ==========================================
+func tocar_click_forma() -> void:
+	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+		feedback_audio.tocar_click_forma()
+		return
+
+	if som_click_forma:
+		som_click_forma.play()
+	elif som_click_objeto:
+		som_click_objeto.play()
+
+
+func tocar_acerto() -> void:
+	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+		feedback_audio.tocar_acerto()
+		return
+
+	if som_acerto:
+		som_acerto.play()
+
+
+func tocar_erro_pedagogico() -> void:
+	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+		feedback_audio.tocar_erro_pedagogico()
+	else:
+		if som_erro:
+			som_erro.play()
+
+	if robo and robo.has_method("errar"):
+		robo.errar()
+
+
+func tocar_vitoria_pedagogica() -> void:
+	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+		feedback_audio.tocar_vitoria_pedagogica()
+		return
+
+	if som_vitoria:
+		som_vitoria.play()
+
+
+# ==========================================
+# PONTOS DA FASE
+# ==========================================
 func pegar_pontos_da_fase() -> Array:
 	var pontos := []
 
@@ -114,37 +209,43 @@ func randomizar_posicoes() -> void:
 		todos_pontos[i].global_position = posicoes[i]
 
 
+# ==========================================
+# INPUT
+# ==========================================
 func _input(event) -> void:
+	if nivel_concluido:
+		return
+
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		registrar_interacao_no_hint()
+
 		var ponto = buscar_ponto_sob_mouse()
 
-		# Se já existe uma linha aberta, o próximo clique pode finalizar a ligação.
-		if linha_atual:
+		if existe_linha_aberta():
 			if ponto and ponto != ponto_inicial:
 				finalizar_linha_com_ponto(ponto)
 			return
 
-		# Se ainda não existe linha aberta, tenta iniciar uma nova.
 		if ponto:
 			pos_inicio_interacao = get_global_mouse_position()
 			arrastou_linha = false
 			tentar_iniciar_linha(ponto)
 
-	elif event is InputEventMouseMotion and linha_atual:
+	elif event is InputEventMouseMotion and existe_linha_aberta():
+		resetar_timer_hint_sem_limpar_visual()
+
 		var pos_mouse := get_global_mouse_position()
 
-		linha_atual.set_point_position(1, pos_mouse)
-
-		if linha_sombra_atual:
-			linha_sombra_atual.set_point_position(1, pos_mouse)
+		if line_renderer and line_renderer.has_method("atualizar_linha"):
+			line_renderer.atualizar_linha(pos_mouse)
 
 		if pos_mouse.distance_to(pos_inicio_interacao) >= distancia_minima_arrasto:
 			arrastou_linha = true
 
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		# Se arrastou, finaliza ao soltar.
-		# Se foi só clique, mantém a linha aberta aguardando o segundo ponto.
-		if linha_atual and arrastou_linha:
+		resetar_timer_hint_sem_limpar_visual()
+
+		if existe_linha_aberta() and arrastou_linha:
 			finalizar_linha()
 
 
@@ -171,81 +272,25 @@ func tentar_iniciar_linha(ponto) -> void:
 	if not ponto.esta_conectado_saida:
 		ponto_inicial = ponto
 
-		if som_click_forma:
-			som_click_forma.play()
-		elif som_click_objeto:
-			som_click_objeto.play()
+		tocar_click_forma()
+		pausar_hint_manager()
 
-		criar_visual_linha(ponto.global_position)
-
-
-func criar_visual_linha(pos_inicial: Vector2) -> void:
-	# Linha de sombra: dá profundidade e melhora a leitura visual.
-	linha_sombra_atual = Line2D.new()
-	linha_sombra_atual.width = largura_linha_preview_sombra
-	linha_sombra_atual.default_color = cor_linha_preview_sombra
-	linha_sombra_atual.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_sombra_atual.end_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_sombra_atual.joint_mode = Line2D.LINE_JOINT_ROUND
-	linha_sombra_atual.z_index = 5
-	linha_sombra_atual.add_point(pos_inicial)
-	linha_sombra_atual.add_point(get_global_mouse_position())
-	camada_linhas.add_child(linha_sombra_atual)
-
-	# Linha principal: visível durante o arrasto, mas sem excesso de brilho.
-	linha_atual = Line2D.new()
-	linha_atual.width = largura_linha_preview
-	linha_atual.default_color = cor_linha_preview
-	linha_atual.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_atual.end_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_atual.joint_mode = Line2D.LINE_JOINT_ROUND
-	linha_atual.z_index = 6
-	linha_atual.add_point(pos_inicial)
-	linha_atual.add_point(get_global_mouse_position())
-	camada_linhas.add_child(linha_atual)
+		if line_renderer and line_renderer.has_method("criar_linha"):
+			line_renderer.criar_linha(ponto.global_position, get_global_mouse_position())
 
 
-func transformar_linha_em_acerto(pos_final: Vector2) -> void:
-	if linha_sombra_atual:
-		linha_sombra_atual.set_point_position(1, pos_final)
-		linha_sombra_atual.width = largura_linha_final_sombra
-		linha_sombra_atual.default_color = cor_linha_final_sombra
-		linha_sombra_atual.z_index = 1
-
-	if linha_atual:
-		linha_atual.set_point_position(1, pos_final)
-		linha_atual.width = largura_linha_final
-		linha_atual.default_color = cor_linha_final
-		linha_atual.z_index = 2
-
-	linha_sombra_atual = null
-	linha_atual = null
-
-
-func apagar_linha_atual() -> void:
-	if linha_sombra_atual:
-		linha_sombra_atual.queue_free()
-
-	if linha_atual:
-		linha_atual.queue_free()
-
-	linha_sombra_atual = null
-	linha_atual = null
-
-
+# ==========================================
+# FINALIZAÇÃO DAS LIGAÇÕES
+# ==========================================
 func finalizar_linha() -> void:
 	var ponto_final = buscar_ponto_sob_mouse()
 
 	if ponto_final:
 		finalizar_linha_com_ponto(ponto_final)
 	else:
-		if som_erro:
-			som_erro.play()
-
-		if robo and robo.has_method("errar"):
-			robo.errar()
-
+		tocar_erro_pedagogico()
 		apagar_linha_atual()
+
 		ponto_inicial = null
 		arrastou_linha = false
 
@@ -259,51 +304,70 @@ func finalizar_linha_com_ponto(ponto_final) -> void:
 				acertou = true
 
 	if acertou:
-		transformar_linha_em_acerto(ponto_final.global_position)
+		registrar_interacao_no_hint()
+
+		if line_renderer and line_renderer.has_method("transformar_linha_em_acerto"):
+			line_renderer.transformar_linha_em_acerto(ponto_final.global_position)
 
 		ponto_inicial.esta_conectado_saida = true
 		ponto_final.esta_conectado_chegada = true
 
-		if som_acerto:
-			som_acerto.play()
+		tocar_acerto()
 
 		ponto_inicial = null
 		arrastou_linha = false
 
+		retomar_hint_manager()
 		verificar_vitoria()
 	else:
 		if ponto_final and ponto_final != ponto_inicial:
-			if som_erro:
-				som_erro.play()
-
-			if robo and robo.has_method("errar"):
-				robo.errar()
+			tocar_erro_pedagogico()
 
 		apagar_linha_atual()
+
 		ponto_inicial = null
 		arrastou_linha = false
 
 
+func apagar_linha_atual() -> void:
+	if line_renderer and line_renderer.has_method("apagar_linha_atual"):
+		line_renderer.apagar_linha_atual()
+
+	retomar_hint_manager()
+
+
+# ==========================================
+# VITÓRIA
+# ==========================================
 func verificar_vitoria() -> void:
 	acertos += 1
 
 	if acertos >= total_objetivos:
-		if confetes:
-			confetes.emitting = true
-
-		if som_vitoria:
-			som_vitoria.play()
-
-		if robo and robo.has_method("vitoria"):
-			robo.vitoria()
-		elif robo and robo.has_method("comemorar"):
-			robo.comemorar()
-
-		await get_tree().create_timer(1.0).timeout
-		mostrar_tela_vitoria()
+		concluir_nivel()
 	else:
 		if robo and robo.has_method("comemorar"):
 			robo.comemorar()
+
+
+func concluir_nivel() -> void:
+	if nivel_concluido:
+		return
+
+	nivel_concluido = true
+	finalizar_hint_manager()
+
+	if confetes:
+		confetes.emitting = true
+
+	tocar_vitoria_pedagogica()
+
+	if robo and robo.has_method("vitoria"):
+		robo.vitoria()
+	elif robo and robo.has_method("comemorar"):
+		robo.comemorar()
+
+	await get_tree().create_timer(1.4).timeout
+	mostrar_tela_vitoria()
 
 
 func mostrar_tela_vitoria() -> void:

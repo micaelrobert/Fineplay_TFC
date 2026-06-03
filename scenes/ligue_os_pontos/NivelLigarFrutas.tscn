@@ -18,6 +18,9 @@
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="16_wgyqq"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="17_p1nwr"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="18_xlh6m"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="19_h8en8"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="20_w05jn"]
+[ext_resource type="Script" uid="uid://d383xofvevuej" path="res://scripts/ligue_os_pontos/LineRenderer.gd" id="21_27tta"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wuhy0"]
 size = Vector2(132.94116, 116)
@@ -52,6 +55,7 @@ stream = ExtResource("13_cg2n5")
 
 [node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=837643258]
 stream = ExtResource("14_iqc7q")
+volume_db = 3.0
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=493796655]
 stream = ExtResource("11_c2p07")
@@ -230,9 +234,23 @@ scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_5eqga")
 
+[node name="BotaoVoltarFase" parent="AreaJogo" unique_id=1138187997 instance=ExtResource("18_xlh6m")]
+
 [node name="CamadaLinhas" type="Node2D" parent="." unique_id=1066483978]
 
-[node name="BotaoVoltarFase" parent="CamadaLinhas" unique_id=1138187997 instance=ExtResource("18_xlh6m")]
+[node name="HintManager" type="Node" parent="." unique_id=737508221]
+script = ExtResource("19_h8en8")
+area_jogo_path = NodePath("../AreaJogo")
+camada_linhas_path = NodePath("../CamadaLinhas")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=539274048]
+script = ExtResource("20_w05jn")
+sons_locais_path = NodePath("../SonsLocais")
+
+[node name="LineRenderer" type="Node" parent="." unique_id=1520706598]
+script = ExtResource("21_27tta")
+camada_linhas_path = NodePath("../CamadaLinhas")
 
 [editable path="AreaJogo/Banana"]
 [editable path="AreaJogo/BananaPreta"]

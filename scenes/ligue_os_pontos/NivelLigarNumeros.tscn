@@ -22,6 +22,9 @@
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="19_vbbpp"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_rfjyx"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="22_3frem"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="23_mqjeg"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="24_5v4xt"]
+[ext_resource type="Script" uid="uid://d383xofvevuej" path="res://scripts/ligue_os_pontos/LineRenderer.gd" id="25_aafwj"]
 
 [sub_resource type="Gradient" id="Gradient_h83n1"]
 offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
@@ -267,9 +270,24 @@ scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_h83n1")
 
+[node name="BotaoVoltarFase" parent="AreaJogo" unique_id=1138187997 instance=ExtResource("22_3frem")]
+
 [node name="CamadaLinhas" type="Node2D" parent="." unique_id=1216902111]
 
-[node name="BotaoVoltarFase" parent="CamadaLinhas" unique_id=1138187997 instance=ExtResource("22_3frem")]
+[node name="HintManager" type="Node" parent="." unique_id=1674353927]
+script = ExtResource("23_mqjeg")
+modo_pista = 2
+area_jogo_path = NodePath("../AreaJogo")
+camada_linhas_path = NodePath("../CamadaLinhas")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=712174973]
+script = ExtResource("24_5v4xt")
+sons_locais_path = NodePath("../SonsLocais")
+
+[node name="LineRenderer" type="Node" parent="." unique_id=980718852]
+script = ExtResource("25_aafwj")
+camada_linhas_path = NodePath("../CamadaLinhas")
 
 [editable path="AreaJogo/Ponto"]
 [editable path="AreaJogo/Ponto2"]

@@ -3,32 +3,54 @@ extends Node2D
 const BASE_SIZE := Vector2(720, 1280)
 
 @export_file("*.tscn") var proxima_fase_cena: String
-
 var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 
 # ==========================================
-# RESPONSIVIDADE
+# NÓS PRINCIPAIS
 # ==========================================
 @onready var fundo_responsivo: Sprite2D = $FundoResponsivo
 @onready var area_jogo: Node2D = $AreaJogo
+@onready var robo = $AreaJogo/ProfessorRobo
+@onready var confetes = $AreaJogo/CPUParticles2D
 
 # ==========================================
-# REFERÊNCIAS DAS PEÇAS
+# MANAGERS
+# ==========================================
+@onready var hint_manager: Node = get_node_or_null("HintManager")
+@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+
+# ==========================================
+# PEÇAS
 # ==========================================
 @onready var peca_p = $AreaJogo/Pecas/Peca_Pequena
 @onready var peca_m = $AreaJogo/Pecas/Peca_Media
 @onready var peca_g = $AreaJogo/Pecas/Peca_Grande
 
 # ==========================================
-# REFERÊNCIAS DE FEEDBACK
+# SLOTS / DESTINOS PARA PISTAS
+# Configure no Inspector.
 # ==========================================
-@onready var robo = $AreaJogo/ProfessorRobo
-@onready var confetes = $AreaJogo/CPUParticles2D
+@export_node_path("Node2D") var slot_pequeno_path: NodePath
+@export_node_path("Node2D") var slot_medio_path: NodePath
+@export_node_path("Node2D") var slot_grande_path: NodePath
 
-@onready var som_acerto = $SonsLocais/SomAcerto
-@onready var som_vitoria = $SonsLocais/SomVitoria
-@onready var som_erro = $SonsLocais/SomErro
-@onready var som_click_forma = $SonsLocais/SomClickNaForma
+@onready var slot_pequeno: Node2D = get_node_or_null(slot_pequeno_path)
+@onready var slot_medio: Node2D = get_node_or_null(slot_medio_path)
+@onready var slot_grande: Node2D = get_node_or_null(slot_grande_path)
+
+# ==========================================
+# FALLBACK SONSLOCAIS
+# ==========================================
+@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+
+# ==========================================
+# ESTADO
+# ==========================================
+var nivel_concluido := false
+var ordem_obrigatoria := []
 
 
 func _ready() -> void:
@@ -37,21 +59,20 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_ajustar_responsivo)
 	_ajustar_responsivo()
 
+	configurar_ordem_obrigatoria()
 	randomizar_pecas()
-
-	if has_node("/root/AudioManager"):
-		var musica = get_node("/root/AudioManager/MusicaFundo")
-		if not musica.playing:
-			musica.play()
+	configurar_hint_manager()
+	iniciar_musica_fundo()
 
 
+# ==========================================
+# RESPONSIVIDADE
+# ==========================================
 func _ajustar_responsivo() -> void:
 	var tamanho_tela: Vector2 = get_viewport().get_visible_rect().size
 
-	# Centraliza a área lógica 720x1280 dentro da tela real.
 	area_jogo.position = (tamanho_tela - BASE_SIZE) / 2.0
 
-	# Faz o fundo cobrir toda a tela real.
 	if fundo_responsivo and fundo_responsivo.texture:
 		var tamanho_textura: Vector2 = fundo_responsivo.texture.get_size()
 
@@ -65,14 +86,155 @@ func _ajustar_responsivo() -> void:
 		fundo_responsivo.scale = Vector2(escala_final, escala_final)
 
 
-# ==========================================
-# LÓGICA DO JOGO E VALIDAÇÃO
-# ==========================================
+func iniciar_musica_fundo() -> void:
+	if has_node("/root/AudioManager"):
+		var musica = get_node("/root/AudioManager/MusicaFundo")
+		if not musica.playing:
+			musica.play()
 
+
+# ==========================================
+# ORDEM OBRIGATÓRIA
+# ==========================================
+func configurar_ordem_obrigatoria() -> void:
+	# Ordem normal: pequena -> média -> grande.
+	ordem_obrigatoria = [peca_p, peca_m, peca_g]
+
+
+func obter_proxima_peca_obrigatoria() -> Node:
+	for peca in ordem_obrigatoria:
+		if peca and peca.slot_atual == null:
+			return peca
+
+	return null
+
+
+func peca_pode_ser_movida(peca: Node) -> bool:
+	if nivel_concluido:
+		return false
+
+	var proxima_peca = obter_proxima_peca_obrigatoria()
+
+	if not proxima_peca:
+		return false
+
+	return peca == proxima_peca
+
+
+func tentar_iniciar_peca(peca: Node) -> bool:
+	registrar_interacao_no_hint()
+
+	if peca_pode_ser_movida(peca):
+		tocar_som_clique()
+		return true
+
+	tocar_som_erro()
+
+	if hint_manager and hint_manager.has_method("forcar_pista"):
+		hint_manager.forcar_pista(2)
+
+	return false
+
+
+# ==========================================
+# HINT MANAGER
+# ==========================================
+func configurar_hint_manager() -> void:
+	if not hint_manager:
+		push_warning("HintManager não encontrado. Pistas desativadas.")
+		return
+
+	if hint_manager.has_method("configurar_callbacks"):
+		hint_manager.configurar_callbacks(
+			Callable(self, "buscar_peca_para_pista"),
+			Callable(self, "buscar_destino_da_peca_para_pista")
+		)
+
+	if hint_manager.has_method("reiniciar_sistema"):
+		hint_manager.reiniciar_sistema()
+
+	hint_manager.set("mensagem_pista_professor", "Observe com calma. Organize do menor para o maior.")
+	hint_manager.set("mensagem_pista_origem", "Comece pela peça destacada.")
+	hint_manager.set("mensagem_pista_destino", "Agora leve essa peça para o lugar que está brilhando.")
+
+
+func registrar_interacao_no_hint() -> void:
+	if hint_manager and hint_manager.has_method("registrar_interacao"):
+		hint_manager.registrar_interacao()
+
+
+func finalizar_hint_manager() -> void:
+	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+		hint_manager.finalizar_nivel()
+
+
+# ==========================================
+# RANDOMIZAÇÃO
+# ==========================================
+func randomizar_pecas() -> void:
+	var pecas = [peca_p, peca_m, peca_g]
+	var posicoes := []
+
+	for p in pecas:
+		posicoes.append(p.global_position)
+
+	posicoes.shuffle()
+
+	for i in range(pecas.size()):
+		pecas[i].global_position = posicoes[i]
+		pecas[i].posicao_inicial = posicoes[i]
+
+
+# ==========================================
+# ÁUDIO / FEEDBACK
+# ==========================================
+func tocar_som_clique() -> void:
+	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+		feedback_audio.tocar_click_forma()
+		return
+
+	if som_click_forma:
+		som_click_forma.play()
+
+
+func tocar_som_acerto() -> void:
+	registrar_interacao_no_hint()
+
+	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+		feedback_audio.tocar_acerto()
+		return
+
+	if som_acerto:
+		som_acerto.play()
+
+
+func tocar_som_erro() -> void:
+	registrar_interacao_no_hint()
+
+	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+		feedback_audio.tocar_erro_pedagogico()
+	else:
+		if som_erro:
+			som_erro.play()
+
+	if robo and robo.has_method("errar"):
+		robo.errar()
+
+
+func tocar_som_vitoria() -> void:
+	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+		feedback_audio.tocar_vitoria_pedagogica()
+		return
+
+	if som_vitoria:
+		som_vitoria.play()
+
+
+# ==========================================
+# LÓGICA DO JOGO
+# ==========================================
 func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
-	var todas_pecas = [peca_p, peca_m, peca_g]
-
-	for peca in todas_pecas:
+	for peca in [peca_p, peca_m, peca_g]:
 		if peca != peca_ignorada and peca.slot_atual == slot_verificado:
 			return true
 
@@ -80,13 +242,10 @@ func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
 
 
 func verificar_vitoria() -> void:
-	var todas_acertaram = (
-		peca_p.slot_atual != null
-		and peca_m.slot_atual != null
-		and peca_g.slot_atual != null
-	)
+	if nivel_concluido:
+		return
 
-	if todas_acertaram:
+	if peca_p.slot_atual != null and peca_m.slot_atual != null and peca_g.slot_atual != null:
 		vitoria()
 	else:
 		if robo and robo.has_method("comemorar"):
@@ -94,20 +253,25 @@ func verificar_vitoria() -> void:
 
 
 func vitoria() -> void:
+	if nivel_concluido:
+		return
+
+	nivel_concluido = true
+	finalizar_hint_manager()
+
 	print("Vitória! Ordenação concluída.")
 
 	if confetes:
 		confetes.emitting = true
 
-	if som_vitoria:
-		som_vitoria.play()
+	tocar_som_vitoria()
 
 	if robo and robo.has_method("vitoria"):
 		robo.vitoria()
 	elif robo and robo.has_method("comemorar"):
 		robo.comemorar()
 
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.4).timeout
 	mostrar_vitoria_padrao()
 
 
@@ -121,40 +285,23 @@ func mostrar_vitoria_padrao() -> void:
 
 
 # ==========================================
-# UTILITÁRIOS
+# CALLBACKS PARA HINTMANAGER
 # ==========================================
-
-func randomizar_pecas() -> void:
-	# Diferente do jogo de Formas, aqui embaralhamos apenas as peças.
-	# Os slots/pódios permanecem fixos para preservar a lógica da seriação.
-	var pecas_da_fase = [peca_p, peca_m, peca_g]
-	var pos_pecas := []
-
-	for p in pecas_da_fase:
-		pos_pecas.append(p.global_position)
-
-	pos_pecas.shuffle()
-
-	for i in range(pecas_da_fase.size()):
-		pecas_da_fase[i].global_position = pos_pecas[i]
-
-		# Atualiza a posição inicial para que o erro retorne ao local embaralhado.
-		pecas_da_fase[i].posicao_inicial = pos_pecas[i]
+func buscar_peca_para_pista() -> Node:
+	return obter_proxima_peca_obrigatoria()
 
 
-func tocar_som_clique() -> void:
-	if som_click_forma:
-		som_click_forma.play()
+func buscar_destino_da_peca_para_pista(peca: Node) -> Node:
+	if not peca:
+		return null
 
+	if peca == peca_p:
+		return slot_pequeno
 
-func tocar_som_acerto() -> void:
-	if som_acerto:
-		som_acerto.play()
+	if peca == peca_m:
+		return slot_medio
 
+	if peca == peca_g:
+		return slot_grande
 
-func tocar_som_erro() -> void:
-	if som_erro:
-		som_erro.play()
-
-	if robo and robo.has_method("errar"):
-		robo.errar()
+	return null

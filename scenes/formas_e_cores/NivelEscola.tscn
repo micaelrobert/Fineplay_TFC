@@ -20,6 +20,8 @@
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="15_wrl74"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_fkv7b"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="20_tst06"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="21_sffy3"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="22_mvmt7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jyl56"]
 radius = 59.5399
@@ -65,6 +67,7 @@ stream = ExtResource("13_g83y3")
 
 [node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1206220619]
 stream = ExtResource("14_ab8er")
+volume_db = 3.0
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1394689786]
 stream = ExtResource("15_wrl74")
@@ -176,7 +179,7 @@ shape = SubResource("RectangleShape2D_ln2lh")
 [node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=380587657]
 position = Vector2(382, 391)
 emitting = false
-amount = 50
+amount = 53
 texture = ExtResource("20_fkv7b")
 one_shot = true
 explosiveness = 1.0
@@ -189,6 +192,16 @@ scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_65tx0")
 
 [node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("20_tst06")]
+
+[node name="HintManager" type="Node" parent="." unique_id=1225423843]
+script = ExtResource("21_sffy3")
+modo_pista = 0
+area_jogo_path = NodePath("../AreaJogo")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=1724518585]
+script = ExtResource("22_mvmt7")
+sons_locais_path = NodePath("../SonsLocais")
 
 [editable path="AreaJogo/ObjetoArrastavel"]
 [editable path="AreaJogo/ObjetoArrastavel2"]

@@ -24,6 +24,8 @@
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="21_m4hpg"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="22_n3ei2"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="23_uwl6c"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="25_53orq"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="26_1xre3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ln2lh"]
 size = Vector2(111, 104)
@@ -66,6 +68,7 @@ stream = ExtResource("19_k6lnc")
 
 [node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=107758879]
 stream = ExtResource("20_r6lu0")
+volume_db = 3.0
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1794983944]
 stream = ExtResource("21_m4hpg")
@@ -203,6 +206,16 @@ scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_65tx0")
 
 [node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("23_uwl6c")]
+
+[node name="HintManager" type="Node" parent="." unique_id=1573921375]
+script = ExtResource("25_53orq")
+modo_pista = 0
+area_jogo_path = NodePath("../AreaJogo")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=1875715978]
+script = ExtResource("26_1xre3")
+sons_locais_path = NodePath("../SonsLocais")
 
 [editable path="AreaJogo/ObjetoArrastavel"]
 [editable path="AreaJogo/ObjetoArrastavel2"]

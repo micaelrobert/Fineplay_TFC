@@ -18,15 +18,13 @@
 [ext_resource type="AudioStream" uid="uid://bdp3cstl6wrsd" path="res://music/Fineplay.mp3" id="21_d7hqq"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="22_7au3h"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="23_t0h6p"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="24_8m1xu"]
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="24_y80la"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="25_av1la"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="25_rpuow"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="26_sftqj"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="27_1r2tf"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="27_m7hl2"]
-
-[sub_resource type="Gradient" id="Gradient_65tx0"]
-offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
-colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ln2lh"]
 size = Vector2(191, 149)
@@ -45,6 +43,10 @@ radius = 60.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xrfph"]
 radius = 63.1981
+
+[sub_resource type="Gradient" id="Gradient_65tx0"]
+offsets = PackedFloat32Array(0, 0, 0, 0, 0.10958904, 0.23287672, 0.3561644, 0.4520548, 0.60273975, 0.75342464, 0.8630137, 1)
+colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055, 1, 0, 0.9411765, 0, 1, 0.093007915, 0.330487, 0.99999994, 1, 0.18069997, 0.3915777, 0.890411, 1, 0.28483427, 0.4641229, 0.7602742, 1, 0.382607, 0.5322363, 0.6380874, 1, 0.45865247, 0.58521336, 0.5430532, 1, 0.5835843, 0.6722471, 0.38692564, 1, 0.70102394, 0.75406146, 0.24016106, 1, 0.7864346, 0.8135628, 0.13342316, 1, 0.89319795, 0.8879395, 7.70092e-07, 1)
 
 [node name="NivelCategoria" type="Node2D" unique_id=776995604]
 script = ExtResource("1_1r2tf")
@@ -73,21 +75,6 @@ stream = ExtResource("25_rpuow")
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1902373142]
 stream = ExtResource("26_sftqj")
-
-[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=78779945]
-position = Vector2(382, 391)
-emitting = false
-amount = 50
-texture = ExtResource("27_m7hl2")
-one_shot = true
-explosiveness = 1.0
-spread = 180.0
-gravity = Vector2(9.8, 980)
-initial_velocity_min = 300.0
-initial_velocity_max = 300.0
-scale_amount_min = 0.1
-scale_amount_max = 0.1
-color_ramp = SubResource("Gradient_65tx0")
 
 [node name="AreaJogo" type="Node2D" parent="." unique_id=19443518]
 
@@ -223,7 +210,32 @@ position = Vector2(663, 122)
 texture = ExtResource("18_374w3")
 script = ExtResource("19_6wpb1")
 
+[node name="CPUParticles2D" type="CPUParticles2D" parent="AreaJogo" unique_id=78779945]
+position = Vector2(382, 391)
+emitting = false
+amount = 50
+texture = ExtResource("27_m7hl2")
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(9.8, 980)
+initial_velocity_min = 300.0
+initial_velocity_max = 300.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_65tx0")
+
 [node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("27_1r2tf")]
+
+[node name="HintManager" type="Node" parent="." unique_id=535920813]
+script = ExtResource("24_8m1xu")
+modo_pista = 0
+area_jogo_path = NodePath("../AreaJogo")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=1972946855]
+script = ExtResource("25_av1la")
+sons_locais_path = NodePath("../SonsLocais")
 
 [editable path="AreaJogo/ObjetoArrastavel"]
 [editable path="AreaJogo/ObjetoArrastavel8"]

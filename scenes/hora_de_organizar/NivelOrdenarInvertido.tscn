@@ -21,6 +21,8 @@
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="19_ongl8"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_40xij"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="21_frqwn"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="22_e6qp5"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="23_0vdih"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1unmf"]
 size = Vector2(205.55554, 188)
@@ -29,7 +31,7 @@ size = Vector2(205.55554, 188)
 size = Vector2(166, 172)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ttlku"]
-size = Vector2(166, 130)
+size = Vector2(166, 153)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d60x6"]
 radius = 39.0
@@ -75,6 +77,7 @@ stream = ExtResource("16_1stn3")
 
 [node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1171203139]
 stream = ExtResource("17_ivsjg")
+volume_db = 3.0
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1244370229]
 stream = ExtResource("13_826hw")
@@ -85,7 +88,7 @@ stream = ExtResource("13_826hw")
 position = Vector2(43, 0)
 
 [node name="Slot_4" type="Area2D" parent="AreaJogo/Slots" unique_id=1193245526]
-position = Vector2(101, 632)
+position = Vector2(94, 371.00003)
 scale = Vector2(0.9, 0.9)
 script = ExtResource("3_btejl")
 altura_da_peca = 115.0
@@ -99,7 +102,7 @@ position = Vector2(-2.777771, -32)
 shape = SubResource("RectangleShape2D_1unmf")
 
 [node name="Slot_3" type="Area2D" parent="AreaJogo/Slots" unique_id=1467898865]
-position = Vector2(557.00006, 367.00003)
+position = Vector2(333, 377)
 scale = Vector2(1.25, 1.25)
 script = ExtResource("3_btejl")
 altura_da_peca = 100.0
@@ -113,7 +116,7 @@ position = Vector2(0, -40)
 shape = SubResource("RectangleShape2D_qp2rx")
 
 [node name="Slot_2" type="Area2D" parent="AreaJogo/Slots" unique_id=942940915]
-position = Vector2(325, 364)
+position = Vector2(557, 367)
 script = ExtResource("3_btejl")
 altura_da_peca = 70.0
 
@@ -122,11 +125,11 @@ scale = Vector2(0.14, 0.14)
 texture = ExtResource("6_wiq7u")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaJogo/Slots/Slot_2" unique_id=1881451879]
-position = Vector2(0, -29)
+position = Vector2(0, -20.5)
 shape = SubResource("RectangleShape2D_ttlku")
 
 [node name="Slot_1" type="Area2D" parent="AreaJogo/Slots" unique_id=103562952]
-position = Vector2(94, 369)
+position = Vector2(88, 562)
 script = ExtResource("3_btejl")
 altura_da_peca = 60.0
 
@@ -211,3 +214,13 @@ scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_v0147")
 
 [node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("21_frqwn")]
+
+[node name="HintManager" type="Node" parent="." unique_id=282180036]
+script = ExtResource("22_e6qp5")
+modo_pista = 2
+area_jogo_path = NodePath("../AreaJogo")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=157610484]
+script = ExtResource("23_0vdih")
+sons_locais_path = NodePath("../SonsLocais")

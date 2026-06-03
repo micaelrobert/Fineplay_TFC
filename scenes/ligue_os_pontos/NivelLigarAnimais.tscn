@@ -17,6 +17,9 @@
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="15_6kgn1"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="16_7ka50"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="17_roh4w"]
+[ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="18_spa7r"]
+[ext_resource type="Script" uid="uid://cyfdwfgwnwipv" path="res://scripts/generic/FeedbackAudio.gd" id="19_re2lj"]
+[ext_resource type="Script" uid="uid://d383xofvevuej" path="res://scripts/ligue_os_pontos/LineRenderer.gd" id="20_j7d0k"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_koxun"]
 radius = 44.102154
@@ -87,6 +90,7 @@ stream = ExtResource("12_5auuk")
 
 [node name="SomErro" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1016992848]
 stream = ExtResource("13_rsh0i")
+volume_db = 3.0
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1656460192]
 stream = ExtResource("10_0nudm")
@@ -281,9 +285,23 @@ scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_8pf32")
 
+[node name="BotaoVoltarFase" parent="AreaJogo" unique_id=1138187997 instance=ExtResource("17_roh4w")]
+
 [node name="CamadaLinhas" type="Node2D" parent="." unique_id=604635104]
 
-[node name="BotaoVoltarFase" parent="CamadaLinhas" unique_id=1138187997 instance=ExtResource("17_roh4w")]
+[node name="HintManager" type="Node" parent="." unique_id=3146206]
+script = ExtResource("18_spa7r")
+area_jogo_path = NodePath("../AreaJogo")
+camada_linhas_path = NodePath("../CamadaLinhas")
+robo_path = NodePath("../AreaJogo/ProfessorRobo")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=47543523]
+script = ExtResource("19_re2lj")
+sons_locais_path = NodePath("../SonsLocais")
+
+[node name="LineRenderer" type="Node" parent="." unique_id=900814558]
+script = ExtResource("20_j7d0k")
+camada_linhas_path = NodePath("../CamadaLinhas")
 
 [editable path="AreaJogo/Urso"]
 [editable path="AreaJogo/Pintinho"]

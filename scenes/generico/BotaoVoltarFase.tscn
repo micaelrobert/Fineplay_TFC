@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://duu08rukk8b82"]
 
 [ext_resource type="Script" uid="uid://bfj0umpsh0acu" path="res://scripts/generic/botao_voltar_fase.gd" id="1_d72pk"]
-[ext_resource type="Texture2D" uid="uid://ca47cksfc0gtv" path="res://assets/kenney_ui-pack/PNG/Extra/Default/home_light.png" id="7_83u2t"]
+[ext_resource type="Texture2D" uid="uid://tyf2s1lxfe05" path="res://assets/kenney_ui-pack/PNG/Extra/Default/home_icon.png" id="2_d72pk"]
 
 [node name="BotaoVoltarFase" type="CanvasLayer" unique_id=1138187997]
 script = ExtResource("1_d72pk")
@@ -32,10 +32,10 @@ mouse_filter = 2
 [node name="BtnVoltarFase" type="TextureButton" parent="UIResponsiva/CenterContainer/AreaJogo" unique_id=1254030946]
 layout_mode = 1
 offset_left = 16.0
-offset_top = 7.0
-offset_right = 120.0
-offset_bottom = 110.0
-texture_normal = ExtResource("7_83u2t")
+offset_top = 43.0
+offset_right = 150.0
+offset_bottom = 171.0
+texture_normal = ExtResource("2_d72pk")
 ignore_texture_size = true
 stretch_mode = 0
 

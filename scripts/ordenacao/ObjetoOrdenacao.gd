@@ -1,7 +1,13 @@
 extends Area2D
 
+# ==========================================
+# CONFIGURAÇÃO
+# ==========================================
 @export var nome_do_slot_correto: String = ""
 
+# ==========================================
+# ESTADO
+# ==========================================
 var arrastando := false
 var posicao_inicial: Vector2
 var slot_atual = null
@@ -9,7 +15,9 @@ var travado := false
 
 var controlador = null
 
-
+# ==========================================
+# READY
+# ==========================================
 func _ready() -> void:
 	await get_tree().process_frame
 
@@ -17,11 +25,17 @@ func _ready() -> void:
 	controlador = get_tree().current_scene
 
 
+# ==========================================
+# PROCESS
+# ==========================================
 func _process(_delta) -> void:
 	if arrastando and not travado:
 		global_position = get_global_mouse_position()
 
 
+# ==========================================
+# INPUT
+# ==========================================
 func _input_event(_viewport, event, _shape_idx) -> void:
 	if travado:
 		return
@@ -29,6 +43,11 @@ func _input_event(_viewport, event, _shape_idx) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
+				# Antes de permitir o arraste, verifica ordem obrigatória
+				if controlador and controlador.has_method("tentar_iniciar_peca"):
+					var permitido = controlador.tentar_iniciar_peca(self)
+					if not permitido:
+						return  # não permite arraste se não for a peça correta
 				arrastando = true
 				z_index = 10
 
@@ -40,6 +59,9 @@ func _input_event(_viewport, event, _shape_idx) -> void:
 				verificar_soltura()
 
 
+# ==========================================
+# SOLTURA / ENCAIXE
+# ==========================================
 func verificar_soltura() -> void:
 	var areas = get_overlapping_areas()
 	var soltou_no_slot := false
@@ -67,7 +89,7 @@ func encaixar_no_slot(area) -> void:
 
 	var posicao_final: Vector2 = area.global_position
 
-	# Puxa a altura personalizada do slot, se existir.
+	# Puxa a altura personalizada do slot, se existir
 	if "altura_da_peca" in area:
 		posicao_final.y -= area.altura_da_peca
 	else:
@@ -81,7 +103,7 @@ func encaixar_no_slot(area) -> void:
 
 	if controlador and controlador.has_method("verificar_vitoria"):
 		controlador.verificar_vitoria()
-
+ 
 
 func voltar_para_inicio() -> void:
 	slot_atual = null
