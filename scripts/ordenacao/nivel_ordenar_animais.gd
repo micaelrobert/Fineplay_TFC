@@ -1,33 +1,25 @@
 extends Node2D
 
-const BASE_SIZE := Vector2(720, 1280)
+# ============================================================
+# Ordenação 4 peças — menor para maior
+# Responsividade controlada pelo AutoLoad ResponsividadeUniversal.gd
+# ============================================================
 
 @export_file("*.tscn") var proxima_fase_cena: String
-var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
+var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
 
-# ==========================================
-# RESPONSIVIDADE
-# ==========================================
-@onready var fundo_responsivo: Sprite2D = $FundoResponsivo
 @onready var area_jogo: Node2D = $AreaJogo
+@onready var robo = $AreaJogo/ProfessorRobo
+@onready var confetes = $AreaJogo/CPUParticles2D
 
-# ==========================================
-# MANAGERS
-# ==========================================
 @onready var hint_manager: Node = get_node_or_null("HintManager")
 @onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
 
-# ==========================================
-# PEÇAS
-# ==========================================
 @onready var peca_p = $AreaJogo/Pecas/Peca_Pequena
 @onready var peca_m = $AreaJogo/Pecas/Peca_Media
 @onready var peca_g = $AreaJogo/Pecas/Peca_Grande
 @onready var peca_gg = $AreaJogo/Pecas/Peca_Gigante
 
-# ==========================================
-# SLOTS / DESTINOS PARA PISTAS
-# ==========================================
 @export_node_path("Node2D") var slot_pequeno_path: NodePath
 @export_node_path("Node2D") var slot_medio_path: NodePath
 @export_node_path("Node2D") var slot_grande_path: NodePath
@@ -38,64 +30,45 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 @onready var slot_grande: Node2D = get_node_or_null(slot_grande_path)
 @onready var slot_gigante: Node2D = get_node_or_null(slot_gigante_path)
 
-# ==========================================
-# FEEDBACK
-# ==========================================
-@onready var robo = $AreaJogo/ProfessorRobo
-@onready var confetes = $AreaJogo/CPUParticles2D
-
 @onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
 @onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
 @onready var som_erro = get_node_or_null("SonsLocais/SomErro")
 @onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
 
-# ==========================================
-# ESTADO
-# ==========================================
 var nivel_concluido := false
 var ordem_obrigatoria := []
 
 
 func _ready() -> void:
 	randomize()
+	call_deferred("_inicializar_fase_com_seguranca")
 
-	get_viewport().size_changed.connect(_ajustar_responsivo)
-	_ajustar_responsivo()
+
+func _inicializar_fase_com_seguranca() -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	_inicializar_fase()
+
+
+func _inicializar_fase() -> void:
+	nivel_concluido = false
 
 	configurar_ordem_obrigatoria()
 	randomizar_pecas()
 	configurar_hint_manager()
 	iniciar_musica_fundo()
 
-
-func _ajustar_responsivo() -> void:
-	var tamanho_tela: Vector2 = get_viewport().get_visible_rect().size
-
-	area_jogo.position = (tamanho_tela - BASE_SIZE) / 2.0
-
-	if fundo_responsivo and fundo_responsivo.texture:
-		var tamanho_textura: Vector2 = fundo_responsivo.texture.get_size()
-
-		fundo_responsivo.centered = true
-		fundo_responsivo.position = tamanho_tela / 2.0
-
-		var escala_x := tamanho_tela.x / tamanho_textura.x
-		var escala_y := tamanho_tela.y / tamanho_textura.y
-		var escala_final = max(escala_x, escala_y)
-
-		fundo_responsivo.scale = Vector2(escala_final, escala_final)
+	print("Minigame de Ordenação 4 peças iniciado: menor para maior.")
 
 
 func iniciar_musica_fundo() -> void:
-	if has_node("/root/AudioManager"):
-		var musica = get_node("/root/AudioManager/MusicaFundo")
-		if not musica.playing:
-			musica.play()
+	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+
+	if musica and not musica.playing:
+		musica.play()
 
 
-# ==========================================
-# ORDEM OBRIGATÓRIA
-# ==========================================
 func configurar_ordem_obrigatoria() -> void:
 	# Ordem normal: pequena -> média -> grande -> gigante.
 	ordem_obrigatoria = [peca_p, peca_m, peca_g, peca_gg]
@@ -122,23 +95,26 @@ func peca_pode_ser_movida(peca: Node) -> bool:
 
 
 func tentar_iniciar_peca(peca: Node) -> bool:
-	registrar_interacao_no_hint()
+	# Clique não deve resetar pista.
+	registrar_acao_no_hint_sem_resetar()
 
 	if peca_pode_ser_movida(peca):
 		tocar_som_clique()
 		return true
 
+	# Se a criança tenta pegar uma peça fora da ordem,
 	tocar_som_erro()
-
 	if hint_manager and hint_manager.has_method("forcar_pista"):
-		hint_manager.forcar_pista(2)
+		hint_manager.forcar_pista(1)
+
+	if robo and robo.has_method("errar"):
+		robo.errar()
+	elif robo.has_method("dar_dica"):
+		robo.dar_dica()
 
 	return false
 
 
-# ==========================================
-# HINT MANAGER
-# ==========================================
 func configurar_hint_manager() -> void:
 	if not hint_manager:
 		push_warning("HintManager não encontrado. Pistas desativadas.")
@@ -153,14 +129,17 @@ func configurar_hint_manager() -> void:
 	if hint_manager.has_method("reiniciar_sistema"):
 		hint_manager.reiniciar_sistema()
 
-	hint_manager.set("mensagem_pista_professor", "Observe com calma. Organize os animais do menor para o maior.")
-	hint_manager.set("mensagem_pista_origem", "Comece pelo menor animal destacado.")
-	hint_manager.set("mensagem_pista_destino", "Agora leve esse animal para o lugar que está brilhando.")
+
+func registrar_acao_no_hint_sem_resetar() -> void:
+	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+		hint_manager.registrar_acao_sem_resetar_pista()
 
 
-func registrar_interacao_no_hint() -> void:
-	if hint_manager and hint_manager.has_method("registrar_interacao"):
-		hint_manager.registrar_interacao()
+func registrar_acerto_no_hint() -> void:
+	if hint_manager and hint_manager.has_method("registrar_acerto"):
+		hint_manager.registrar_acerto()
+	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+		hint_manager.resetar_pistas()
 
 
 func finalizar_hint_manager() -> void:
@@ -168,26 +147,30 @@ func finalizar_hint_manager() -> void:
 		hint_manager.finalizar_nivel()
 
 
-# ==========================================
-# RANDOMIZAÇÃO
-# ==========================================
 func randomizar_pecas() -> void:
 	var pecas = [peca_p, peca_m, peca_g, peca_gg]
 	var posicoes := []
 
 	for p in pecas:
-		posicoes.append(p.global_position)
+		if p:
+			posicoes.append(p.global_position)
 
 	posicoes.shuffle()
 
-	for i in range(pecas.size()):
-		pecas[i].global_position = posicoes[i]
-		pecas[i].posicao_inicial = posicoes[i]
+	var indice := 0
+
+	for p in pecas:
+		if p:
+			p.global_position = posicoes[indice]
+
+			if p.has_method("atualizar_posicao_inicial"):
+				p.atualizar_posicao_inicial()
+			else:
+				p.posicao_inicial = p.global_position
+
+			indice += 1
 
 
-# ==========================================
-# ÁUDIO / FEEDBACK
-# ==========================================
 func tocar_som_clique() -> void:
 	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
 		feedback_audio.tocar_click_forma()
@@ -198,7 +181,7 @@ func tocar_som_clique() -> void:
 
 
 func tocar_som_acerto() -> void:
-	registrar_interacao_no_hint()
+	registrar_acerto_no_hint()
 
 	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
 		feedback_audio.tocar_acerto()
@@ -209,7 +192,8 @@ func tocar_som_acerto() -> void:
 
 
 func tocar_som_erro() -> void:
-	registrar_interacao_no_hint()
+	# Erro no slot errado mantém a pista e o tempo.
+	registrar_acao_no_hint_sem_resetar()
 
 	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
 		feedback_audio.tocar_erro_pedagogico()
@@ -230,9 +214,6 @@ func tocar_som_vitoria() -> void:
 		som_vitoria.play()
 
 
-# ==========================================
-# LÓGICA DO JOGO
-# ==========================================
 func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
 	for peca in [peca_p, peca_m, peca_g, peca_gg]:
 		if peca != peca_ignorada and peca.slot_atual == slot_verificado:
@@ -284,14 +265,13 @@ func mostrar_vitoria_padrao() -> void:
 	var tela = cena_vitoria.instantiate()
 	add_child(tela)
 
-	await get_tree().process_frame
 
-	tela.configurar(proxima_fase_cena)
+	if tela.has_method("configurar"):
+		tela.configurar(proxima_fase_cena)
+	else:
+		push_warning("TelaVitoria não possui o método configurar().")
 
 
-# ==========================================
-# CALLBACKS PARA HINTMANAGER
-# ==========================================
 func buscar_peca_para_pista() -> Node:
 	return obter_proxima_peca_obrigatoria()
 

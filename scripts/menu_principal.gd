@@ -1,7 +1,5 @@
 extends Control
 
-const BASE_SIZE := Vector2(720, 1280)
-
 @onready var fundo_responsivo: Control = $FundoResponsivo
 @onready var center_container: CenterContainer = $CenterContainer
 @onready var area_jogo: Control = $CenterContainer/AreaJogo
@@ -31,9 +29,6 @@ var robo_animando := true
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
-	get_viewport().size_changed.connect(_ajustar_responsivo)
-	call_deferred("_ajustar_responsivo")
-
 	await get_tree().process_frame
 	await get_tree().process_frame
 
@@ -49,28 +44,6 @@ func _ready() -> void:
 	_iniciar_pulsacao_botao()
 	_iniciar_pulsacao_robo()
 	_animacao_poses_robo()
-
-
-func _ajustar_responsivo() -> void:
-	var tamanho_tela := get_viewport().get_visible_rect().size
-
-	position = Vector2.ZERO
-	set_deferred("size", tamanho_tela)
-
-	fundo_responsivo.position = Vector2.ZERO
-	fundo_responsivo.set_deferred("size", tamanho_tela)
-
-	center_container.position = Vector2.ZERO
-	center_container.set_deferred("size", tamanho_tela)
-
-	area_jogo.custom_minimum_size = BASE_SIZE
-	area_jogo.set_deferred("size", BASE_SIZE)
-
-	call_deferred("_recalcular_container")
-
-
-func _recalcular_container() -> void:
-	center_container.queue_sort()
 
 
 func _animacao_entrada() -> void:
@@ -100,7 +73,6 @@ func _iniciar_pulsacao_botao() -> void:
 
 	tween_botao_idle = create_tween()
 	tween_botao_idle.set_loops()
-
 	tween_botao_idle.tween_property(botao_jogar, "scale", Vector2(1.035, 1.035), 0.75).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween_botao_idle.tween_property(botao_jogar, "scale", Vector2.ONE, 0.75).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
@@ -114,7 +86,6 @@ func _iniciar_pulsacao_robo() -> void:
 
 	tween_robo_idle = create_tween()
 	tween_robo_idle.set_loops()
-
 	tween_robo_idle.tween_property(robo_menu, "scale", escala_robo_base * 1.035, 0.85).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween_robo_idle.tween_property(robo_menu, "scale", escala_robo_base, 0.85).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 

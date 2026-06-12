@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-const BASE_SIZE := Vector2(720, 1280)
-
 var caminho_proxima_fase: String = ""
 
 @onready var ui_responsiva: Control = $UIResponsiva
@@ -15,37 +13,11 @@ var caminho_proxima_fase: String = ""
 
 
 func _ready() -> void:
-	get_viewport().size_changed.connect(_ajustar_responsivo)
-	call_deferred("_ajustar_responsivo")
-
 	await get_tree().process_frame
 	
 	btn_proximo.pivot_offset = btn_proximo.size / 2
 	btn_reiniciar.pivot_offset = btn_reiniciar.size / 2
 	btn_menu.pivot_offset = btn_menu.size / 2
-
-
-func _ajustar_responsivo() -> void:
-	var tamanho_tela: Vector2 = get_viewport().get_visible_rect().size
-
-	# Faz a camada de UI ocupar a tela real do dispositivo.
-	ui_responsiva.position = Vector2.ZERO
-	ui_responsiva.size = tamanho_tela
-
-	# Fundo/overlay ocupa a tela inteira.
-	fundo_responsivo.position = Vector2.ZERO
-	fundo_responsivo.size = tamanho_tela
-
-	# CenterContainer ocupa a tela real para centralizar a AreaJogo.
-	center_container.position = Vector2.ZERO
-	center_container.size = tamanho_tela
-
-	# AreaJogo permanece como o "celular virtual" base.
-	area_jogo.custom_minimum_size = BASE_SIZE
-	area_jogo.size = BASE_SIZE
-
-	# Força o container a recalcular a centralização.
-	center_container.queue_sort()
 
 
 func configurar(proxima_fase: String) -> void:

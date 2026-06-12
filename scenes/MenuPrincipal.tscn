@@ -32,6 +32,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_f5jwn")
+expand_mode = 1
 stretch_mode = 6
 
 [node name="GerenciadorDeSons" type="Node" parent="." unique_id=1256433243]

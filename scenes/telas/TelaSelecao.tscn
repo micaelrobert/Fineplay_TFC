@@ -57,6 +57,8 @@ offset_right = -6.1035156e-05
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_j02mj")
+expand_mode = 1
+stretch_mode = 6
 metadata/_edit_use_anchors_ = true
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=833290167]
@@ -75,9 +77,9 @@ layout_mode = 2
 
 [node name="BtnFormas" type="TextureButton" parent="CenterContainer/AreaJogo" unique_id=571534405]
 layout_mode = 1
-offset_left = 120.0
+offset_left = 139.0
 offset_top = 403.0
-offset_right = 569.0
+offset_right = 588.0
 offset_bottom = 512.0
 texture_normal = ExtResource("4_k8ouq")
 stretch_mode = 0
@@ -147,9 +149,9 @@ metadata/_edit_use_anchors_ = true
 
 [node name="BtnPontos" type="TextureButton" parent="CenterContainer/AreaJogo" unique_id=1297031641]
 layout_mode = 1
-offset_left = 120.0
+offset_left = 139.0
 offset_top = 533.0
-offset_right = 569.0
+offset_right = 588.0
 offset_bottom = 642.0
 texture_normal = ExtResource("4_eh27v")
 stretch_mode = 0
@@ -216,9 +218,9 @@ metadata/_edit_use_anchors_ = true
 
 [node name="BtnOrdenar" type="TextureButton" parent="CenterContainer/AreaJogo" unique_id=1710301226]
 layout_mode = 1
-offset_left = 120.0
+offset_left = 139.0
 offset_top = 664.0
-offset_right = 569.0
+offset_right = 588.0
 offset_bottom = 773.0
 texture_normal = ExtResource("13_geufk")
 stretch_mode = 0
@@ -320,9 +322,9 @@ vertical_alignment = 1
 
 [node name="BtnVoltar2" type="TextureButton" parent="CenterContainer/AreaJogo" unique_id=985233543]
 layout_mode = 1
-offset_left = 125.0
+offset_left = 144.0
 offset_top = 995.0
-offset_right = 574.0
+offset_right = 593.0
 offset_bottom = 1104.0
 texture_normal = ExtResource("13_vidof")
 stretch_mode = 0

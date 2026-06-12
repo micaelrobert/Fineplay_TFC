@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://q1vm7dn0i574"
+path="res://.godot/imported/Ooops! Esse não está.mp3-5016d44ba2a9ca40a38e9942d32bab1d.mp3str"
+
+[deps]
+
+source_file="res://assets/voices/voice_error/Ooops! Esse não está.mp3"
+dest_files=["res://.godot/imported/Ooops! Esse não está.mp3-5016d44ba2a9ca40a38e9942d32bab1d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,7 +1,5 @@
 extends Control
 
-const BASE_SIZE := Vector2(720, 1280)
-
 @onready var fundo_responsivo: Control = $FundoResponsivo
 @onready var center_container: CenterContainer = $CenterContainer
 @onready var area_jogo: Control = $CenterContainer/AreaJogo
@@ -12,41 +10,14 @@ const BASE_SIZE := Vector2(720, 1280)
 @onready var btn_voltar = $CenterContainer/AreaJogo/BtnVoltar2
 
 
-func _ready():
+func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-
-	get_viewport().size_changed.connect(_ajustar_responsivo)
-	call_deferred("_ajustar_responsivo")
-
 	await get_tree().process_frame
 
 	btn_formas.pivot_offset = btn_formas.size / 2
 	btn_pontos.pivot_offset = btn_pontos.size / 2
 	btn_ordenar.pivot_offset = btn_ordenar.size / 2
 	btn_voltar.pivot_offset = btn_voltar.size / 2
-
-
-func _ajustar_responsivo() -> void:
-	var tamanho_tela: Vector2 = get_viewport().get_visible_rect().size
-
-	# Faz a raiz ocupar a tela real do dispositivo.
-	position = Vector2.ZERO
-	size = tamanho_tela
-
-	# Fundo ocupa a tela inteira.
-	fundo_responsivo.position = Vector2.ZERO
-	fundo_responsivo.size = tamanho_tela
-
-	# CenterContainer ocupa a tela inteira real.
-	center_container.position = Vector2.ZERO
-	center_container.size = tamanho_tela
-
-	# AreaJogo continua sendo o "celular virtual" 720x1280.
-	area_jogo.custom_minimum_size = BASE_SIZE
-	area_jogo.size = BASE_SIZE
-
-	# Força o container a recalcular a centralização.
-	center_container.queue_sort()
 
 
 # ==========================================

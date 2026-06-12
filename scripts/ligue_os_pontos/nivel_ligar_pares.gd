@@ -1,18 +1,39 @@
 extends Node2D
 
-const BASE_SIZE := Vector2(720, 1280)
+# ============================================================
+# OBSERVAÇÃO IMPORTANTE
+# ============================================================
+# A responsividade agora é controlada pelo AutoLoad:
+# ResponsividadeUniversal.gd
+#
+# Este script NÃO centraliza AreaJogo,
+# NÃO redimensiona FundoResponsivo
+# e NÃO reposiciona CamadaLinhas.
+#
+# A cena precisa manter os nós:
+# - FundoResponsivo
+# - AreaJogo
+# - CamadaLinhas
+# - HintManager
+# - FeedbackAudio
+# - LineRenderer
+# ============================================================
 
+
+# ==========================================
+# CONFIGURAÇÕES DA FASE
+# ==========================================
 @export var total_objetivos: int = 3
 @export_file("*.tscn") var proxima_fase_cena: String
 
-var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
+var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+
 
 # ==========================================
-# RESPONSIVIDADE
+# ESTRUTURA DA CENA
 # ==========================================
-@onready var fundo_responsivo: Sprite2D = $FundoResponsivo
 @onready var area_jogo: Node2D = $AreaJogo
-@onready var camada_linhas: Node2D = $CamadaLinhas
+
 
 # ==========================================
 # MANAGERS
@@ -21,11 +42,13 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 @onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
 @onready var line_renderer: Node = get_node_or_null("LineRenderer")
 
+
 # ==========================================
 # REFERÊNCIAS DA FASE
 # ==========================================
 @onready var robo = $AreaJogo/ProfessorRobo
 @onready var confetes = $AreaJogo/CPUParticles2D
+
 
 # ==========================================
 # FALLBACK DE SONS
@@ -36,6 +59,7 @@ var cena_vitoria = preload("res://scenes/telas/TelaVitoria.tscn")
 @onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
 @onready var som_erro = get_node_or_null("SonsLocais/SomErro")
 @onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+
 
 # ==========================================
 # CONTROLE DO JOGO
@@ -51,13 +75,35 @@ var nivel_concluido := false
 
 func _ready() -> void:
 	randomize()
+	call_deferred("_inicializar_fase_com_seguranca")
 
-	get_viewport().size_changed.connect(_ajustar_responsivo)
-	_ajustar_responsivo()
 
+func _inicializar_fase_com_seguranca() -> void:
+	# Aguarda a cena montar completamente.
+	await get_tree().process_frame
+
+	# Aguarda mais um frame para o ResponsividadeUniversal
+	# ajustar AreaJogo, FundoResponsivo e CamadaLinhas.
+	await get_tree().process_frame
+
+	_inicializar_fase()
+
+
+func _inicializar_fase() -> void:
+	resetar_estado_do_nivel()
 	randomizar_posicoes()
 	configurar_managers()
 	iniciar_musica_fundo()
+
+	print("Minigame Ligue os Pontos iniciado.")
+
+
+func resetar_estado_do_nivel() -> void:
+	ponto_inicial = null
+	acertos = 0
+	arrastou_linha = false
+	pos_inicio_interacao = Vector2.ZERO
+	nivel_concluido = false
 
 
 # ==========================================
@@ -75,16 +121,23 @@ func configurar_managers() -> void:
 
 	if not line_renderer:
 		push_warning("LineRenderer não encontrado. As linhas não serão desenhadas corretamente.")
+	else:
+		if line_renderer.has_method("limpar_todas_as_linhas"):
+			line_renderer.limpar_todas_as_linhas()
 
 
-func registrar_interacao_no_hint() -> void:
-	if hint_manager and hint_manager.has_method("registrar_interacao"):
-		hint_manager.registrar_interacao()
+func registrar_acao_no_hint_sem_resetar() -> void:
+	# Clique, arraste e erro não devem limpar pistas nem zerar tempo.
+	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+		hint_manager.registrar_acao_sem_resetar_pista()
 
 
-func resetar_timer_hint_sem_limpar_visual() -> void:
-	if hint_manager and hint_manager.has_method("resetar_timer_sem_limpar_visual"):
-		hint_manager.resetar_timer_sem_limpar_visual()
+func registrar_acerto_no_hint() -> void:
+	# Somente acerto deve limpar pista e reiniciar tempo.
+	if hint_manager and hint_manager.has_method("registrar_acerto"):
+		hint_manager.registrar_acerto()
+	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+		hint_manager.resetar_pistas()
 
 
 func pausar_hint_manager() -> void:
@@ -110,32 +163,13 @@ func existe_linha_aberta() -> bool:
 
 
 # ==========================================
-# RESPONSIVIDADE
+# MÚSICA DE FUNDO
 # ==========================================
-func _ajustar_responsivo() -> void:
-	var tamanho_tela: Vector2 = get_viewport().get_visible_rect().size
-
-	area_jogo.position = (tamanho_tela - BASE_SIZE) / 2.0
-	camada_linhas.position = Vector2.ZERO
-
-	if fundo_responsivo and fundo_responsivo.texture:
-		var tamanho_textura: Vector2 = fundo_responsivo.texture.get_size()
-
-		fundo_responsivo.centered = true
-		fundo_responsivo.position = tamanho_tela / 2.0
-
-		var escala_x := tamanho_tela.x / tamanho_textura.x
-		var escala_y := tamanho_tela.y / tamanho_textura.y
-		var escala_final = max(escala_x, escala_y)
-
-		fundo_responsivo.scale = Vector2(escala_final, escala_final)
-
-
 func iniciar_musica_fundo() -> void:
-	if has_node("/root/AudioManager"):
-		var musica = get_node("/root/AudioManager/MusicaFundo")
-		if not musica.playing:
-			musica.play()
+	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+
+	if musica and not musica.playing:
+		musica.play()
 
 
 # ==========================================
@@ -195,7 +229,11 @@ func pegar_pontos_da_fase() -> Array:
 
 
 func randomizar_posicoes() -> void:
-	var todos_pontos = pegar_pontos_da_fase()
+	var todos_pontos := pegar_pontos_da_fase()
+
+	if todos_pontos.is_empty():
+		push_warning("Nenhum ponto encontrado no grupo 'pontos'.")
+		return
 
 	var pontos_saida := []
 	var pontos_chegada := []
@@ -235,7 +273,7 @@ func _input(event) -> void:
 		return
 
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		registrar_interacao_no_hint()
+		registrar_acao_no_hint_sem_resetar()
 
 		var ponto = buscar_ponto_sob_mouse()
 
@@ -250,8 +288,6 @@ func _input(event) -> void:
 			tentar_iniciar_linha(ponto)
 
 	elif event is InputEventMouseMotion and existe_linha_aberta():
-		resetar_timer_hint_sem_limpar_visual()
-
 		var pos_mouse := get_global_mouse_position()
 
 		if line_renderer and line_renderer.has_method("atualizar_linha"):
@@ -261,8 +297,6 @@ func _input(event) -> void:
 			arrastou_linha = true
 
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		resetar_timer_hint_sem_limpar_visual()
-
 		if existe_linha_aberta() and arrastou_linha:
 			finalizar_linha()
 
@@ -279,13 +313,16 @@ func buscar_ponto_sob_mouse():
 	var resultados = physics_space.intersect_point(query)
 
 	for res in resultados:
-		if res.collider.is_in_group("pontos"):
+		if res.collider and res.collider.is_in_group("pontos"):
 			return res.collider
 
 	return null
 
 
 func tentar_iniciar_linha(ponto) -> void:
+	if ponto == null:
+		return
+
 	if ponto.tipo == ponto.Tipo.SAIDA and not ponto.esta_conectado_saida:
 		ponto_inicial = ponto
 
@@ -305,7 +342,8 @@ func finalizar_linha() -> void:
 	if ponto_final:
 		finalizar_linha_com_ponto(ponto_final)
 	else:
-		tocar_erro_pedagogico()
+		# Soltar fora de qualquer ponto apenas cancela a linha.
+		# Não toca voz de erro.
 		apagar_linha_atual()
 
 		ponto_inicial = null
@@ -315,13 +353,19 @@ func finalizar_linha() -> void:
 func finalizar_linha_com_ponto(ponto_final) -> void:
 	var acertou := false
 
+	if ponto_inicial == null:
+		apagar_linha_atual()
+		ponto_inicial = null
+		arrastou_linha = false
+		return
+
 	if ponto_final and ponto_final != ponto_inicial:
 		if ponto_final.tipo == ponto_final.Tipo.CHEGADA and not ponto_final.esta_conectado_chegada:
 			if ponto_final.id_par == ponto_inicial.id_par:
 				acertou = true
 
 	if acertou:
-		registrar_interacao_no_hint()
+		registrar_acerto_no_hint()
 
 		if line_renderer and line_renderer.has_method("transformar_linha_em_acerto"):
 			line_renderer.transformar_linha_em_acerto(ponto_final.global_position)
@@ -391,6 +435,7 @@ func mostrar_tela_vitoria() -> void:
 	var tela = cena_vitoria.instantiate()
 	add_child(tela)
 
-	await get_tree().process_frame
-
-	tela.configurar(proxima_fase_cena)
+	if tela.has_method("configurar"):
+		tela.configurar(proxima_fase_cena)
+	else:
+		push_warning("TelaVitoria não possui o método configurar().")

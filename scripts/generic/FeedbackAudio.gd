@@ -13,7 +13,7 @@ class_name FeedbackAudioManager
 # - tocar som de vitória;
 # - tocar voz aleatória de erro;
 # - tocar voz aleatória de vitória;
-# - parar vozes anteriores antes de tocar novas.
+# - parar vozes anteriores quando necessário.
 #
 # Este script NÃO valida regras do jogo.
 # Este script NÃO controla input.
@@ -25,9 +25,6 @@ class_name FeedbackAudioManager
 # ============================================================
 # REFERÊNCIA AO CONTAINER DE SONS
 # ============================================================
-# Em vez de arrastar áudio por áudio, basta apontar para o nó SonsLocais.
-# Exemplo no Inspector:
-# sons_locais_path = ../SonsLocais
 @export_node_path("Node") var sons_locais_path: NodePath
 
 @onready var sons_locais: Node = get_node_or_null(sons_locais_path)
@@ -138,14 +135,20 @@ func tocar_click_forma() -> void:
 
 
 func tocar_acerto() -> void:
+	# CRÍTICO:
+	# Se uma voz de erro estiver tocando, corta imediatamente.
+	# O acerto deve tocar apenas o som simples de peça correta.
+	parar_vozes_erro()
 	tocar_audio(som_acerto)
 
 
 func tocar_erro_simples() -> void:
+	# Erro simples não toca voz.
 	tocar_audio(som_erro)
 
 
 func tocar_vitoria_simples() -> void:
+	parar_todas_as_vozes()
 	tocar_audio(som_vitoria)
 
 
@@ -153,11 +156,18 @@ func tocar_vitoria_simples() -> void:
 # MÉTODOS PÚBLICOS — FEEDBACK PEDAGÓGICO
 # ============================================================
 func tocar_erro_pedagogico() -> void:
+	# Evita sobreposição de vozes de erro.
+	parar_vozes_erro()
+
 	tocar_audio(som_erro)
 	tocar_voz_erro_aleatoria()
 
 
 func tocar_vitoria_pedagogica() -> void:
+	# Vitória deve interromper qualquer voz anterior,
+	# inclusive voz de erro que ainda esteja tocando.
+	parar_todas_as_vozes()
+
 	tocar_audio(som_vitoria)
 	tocar_voz_vitoria_aleatoria()
 
@@ -169,7 +179,7 @@ func tocar_voz_erro_aleatoria() -> void:
 	if vozes_erro.is_empty():
 		return
 
-	parar_vozes(vozes_erro)
+	parar_vozes_erro()
 
 	var voz_escolhida = vozes_erro.pick_random()
 	tocar_audio(voz_escolhida)
@@ -179,7 +189,7 @@ func tocar_voz_vitoria_aleatoria() -> void:
 	if vozes_vitoria.is_empty():
 		return
 
-	parar_vozes(vozes_vitoria)
+	parar_vozes_vitoria()
 
 	var voz_escolhida = vozes_vitoria.pick_random()
 	tocar_audio(voz_escolhida)
@@ -191,6 +201,14 @@ func parar_vozes(lista_vozes: Array) -> void:
 			parar_audio(voz)
 
 
-func parar_todas_as_vozes() -> void:
+func parar_vozes_erro() -> void:
 	parar_vozes(vozes_erro)
+
+
+func parar_vozes_vitoria() -> void:
 	parar_vozes(vozes_vitoria)
+
+
+func parar_todas_as_vozes() -> void:
+	parar_vozes_erro()
+	parar_vozes_vitoria()

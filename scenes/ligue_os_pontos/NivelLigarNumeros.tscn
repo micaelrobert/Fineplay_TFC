@@ -7,15 +7,23 @@
 [ext_resource type="FontFile" uid="uid://cqxjmhdvoxh1s" path="res://assets/kenney_kenney-fonts/Fonts/Kenney Blocks.ttf" id="5_w146j"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="6_syp62"]
 [ext_resource type="Texture2D" uid="uid://xjp1xo0gwoyh" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_roxa.png" id="6_tvc8x"]
+[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/“Boa! Você conseguiu.mp3" id="7_6vrxc"]
 [ext_resource type="Texture2D" uid="uid://bh1am83jtq3w0" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_laranja.png" id="7_coq2q"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="7_dixt7"]
+[ext_resource type="AudioStream" uid="uid://ccy0or0ot5ovp" path="res://assets/voices/“Isso! Você venceu!”.mp3" id="8_7uw3o"]
 [ext_resource type="Texture2D" uid="uid://dt28l5k47d31d" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_preta.png" id="8_b1ymn"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="8_s3x8e"]
 [ext_resource type="Texture2D" uid="uid://ciw2g22newaiw" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_verde.png" id="9_m3wkg"]
+[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/“Muito bem! Você ace (1).mp3" id="9_pus7w"]
+[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/“Perfeito! Missão co.mp3" id="10_8jusx"]
 [ext_resource type="Texture2D" uid="uid://rqxbg05bchrq" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_ciano.png" id="10_s1n0v"]
 [ext_resource type="Texture2D" uid="uid://dvj21ktscram1" path="res://assets/kenney_ui-pack/PNG/Grey/Default/button_round_border.png" id="11_coq2q"]
+[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse! Tenta de.mp3" id="11_xaspu"]
 [ext_resource type="Texture2D" uid="uid://3oatvwx7g3do" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_marrom.png" id="12_coq2q"]
+[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops! Esse não está.mp3" id="12_lwhso"]
 [ext_resource type="Texture2D" uid="uid://bsit2biyfu1su" path="res://assets/kenney_ui-pack/PNG/Blue/Default/button_round_border.png" id="13_b1ymn"]
+[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase! Mas não é ess.mp3" id="13_cbb68"]
+[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez!.mp3" id="14_ictrx"]
 [ext_resource type="Texture2D" uid="uid://cblsx8q7xc8ay" path="res://assets/kenney_ui-pack/PNG/Circles_colors/circulo_borda_rosa.png" id="14_m3wkg"]
 [ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="18_s1n0v"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="18_vbbpp"]
@@ -33,10 +41,15 @@ colors = PackedColorArray(0.90588236, 0, 0, 1, 0.6834966, 0.04073695, 0.73373055
 [node name="NivelLigar" type="Node2D" unique_id=1931865823]
 script = ExtResource("1_vbbpp")
 
-[node name="FundoResponsivo" type="Sprite2D" parent="." unique_id=1630688205]
-position = Vector2(348, 597)
+[node name="FundoResponsivo" type="TextureRect" parent="." unique_id=2112659361]
+offset_left = -388.0
+offset_top = -170.0
+offset_right = 866.0
+offset_bottom = 1084.0
 scale = Vector2(1.1658692, 1.2384372)
 texture = ExtResource("2_u670g")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SonsLocais" type="Node" parent="." unique_id=2059553741]
 
@@ -54,6 +67,38 @@ stream = ExtResource("18_vbbpp")
 
 [node name="SomClickNaForma" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1833308105]
 stream = ExtResource("6_syp62")
+
+[node name="VozVitoria1" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1763810785]
+stream = ExtResource("7_6vrxc")
+volume_db = 10.0
+
+[node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=493923375]
+stream = ExtResource("8_7uw3o")
+volume_db = 10.0
+
+[node name="VozVitoria3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1570601359]
+stream = ExtResource("9_pus7w")
+volume_db = 10.0
+
+[node name="VozVitoria4" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=164359507]
+stream = ExtResource("10_8jusx")
+volume_db = 10.0
+
+[node name="VozErro1" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1101965557]
+stream = ExtResource("11_xaspu")
+volume_db = 10.0
+
+[node name="VozErro2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=42132390]
+stream = ExtResource("12_lwhso")
+volume_db = 10.0
+
+[node name="VozErro3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1705524355]
+stream = ExtResource("13_cbb68")
+volume_db = 10.0
+
+[node name="VozErro4" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=747243514]
+stream = ExtResource("14_ictrx")
+volume_db = 10.0
 
 [node name="AreaJogo" type="Node2D" parent="." unique_id=1166639759]
 
@@ -270,8 +315,6 @@ scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_h83n1")
 
-[node name="BotaoVoltarFase" parent="AreaJogo" unique_id=1138187997 instance=ExtResource("22_3frem")]
-
 [node name="CamadaLinhas" type="Node2D" parent="." unique_id=1216902111]
 
 [node name="HintManager" type="Node" parent="." unique_id=1674353927]
@@ -288,6 +331,8 @@ sons_locais_path = NodePath("../SonsLocais")
 [node name="LineRenderer" type="Node" parent="." unique_id=980718852]
 script = ExtResource("25_aafwj")
 camada_linhas_path = NodePath("../CamadaLinhas")
+
+[node name="BotaoVoltarFase" parent="." unique_id=1138187997 instance=ExtResource("22_3frem")]
 
 [editable path="AreaJogo/Ponto"]
 [editable path="AreaJogo/Ponto2"]
