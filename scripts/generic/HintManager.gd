@@ -2,12 +2,10 @@ extends Node
 
 class_name HintManager
 
-enum ModoPista {
-	ARRASTAR_PECAS,
-	LIGAR_PARES,
-	LIGAR_NUMEROS,
-	CUSTOM
-}
+signal pista_exibida(nivel: int, origem: Node, destino: Node)
+signal interacao_registrada
+
+enum ModoPista { ARRASTAR_PECAS, LIGAR_PARES, LIGAR_NUMEROS, CUSTOM }
 
 @export var modo_pista: ModoPista = ModoPista.ARRASTAR_PECAS
 
@@ -16,25 +14,26 @@ enum ModoPista {
 @export_node_path("Label") var texto_dica_path: NodePath
 @export_node_path("Node") var robo_path: NodePath
 
-@onready var area_jogo: Node2D = get_node_or_null(area_jogo_path)
-@onready var camada_linhas: Node2D = get_node_or_null(camada_linhas_path)
-@onready var texto_dica: Label = get_node_or_null(texto_dica_path)
-@onready var robo: Node = get_node_or_null(robo_path)
-
+@export_group("Tempos das pistas")
 @export var ativar_pistas := true
-@export var tempo_pista_1 := 8.0
-@export var tempo_pista_2 := 15.0
-@export var tempo_pista_3 := 25.0
+@export_range(0.5, 120.0, 0.5) var tempo_pista_1 := 8.0
+@export_range(1.0, 180.0, 0.5) var tempo_pista_2 := 15.0
+@export_range(1.5, 240.0, 0.5) var tempo_pista_3 := 25.0
+@export var limpar_pista_ao_interagir := true
 
+@export_group("Destaque visual")
 @export var cor_amarela_pista: Color = Color(1.8, 1.55, 0.15, 1.0)
-@export var cor_normal: Color = Color(1.0, 1.0, 1.0, 1.0)
 @export var escala_origem_pista := 1.10
 @export var escala_destino_pista := 1.16
-
 @export var largura_linha_dica := 10.0
 @export var largura_linha_dica_sombra := 22.0
 @export var cor_linha_dica: Color = Color(1.0, 0.85, 0.05, 1.0)
 @export var cor_linha_dica_sombra: Color = Color(0.0, 0.0, 0.0, 0.28)
+
+@onready var area_jogo: Node2D = get_node_or_null(area_jogo_path) as Node2D
+@onready var camada_linhas: Node2D = get_node_or_null(camada_linhas_path) as Node2D
+@onready var texto_dica: Label = get_node_or_null(texto_dica_path) as Label
+@onready var robo: Node = get_node_or_null(robo_path)
 
 var tempo_sem_acao := 0.0
 var nivel_pista_atual := 0
@@ -55,58 +54,76 @@ var tween_linha_largura: Tween = null
 var linha_dica: Line2D = null
 var linha_dica_sombra: Line2D = null
 
-var modulates_originais := {}
-var escalas_originais := {}
+var modulates_originais: Dictionary = {}
+var escalas_originais: Dictionary = {}
 
 var callback_buscar_origem: Callable
 var callback_buscar_destino: Callable
 
 
 func _ready() -> void:
+	_normalizar_tempos()
+	_resolver_referencias()
+
 	if texto_dica:
 		texto_dica.visible = false
 
-	_resolver_referencias()
+
+func _exit_tree() -> void:
+	_limpar_animacoes_e_visuais()
 
 
 func _process(delta: float) -> void:
-	if not ativar_pistas:
+	if not ativar_pistas or sistema_pausado or nivel_concluido:
 		return
 
-	if sistema_pausado:
-		return
-
-	if nivel_concluido:
-		return
-
-	tempo_sem_acao += delta
+	tempo_sem_acao += maxf(delta, 0.0)
 	verificar_pistas_por_inatividade()
 
 
+func _normalizar_tempos() -> void:
+	tempo_pista_1 = maxf(tempo_pista_1, 0.5)
+	tempo_pista_2 = maxf(tempo_pista_2, tempo_pista_1 + 0.5)
+	tempo_pista_3 = maxf(tempo_pista_3, tempo_pista_2 + 0.5)
+
+
 func _resolver_referencias() -> void:
-	var cena_atual = get_tree().current_scene
+	var cena_atual := get_tree().current_scene
 
-	if not area_jogo and cena_atual:
-		var area_encontrada = cena_atual.find_child("AreaJogo", true, false)
-		if area_encontrada and area_encontrada is Node2D:
-			area_jogo = area_encontrada
+	if not _node_valido(area_jogo) and cena_atual:
+		area_jogo = cena_atual.find_child("AreaJogo", true, false) as Node2D
 
-	if not camada_linhas and cena_atual:
-		var camada_encontrada = cena_atual.find_child("CamadaLinhas", true, false)
-		if camada_encontrada and camada_encontrada is Node2D:
-			camada_linhas = camada_encontrada
+	if not _node_valido(camada_linhas) and cena_atual:
+		camada_linhas = cena_atual.find_child("CamadaLinhas", true, false) as Node2D
+
+	if not _node_valido(robo) and cena_atual:
+		robo = cena_atual.find_child("ProfessorRobo", true, false)
 
 	if camada_linhas:
 		camada_linhas.z_index = 900
 		camada_linhas.z_as_relative = false
 
 
+# Registra uma ação real do jogador. Por padrão, reinicia o relógio de
+# inatividade e limpa a pista visual anterior, porque o usuário retomou a tarefa.
 func registrar_interacao() -> void:
-	pass
+	if nivel_concluido:
+		return
+
+	tempo_sem_acao = 0.0
+	interacao_registrada.emit()
+
+	if limpar_pista_ao_interagir and pista_ativa:
+		_limpar_pista_visual_sem_alterar_estado()
+		nivel_pista_atual = 0
+		pista_ativa = false
 
 
+# Mantém a pista que já está visível, mas reinicia o relógio de inatividade.
+# É útil durante uma tentativa, um arraste ou um erro em que a orientação deve
+# permanecer na tela.
 func registrar_acao_sem_resetar_pista() -> void:
-	pass
+	resetar_timer_sem_limpar_visual()
 
 
 func registrar_acerto() -> void:
@@ -114,27 +131,36 @@ func registrar_acerto() -> void:
 
 
 func resetar_timer_sem_limpar_visual() -> void:
-	pass
+	if nivel_concluido:
+		return
+
+	tempo_sem_acao = 0.0
+	interacao_registrada.emit()
 
 
 func pausar_pistas() -> void:
 	sistema_pausado = true
 
 
-func retomar_pistas() -> void:
+func retomar_pistas(reiniciar_timer: bool = true) -> void:
 	sistema_pausado = false
+
+	if reiniciar_timer:
+		resetar_timer_sem_limpar_visual()
 
 
 func finalizar_nivel() -> void:
 	nivel_concluido = true
+	sistema_pausado = true
 	resetar_pistas()
 
 
 func reiniciar_sistema() -> void:
 	nivel_concluido = false
 	sistema_pausado = false
-	resetar_pistas()
+	_normalizar_tempos()
 	_resolver_referencias()
+	resetar_pistas()
 
 
 func configurar_callbacks(buscar_origem: Callable, buscar_destino: Callable) -> void:
@@ -144,66 +170,62 @@ func configurar_callbacks(buscar_origem: Callable, buscar_destino: Callable) -> 
 
 
 func forcar_pista(nivel: int) -> void:
-	if nivel_concluido:
+	if nivel_concluido or not ativar_pistas:
 		return
 
-	if nivel <= 1:
+	var nivel_seguro := clampi(nivel, 1, 3)
+
+	if nivel_seguro == 1:
 		resetar_pistas()
-		mostrar_pista(1)
-		tempo_sem_acao = tempo_pista_1
-		return
+	else:
+		_limpar_pista_visual_sem_alterar_estado()
 
-	if nivel == 2:
-		mostrar_pista(2)
-		tempo_sem_acao = tempo_pista_2
-		return
+	mostrar_pista(nivel_seguro)
 
-	if nivel >= 3:
-		mostrar_pista(3)
-		tempo_sem_acao = tempo_pista_3
-		return
+	match nivel_seguro:
+		1:
+			tempo_sem_acao = tempo_pista_1
+		2:
+			tempo_sem_acao = tempo_pista_2
+		3:
+			tempo_sem_acao = tempo_pista_3
 
 
 func verificar_pistas_por_inatividade() -> void:
 	if nivel_pista_atual == 0 and tempo_sem_acao >= tempo_pista_1:
 		mostrar_pista(1)
-		return
-
-	if nivel_pista_atual == 1 and tempo_sem_acao >= tempo_pista_2:
+	elif nivel_pista_atual == 1 and tempo_sem_acao >= tempo_pista_2:
 		mostrar_pista(2)
-		return
-
-	if nivel_pista_atual == 2 and tempo_sem_acao >= tempo_pista_3:
+	elif nivel_pista_atual == 2 and tempo_sem_acao >= tempo_pista_3:
 		mostrar_pista(3)
-		return
 
 
 func mostrar_pista(nivel: int) -> void:
-	if nivel_concluido:
-		return
-
-	if sistema_pausado:
+	if nivel_concluido or sistema_pausado or not ativar_pistas:
 		return
 
 	_resolver_referencias()
+	_limpar_pista_visual_sem_alterar_estado()
 
-	nivel_pista_atual = nivel
+	nivel_pista_atual = clampi(nivel, 1, 3)
 	pista_ativa = true
 
 	if texto_dica:
 		texto_dica.visible = false
 
-	if nivel == 1:
-		pista_1_origem_piscando()
-	elif nivel == 2:
-		pista_2_destino_piscando_e_movendo()
-	elif nivel == 3:
-		pista_3_linha_amarela()
+	match nivel_pista_atual:
+		1:
+			pista_1_origem_piscando()
+		2:
+			pista_2_destino_piscando_e_movendo()
+		3:
+			pista_3_linha_amarela()
+
+	pista_exibida.emit(nivel_pista_atual, origem_dica, destino_dica)
 
 
 func pista_1_origem_piscando() -> void:
-	if not origem_dica or not is_instance_valid(origem_dica):
-		origem_dica = buscar_origem_para_pista()
+	origem_dica = buscar_origem_para_pista()
 
 	if origem_dica:
 		destacar_origem_piscando(origem_dica)
@@ -212,7 +234,7 @@ func pista_1_origem_piscando() -> void:
 
 
 func pista_2_destino_piscando_e_movendo() -> void:
-	if not origem_dica or not is_instance_valid(origem_dica):
+	if not _node_valido(origem_dica):
 		origem_dica = buscar_origem_para_pista()
 
 	destino_dica = buscar_destino_para_pista(origem_dica)
@@ -224,10 +246,10 @@ func pista_2_destino_piscando_e_movendo() -> void:
 
 
 func pista_3_linha_amarela() -> void:
-	if not origem_dica or not is_instance_valid(origem_dica):
+	if not _node_valido(origem_dica):
 		origem_dica = buscar_origem_para_pista()
 
-	if not destino_dica or not is_instance_valid(destino_dica):
+	if not _node_valido(destino_dica):
 		destino_dica = buscar_destino_para_pista(origem_dica)
 
 	if origem_dica and destino_dica:
@@ -238,39 +260,33 @@ func pista_3_linha_amarela() -> void:
 
 func buscar_origem_para_pista() -> Node:
 	if modo_pista == ModoPista.CUSTOM:
-		if callback_buscar_origem.is_valid():
-			return callback_buscar_origem.call()
-		return null
+		return callback_buscar_origem.call() if callback_buscar_origem.is_valid() else null
 
-	if modo_pista == ModoPista.ARRASTAR_PECAS:
-		return buscar_peca_disponivel()
-
-	if modo_pista == ModoPista.LIGAR_PARES:
-		return buscar_ponto_saida_ligar_pares()
-
-	if modo_pista == ModoPista.LIGAR_NUMEROS:
-		return buscar_numero_inicial_ligar_numeros()
+	match modo_pista:
+		ModoPista.ARRASTAR_PECAS:
+			return buscar_peca_disponivel()
+		ModoPista.LIGAR_PARES:
+			return buscar_ponto_saida_ligar_pares()
+		ModoPista.LIGAR_NUMEROS:
+			return buscar_numero_inicial_ligar_numeros()
 
 	return null
 
 
 func buscar_destino_para_pista(origem: Node) -> Node:
-	if not origem:
+	if not _node_valido(origem):
 		return null
 
 	if modo_pista == ModoPista.CUSTOM:
-		if callback_buscar_destino.is_valid():
-			return callback_buscar_destino.call(origem)
-		return null
+		return callback_buscar_destino.call(origem) if callback_buscar_destino.is_valid() else null
 
-	if modo_pista == ModoPista.ARRASTAR_PECAS:
-		return buscar_slot_da_peca(origem)
-
-	if modo_pista == ModoPista.LIGAR_PARES:
-		return buscar_destino_ligar_pares(origem)
-
-	if modo_pista == ModoPista.LIGAR_NUMEROS:
-		return buscar_destino_ligar_numeros(origem)
+	match modo_pista:
+		ModoPista.ARRASTAR_PECAS:
+			return buscar_slot_da_peca(origem)
+		ModoPista.LIGAR_PARES:
+			return buscar_destino_ligar_pares(origem)
+		ModoPista.LIGAR_NUMEROS:
+			return buscar_destino_ligar_numeros(origem)
 
 	return null
 
@@ -279,11 +295,11 @@ func buscar_peca_disponivel() -> Node:
 	if not area_jogo:
 		return null
 
-	for filho in area_jogo.get_children():
-		if filho.is_in_group("pecas") and peca_esta_disponivel(filho):
+	for filho in _nos_do_grupo_na_area("pecas"):
+		if peca_esta_disponivel(filho):
 			return filho
 
-	for filho in area_jogo.get_children():
+	for filho in area_jogo.find_children("*", "Area2D", true, false):
 		if filho.has_signal("peca_encaixada") and peca_esta_disponivel(filho):
 			return filho
 
@@ -291,276 +307,252 @@ func buscar_peca_disponivel() -> Node:
 
 
 func peca_esta_disponivel(peca: Node) -> bool:
-	if not peca:
+	if not _node_valido(peca):
 		return false
 
 	if peca.has_method("esta_disponivel_para_pista"):
-		return peca.esta_disponivel_para_pista()
+		return bool(peca.call("esta_disponivel_para_pista"))
 
-	var valor_travado = peca.get("esta_travado")
-	if valor_travado != null:
-		return not bool(valor_travado)
-
-	var valor_encaixada = peca.get("encaixada")
-	if valor_encaixada != null:
-		return not bool(valor_encaixada)
-
-	var valor_ja_encaixada = peca.get("ja_encaixada")
-	if valor_ja_encaixada != null:
-		return not bool(valor_ja_encaixada)
+	for nome_propriedade in ["esta_travado", "encaixada", "ja_encaixada", "travado"]:
+		if _objeto_tem_propriedade(peca, nome_propriedade):
+			return not bool(peca.get(nome_propriedade))
 
 	return true
 
 
 func buscar_slot_da_peca(peca: Node) -> Node:
-	if not peca:
+	if not _node_valido(peca):
 		return null
 
 	if peca.has_method("get_slot_correto"):
-		return peca.get_slot_correto()
+		var slot_por_metodo: Node = peca.call("get_slot_correto")
+		if _node_valido(slot_por_metodo):
+			return slot_por_metodo
 
-	var nome_slot = peca.get("slot_correto_nome")
+	if not _objeto_tem_propriedade(peca, "slot_correto_nome"):
+		return null
 
-	if nome_slot != null and String(nome_slot) != "":
-		if area_jogo:
-			return area_jogo.get_node_or_null(String(nome_slot))
+	var nome_slot := String(peca.get("slot_correto_nome"))
+	if nome_slot.is_empty() or not area_jogo:
+		return null
 
-	return null
+	var slot := area_jogo.get_node_or_null(nome_slot)
+	if slot:
+		return slot
+
+	return area_jogo.find_child(nome_slot, true, false)
 
 
 func buscar_ponto_saida_ligar_pares() -> Node:
-	var pontos = pegar_pontos_da_fase()
-
-	for ponto in pontos:
-		if ponto.tipo == ponto.Tipo.SAIDA and not ponto.esta_conectado_saida:
+	for ponto in pegar_pontos_da_fase():
+		if _tipo_ponto(ponto) == 0 and not _bool_propriedade(ponto, "esta_conectado_saida"):
 			return ponto
 
 	return null
 
 
 func buscar_destino_ligar_pares(ponto_saida: Node) -> Node:
-	if not ponto_saida:
+	if not _node_valido(ponto_saida):
 		return null
 
-	var pontos = pegar_pontos_da_fase()
+	var id_origem := int(ponto_saida.get("id_par"))
 
-	for ponto in pontos:
-		if ponto.tipo == ponto.Tipo.CHEGADA:
-			if not ponto.esta_conectado_chegada and ponto.id_par == ponto_saida.id_par:
+	for ponto in pegar_pontos_da_fase():
+		if _tipo_ponto(ponto) == 1:
+			if (
+				not _bool_propriedade(ponto, "esta_conectado_chegada")
+				and int(ponto.get("id_par")) == id_origem
+			):
 				return ponto
 
 	return null
 
 
 func buscar_numero_inicial_ligar_numeros() -> Node:
-	var pontos = pegar_pontos_da_fase()
 	var melhor_ponto: Node = null
-	var menor_valor := 999999
+	var menor_valor := 2147483647
 
-	for ponto in pontos:
-		if ponto.esta_conectado_saida:
+	for ponto in pegar_pontos_da_fase():
+		if _bool_propriedade(ponto, "esta_conectado_saida"):
 			continue
 
-		var destino = buscar_destino_ligar_numeros(ponto)
-
+		var destino := buscar_destino_ligar_numeros(ponto)
 		if destino:
-			if ponto.valor_numero < menor_valor:
-				menor_valor = ponto.valor_numero
+			var valor := int(ponto.get("valor_numero"))
+			if valor < menor_valor:
+				menor_valor = valor
 				melhor_ponto = ponto
 
 	return melhor_ponto
 
 
 func buscar_destino_ligar_numeros(ponto_saida: Node) -> Node:
-	if not ponto_saida:
+	if not _node_valido(ponto_saida):
 		return null
 
-	var pontos = pegar_pontos_da_fase()
-	var valor_destino = ponto_saida.valor_numero + 1
+	var valor_destino := int(ponto_saida.get("valor_numero")) + 1
 
-	for ponto in pontos:
+	for ponto in pegar_pontos_da_fase():
 		if ponto == ponto_saida:
 			continue
 
-		if ponto.valor_numero == valor_destino:
-			if not ponto.esta_conectado_chegada:
-				return ponto
+		if (
+			int(ponto.get("valor_numero")) == valor_destino
+			and not _bool_propriedade(ponto, "esta_conectado_chegada")
+		):
+			return ponto
 
 	return null
 
 
-func pegar_pontos_da_fase() -> Array:
-	var pontos := []
+func pegar_pontos_da_fase() -> Array[Node]:
+	return _nos_do_grupo_na_area("pontos")
+
+
+func _nos_do_grupo_na_area(nome_grupo: StringName) -> Array[Node]:
+	var resultado: Array[Node] = []
 
 	if not area_jogo:
-		return pontos
+		return resultado
 
-	for filho in area_jogo.get_children():
-		if filho.is_in_group("pontos"):
-			pontos.append(filho)
+	for node in get_tree().get_nodes_in_group(nome_grupo):
+		if node is Node and area_jogo.is_ancestor_of(node):
+			resultado.append(node)
 
-	return pontos
+	return resultado
 
 
 func destacar_origem_piscando(origem: Node) -> void:
-	if not origem or not origem is CanvasItem:
-		return
-
-	var canvas_item := origem as CanvasItem
-
-	if not modulates_originais.has(origem):
-		modulates_originais[origem] = canvas_item.modulate
-
-	if origem is Node2D and not escalas_originais.has(origem):
-		escalas_originais[origem] = origem.scale
-
-	if tween_origem_cor:
-		tween_origem_cor.kill()
-
-	if tween_origem_escala:
-		tween_origem_escala.kill()
-
-	tween_origem_cor = create_tween()
-	tween_origem_cor.set_loops()
-	tween_origem_cor.tween_property(canvas_item, "modulate", cor_amarela_pista, 0.35)
-	tween_origem_cor.tween_property(canvas_item, "modulate", cor_normal, 0.35)
-
-	if origem is Node2D:
-		tween_origem_escala = create_tween()
-		tween_origem_escala.set_loops()
-		tween_origem_escala.tween_property(origem, "scale", escalas_originais[origem] * escala_origem_pista, 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tween_origem_escala.tween_property(origem, "scale", escalas_originais[origem], 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_destacar_node_piscando(origem, escala_origem_pista, true)
 
 
 func destacar_destino_piscando_e_movendo(destino: Node) -> void:
-	if not destino or not destino is CanvasItem:
+	_destacar_node_piscando(destino, escala_destino_pista, false)
+
+
+func _destacar_node_piscando(node: Node, multiplicador_escala: float, origem: bool) -> void:
+	if not _node_valido(node) or not node is CanvasItem:
 		return
 
-	var canvas_item := destino as CanvasItem
+	var canvas_item := node as CanvasItem
+	if not modulates_originais.has(node):
+		modulates_originais[node] = canvas_item.modulate
 
-	if not modulates_originais.has(destino):
-		modulates_originais[destino] = canvas_item.modulate
+	if node is Node2D and not escalas_originais.has(node):
+		escalas_originais[node] = (node as Node2D).scale
 
-	if destino is Node2D and not escalas_originais.has(destino):
-		escalas_originais[destino] = destino.scale
+	var cor_original: Color = modulates_originais[node]
+	var tween_cor := create_tween().set_loops()
+	tween_cor.tween_property(canvas_item, "modulate", cor_amarela_pista, 0.34)
+	tween_cor.tween_property(canvas_item, "modulate", cor_original, 0.34)
 
-	if tween_destino_cor:
-		tween_destino_cor.kill()
+	var tween_escala: Tween = null
+	if node is Node2D:
+		var node_2d := node as Node2D
+		var escala_original: Vector2 = escalas_originais[node]
+		tween_escala = create_tween().set_loops()
+		(
+			tween_escala
+			. tween_property(node_2d, "scale", escala_original * multiplicador_escala, 0.34)
+			. set_trans(Tween.TRANS_SINE)
+			. set_ease(Tween.EASE_IN_OUT)
+		)
+		(
+			tween_escala
+			. tween_property(node_2d, "scale", escala_original, 0.34)
+			. set_trans(Tween.TRANS_SINE)
+			. set_ease(Tween.EASE_IN_OUT)
+		)
 
-	if tween_destino_escala:
-		tween_destino_escala.kill()
-
-	tween_destino_cor = create_tween()
-	tween_destino_cor.set_loops()
-	tween_destino_cor.tween_property(canvas_item, "modulate", cor_amarela_pista, 0.32)
-	tween_destino_cor.tween_property(canvas_item, "modulate", cor_normal, 0.32)
-
-	if destino is Node2D:
-		tween_destino_escala = create_tween()
-		tween_destino_escala.set_loops()
-		tween_destino_escala.tween_property(destino, "scale", escalas_originais[destino] * escala_destino_pista, 0.32).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tween_destino_escala.tween_property(destino, "scale", escalas_originais[destino], 0.32).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if origem:
+		tween_origem_cor = tween_cor
+		tween_origem_escala = tween_escala
+	else:
+		tween_destino_cor = tween_cor
+		tween_destino_escala = tween_escala
 
 
 func criar_linha_dica(origem: Node, destino: Node) -> void:
 	remover_linha_dica()
+	_resolver_referencias()
 
 	if not camada_linhas:
-		push_warning("HintManager: CamadaLinhas não configurada.")
+		push_warning(
+			"HintManager: CamadaLinhas não configurada; a pista de nível 3 não será desenhada."
+		)
 		return
 
-	if not origem or not destino:
+	if not origem is Node2D or not destino is Node2D:
 		return
 
 	origem_dica = origem
 	destino_dica = destino
 
-	linha_dica_sombra = Line2D.new()
-	linha_dica_sombra.name = "LinhaDicaSombra"
-	linha_dica_sombra.width = largura_linha_dica_sombra
-	linha_dica_sombra.default_color = cor_linha_dica_sombra
-	linha_dica_sombra.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_dica_sombra.end_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_dica_sombra.joint_mode = Line2D.LINE_JOINT_ROUND
-	linha_dica_sombra.z_index = 998
-	linha_dica_sombra.z_as_relative = false
+	linha_dica_sombra = _criar_line2d(
+		"LinhaDicaSombra", largura_linha_dica_sombra, cor_linha_dica_sombra, 998
+	)
 	camada_linhas.add_child(linha_dica_sombra)
 
-	linha_dica = Line2D.new()
-	linha_dica.name = "LinhaDica"
-	linha_dica.width = largura_linha_dica
-	linha_dica.default_color = cor_linha_dica
-	linha_dica.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_dica.end_cap_mode = Line2D.LINE_CAP_ROUND
-	linha_dica.joint_mode = Line2D.LINE_JOINT_ROUND
-	linha_dica.z_index = 999
-	linha_dica.z_as_relative = false
+	linha_dica = _criar_line2d("LinhaDica", largura_linha_dica, cor_linha_dica, 999)
 	camada_linhas.add_child(linha_dica)
 
 	_atualizar_linha_dica_animada(0.0)
 
-	if tween_linha_dica:
-		tween_linha_dica.kill()
+	tween_linha_dica = create_tween().set_loops()
+	(
+		tween_linha_dica
+		. tween_method(_atualizar_linha_dica_animada, 0.0, 1.0, 0.7)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
+	(
+		tween_linha_dica
+		. tween_method(_atualizar_linha_dica_animada, 1.0, 0.0, 0.7)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
 
-	if tween_linha_largura:
-		tween_linha_largura.kill()
-
-	tween_linha_dica = create_tween()
-	tween_linha_dica.set_loops()
-	tween_linha_dica.tween_method(_atualizar_linha_dica_animada, 0.0, 1.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween_linha_dica.tween_method(_atualizar_linha_dica_animada, 1.0, 0.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-
-	tween_linha_largura = create_tween()
-	tween_linha_largura.set_loops()
+	tween_linha_largura = create_tween().set_loops()
 	tween_linha_largura.tween_property(linha_dica, "width", largura_linha_dica + 5.0, 0.35)
 	tween_linha_largura.tween_property(linha_dica, "width", largura_linha_dica, 0.35)
 
 
+func _criar_line2d(nome_linha: String, largura: float, cor: Color, indice_z: int) -> Line2D:
+	var linha := Line2D.new()
+	linha.name = nome_linha
+	linha.width = largura
+	linha.default_color = cor
+	linha.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	linha.end_cap_mode = Line2D.LINE_CAP_ROUND
+	linha.joint_mode = Line2D.LINE_JOINT_ROUND
+	linha.z_index = indice_z
+	linha.z_as_relative = false
+	return linha
+
+
 func _atualizar_linha_dica_animada(progresso: float) -> void:
-	if not linha_dica or not is_instance_valid(linha_dica):
+	if not _node_valido(linha_dica) or not _node_valido(linha_dica_sombra):
+		return
+	if not _node_valido(camada_linhas) or not origem_dica is Node2D or not destino_dica is Node2D:
 		return
 
-	if not linha_dica_sombra or not is_instance_valid(linha_dica_sombra):
-		return
+	var origem_local := camada_linhas.to_local((origem_dica as Node2D).global_position)
+	var destino_local := camada_linhas.to_local((destino_dica as Node2D).global_position)
+	var ponto_animado := origem_local.lerp(destino_local, clampf(progresso, 0.0, 1.0))
 
-	if not camada_linhas or not is_instance_valid(camada_linhas):
-		return
-
-	if not origem_dica or not is_instance_valid(origem_dica):
-		return
-
-	if not destino_dica or not is_instance_valid(destino_dica):
-		return
-
-	if not origem_dica is Node2D or not destino_dica is Node2D:
-		return
-
-	var origem_local: Vector2 = camada_linhas.to_local(origem_dica.global_position)
-	var destino_local: Vector2 = camada_linhas.to_local(destino_dica.global_position)
-	var ponto_animado: Vector2 = origem_local.lerp(destino_local, clamp(progresso, 0.0, 1.0))
-
-	linha_dica.clear_points()
-	linha_dica.add_point(origem_local)
-	linha_dica.add_point(ponto_animado)
-
-	linha_dica_sombra.clear_points()
-	linha_dica_sombra.add_point(origem_local)
-	linha_dica_sombra.add_point(ponto_animado)
+	linha_dica.points = PackedVector2Array([origem_local, ponto_animado])
+	linha_dica_sombra.points = PackedVector2Array([origem_local, ponto_animado])
 
 
 func remover_linha_dica() -> void:
-	if tween_linha_dica:
-		tween_linha_dica.kill()
-		tween_linha_dica = null
+	_matar_tween(tween_linha_dica)
+	_matar_tween(tween_linha_largura)
+	tween_linha_dica = null
+	tween_linha_largura = null
 
-	if tween_linha_largura:
-		tween_linha_largura.kill()
-		tween_linha_largura = null
-
-	if linha_dica_sombra and is_instance_valid(linha_dica_sombra):
+	if _node_valido(linha_dica_sombra):
 		linha_dica_sombra.queue_free()
-
-	if linha_dica and is_instance_valid(linha_dica):
+	if _node_valido(linha_dica):
 		linha_dica.queue_free()
 
 	linha_dica_sombra = null
@@ -571,62 +563,91 @@ func resetar_pistas() -> void:
 	tempo_sem_acao = 0.0
 	nivel_pista_atual = 0
 	pista_ativa = false
+	_limpar_pista_visual_sem_alterar_estado()
 
+
+func _limpar_pista_visual_sem_alterar_estado() -> void:
 	if texto_dica:
 		texto_dica.visible = false
 
-	if tween_origem_cor:
-		tween_origem_cor.kill()
-		tween_origem_cor = null
+	_matar_tween(tween_origem_cor)
+	_matar_tween(tween_origem_escala)
+	_matar_tween(tween_destino_cor)
+	_matar_tween(tween_destino_escala)
 
-	if tween_origem_escala:
-		tween_origem_escala.kill()
-		tween_origem_escala = null
-
-	if tween_destino_cor:
-		tween_destino_cor.kill()
-		tween_destino_cor = null
-
-	if tween_destino_escala:
-		tween_destino_escala.kill()
-		tween_destino_escala = null
+	tween_origem_cor = null
+	tween_origem_escala = null
+	tween_destino_cor = null
+	tween_destino_escala = null
 
 	for node in modulates_originais.keys():
-		if node and is_instance_valid(node) and node is CanvasItem:
-			node.modulate = modulates_originais[node]
+		if _node_valido(node) and node is CanvasItem:
+			(node as CanvasItem).modulate = modulates_originais[node]
 
 	for node in escalas_originais.keys():
-		if node and is_instance_valid(node):
-			node.scale = escalas_originais[node]
+		if _node_valido(node) and node is Node2D:
+			(node as Node2D).scale = escalas_originais[node]
 
 	modulates_originais.clear()
 	escalas_originais.clear()
-
 	origem_dica = null
 	destino_dica = null
-
 	remover_linha_dica()
 
 
+func _limpar_animacoes_e_visuais() -> void:
+	_limpar_pista_visual_sem_alterar_estado()
+
+
 func animar_robo_dica() -> void:
-	if not robo:
+	if not _node_valido(robo):
 		return
 
 	if robo.has_method("dar_dica"):
-		robo.dar_dica()
+		robo.call("dar_dica")
 	elif robo.has_method("pensar"):
-		robo.pensar()
-	elif robo.has_method("comemorar"):
-		robo.comemorar()
+		robo.call("pensar")
 
 
 func animar_robo_apontar() -> void:
-	if not robo:
+	if not _node_valido(robo):
 		return
 
 	if robo.has_method("apontar"):
-		robo.apontar()
+		robo.call("apontar")
 	elif robo.has_method("dar_dica"):
-		robo.dar_dica()
+		robo.call("dar_dica")
 	elif robo.has_method("pensar"):
-		robo.pensar()
+		robo.call("pensar")
+
+
+func _objeto_tem_propriedade(objeto: Object, nome_propriedade: StringName) -> bool:
+	if not objeto:
+		return false
+
+	for propriedade in objeto.get_property_list():
+		if StringName(propriedade.name) == nome_propriedade:
+			return true
+
+	return false
+
+
+func _bool_propriedade(objeto: Object, nome_propriedade: StringName) -> bool:
+	if not _objeto_tem_propriedade(objeto, nome_propriedade):
+		return false
+	return bool(objeto.get(nome_propriedade))
+
+
+func _tipo_ponto(ponto: Node) -> int:
+	if not _objeto_tem_propriedade(ponto, "tipo"):
+		return -1
+	return int(ponto.get("tipo"))
+
+
+func _node_valido(node: Variant) -> bool:
+	return node != null and is_instance_valid(node)
+
+
+func _matar_tween(tween: Tween) -> void:
+	if tween and tween.is_valid():
+		tween.kill()

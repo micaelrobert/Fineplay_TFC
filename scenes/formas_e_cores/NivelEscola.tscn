@@ -7,25 +7,25 @@
 [ext_resource type="Texture2D" uid="uid://wwem30g3af0w" path="res://assets/kenney_shape-characters/PNG/Default/blue_body_rhombus.png" id="4_jyl56"]
 [ext_resource type="PackedScene" uid="uid://brrtkn3hdao4i" path="res://scenes/formas_e_cores/ObjetoArrastavel.tscn" id="5_ywf23"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="8_jyl56"]
-[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/“Boa! Você conseguiu.mp3" id="9_64s4m"]
+[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/Boa Você conseguiu.mp3" id="9_64s4m"]
 [ext_resource type="Texture2D" uid="uid://71emhwlyq7i5" path="res://assets/kenney_shape-characters/PNG/Default/face_brava.png" id="9_fkv7b"]
-[ext_resource type="AudioStream" uid="uid://ccy0or0ot5ovp" path="res://assets/voices/“Isso! Você venceu!”.mp3" id="10_6o35q"]
+[ext_resource type="AudioStream" uid="uid://5dfotvwoqebn" path="res://assets/voices/Isso Você venceu.mp3" id="10_64s4m"]
 [ext_resource type="AudioStream" uid="uid://bdp3cstl6wrsd" path="res://music/Fineplay.mp3" id="10_jyl56"]
-[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/“Muito bem! Você ace (1).mp3" id="11_fpmhu"]
+[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/Muito bem Você ace (1).mp3" id="11_fpmhu"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="11_gf60d"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="12_wrl74"]
-[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/“Perfeito! Missão co.mp3" id="12_xwfmm"]
+[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/Perfeito Missão co.mp3" id="12_xwfmm"]
 [ext_resource type="Texture2D" uid="uid://kskh8il84oow" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_idle.png" id="13_e7u2c"]
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="13_g83y3"]
 [ext_resource type="Texture2D" uid="uid://dlvmwhtvaksw2" path="res://assets/kenney_shape-characters/PNG/Default/face_feliz.png" id="13_tst06"]
-[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse! Tenta de.mp3" id="13_v5uk3"]
+[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse Tenta de.mp3" id="13_v5uk3"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="14_ab8er"]
-[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops! Esse não está.mp3" id="14_fghk2"]
+[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops Esse não está.mp3" id="14_fghk2"]
 [ext_resource type="Texture2D" uid="uid://dx2jsatlo6kpv" path="res://assets/kenney_shape-characters/PNG/Default/face_e.png" id="14_sffy3"]
-[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase! Mas não é ess.mp3" id="15_87658"]
+[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase Mas não é ess.mp3" id="15_87658"]
 [ext_resource type="Texture2D" uid="uid://c1afblr4c5veh" path="res://assets/kenney_shape-characters/PNG/Default/face_f.png" id="15_mvmt7"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="15_wrl74"]
-[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez!.mp3" id="16_hkwwl"]
+[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez.mp3" id="16_hkwwl"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="20_fkv7b"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="20_tst06"]
 [ext_resource type="Script" uid="uid://cavfefi0id0ki" path="res://scripts/generic/HintManager.gd" id="21_sffy3"]
@@ -90,7 +90,7 @@ stream = ExtResource("9_64s4m")
 volume_db = 10.0
 
 [node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1195757742]
-stream = ExtResource("10_6o35q")
+stream = ExtResource("10_64s4m")
 volume_db = 10.0
 
 [node name="VozVitoria3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=443025424]

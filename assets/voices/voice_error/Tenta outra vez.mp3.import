@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b65u5hr0m4lqp"
+path="res://.godot/imported/Tenta outra vez.mp3-ec9d0fd0536e1652b67a46fa00c90309.mp3str"
+
+[deps]
+
+source_file="res://assets/voices/voice_error/Tenta outra vez.mp3"
+dest_files=["res://.godot/imported/Tenta outra vez.mp3-ec9d0fd0536e1652b67a46fa00c90309.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

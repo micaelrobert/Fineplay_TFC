@@ -117,7 +117,7 @@ func _ajustar_area_jogo(area_jogo: Node, posicao: Vector2, tamanho: Vector2, esc
 	if area_jogo is Control:
 		var control: Control = area_jogo as Control
 		control.position = posicao
-		control.size = tamanho
+		control.set_deferred("size", tamanho)
 		control.custom_minimum_size = tamanho
 		control.scale = escala
 
@@ -145,5 +145,5 @@ func _ajustar_fundo_android(fundo_responsivo: Node, tamanho_tela: Vector2) -> vo
 	if fundo_responsivo is Control:
 		var control: Control = fundo_responsivo as Control
 		control.position = Vector2.ZERO
-		control.size = tamanho_tela
+		control.set_deferred("size", tamanho_tela)
 		control.scale = Vector2.ONE

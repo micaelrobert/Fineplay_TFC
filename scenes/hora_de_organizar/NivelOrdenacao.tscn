@@ -5,23 +5,23 @@
 [ext_resource type="Script" uid="uid://i7ufcoh86f8j" path="res://scripts/ordenacao/slotpodio.gd" id="3_2iyai"]
 [ext_resource type="Texture2D" uid="uid://n47panb6t3me" path="res://assets/podio/podio_3.png" id="6_y4rw1"]
 [ext_resource type="Script" uid="uid://d0d3aqh81brjm" path="res://scripts/ordenacao/ObjetoOrdenacao.gd" id="7_t5f3c"]
-[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/“Boa! Você conseguiu.mp3" id="8_c86ge"]
+[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/Boa Você conseguiu.mp3" id="8_c86ge"]
 [ext_resource type="Texture2D" uid="uid://cccr20xto1mga" path="res://assets/fruits/itch/pngs/red-apple.png" id="8_urfqc"]
-[ext_resource type="AudioStream" uid="uid://ccy0or0ot5ovp" path="res://assets/voices/“Isso! Você venceu!”.mp3" id="9_a2dwm"]
+[ext_resource type="AudioStream" uid="uid://5dfotvwoqebn" path="res://assets/voices/Isso Você venceu.mp3" id="9_c86ge"]
 [ext_resource type="Texture2D" uid="uid://du23n6kud1744" path="res://assets/podio/podio_1_inverso.png" id="9_cbwia"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="9_uh3w0"]
-[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/“Muito bem! Você ace (1).mp3" id="10_3knis"]
+[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/Muito bem Você ace (1).mp3" id="10_3knis"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="10_38qk0"]
 [ext_resource type="Texture2D" uid="uid://e0gv85kp7u5f" path="res://assets/podio/podio_2_inverso.png" id="10_cbwia"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="11_3hjul"]
-[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/“Perfeito! Missão co.mp3" id="11_cx8dd"]
-[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse! Tenta de.mp3" id="12_3sg5h"]
+[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/Perfeito Missão co.mp3" id="11_cx8dd"]
+[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse Tenta de.mp3" id="12_3sg5h"]
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="12_c86ge"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="13_a2dwm"]
-[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops! Esse não está.mp3" id="13_duqtj"]
+[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops Esse não está.mp3" id="13_duqtj"]
 [ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="14_3knis"]
-[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase! Mas não é ess.mp3" id="14_ckott"]
-[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez!.mp3" id="15_07wgk"]
+[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase Mas não é ess.mp3" id="14_ckott"]
+[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez.mp3" id="15_07wgk"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="15_cx8dd"]
 [ext_resource type="Texture2D" uid="uid://bpa6pbesa6xk7" path="res://assets/kenney_ui-pack/PNG/Blue/Default/star.png" id="16_3sg5h"]
 [ext_resource type="PackedScene" uid="uid://duu08rukk8b82" path="res://scenes/generico/BotaoVoltarFase.tscn" id="17_cbwia"]
@@ -96,7 +96,7 @@ stream = ExtResource("8_c86ge")
 volume_db = 10.0
 
 [node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=138167056]
-stream = ExtResource("9_a2dwm")
+stream = ExtResource("9_c86ge")
 volume_db = 10.0
 
 [node name="VozVitoria3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=590499997]

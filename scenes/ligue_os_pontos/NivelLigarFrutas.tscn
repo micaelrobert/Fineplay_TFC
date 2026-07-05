@@ -7,20 +7,20 @@
 [ext_resource type="Texture2D" uid="uid://c8nfs7um37kr8" path="res://assets/fruits/itch/pngs/coconut.png" id="5_rserd"]
 [ext_resource type="Texture2D" uid="uid://q4pum7aby72a" path="res://assets/fruits/itch/pngs/lemon.png" id="6_mgvjo"]
 [ext_resource type="Texture2D" uid="uid://dth35jovxd5wh" path="res://assets/fruits/itch/pngs/orange.png" id="7_2pnpc"]
-[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/“Boa! Você conseguiu.mp3" id="7_kedla"]
+[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/Boa Você conseguiu.mp3" id="7_kedla"]
 [ext_resource type="Texture2D" uid="uid://bt1g1vlrbml15" path="res://assets/fruits/itch/pngs/strawberry.png" id="8_c2p07"]
-[ext_resource type="AudioStream" uid="uid://ccy0or0ot5ovp" path="res://assets/voices/“Isso! Você venceu!”.mp3" id="8_civ8k"]
+[ext_resource type="AudioStream" uid="uid://5dfotvwoqebn" path="res://assets/voices/Isso Você venceu.mp3" id="8_kedla"]
 [ext_resource type="Texture2D" uid="uid://p3hqgbdceuj8" path="res://assets/fruits/itch/pngs/watermelon.png" id="9_iqc7q"]
-[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/“Muito bem! Você ace (1).mp3" id="9_sqhca"]
+[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/Muito bem Você ace (1).mp3" id="9_sqhca"]
 [ext_resource type="Texture2D" uid="uid://eagcdci0j8o4" path="res://assets/fruits/itch/pngs/green-grape.png" id="10_cg2n5"]
-[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/“Perfeito! Missão co.mp3" id="10_ypjn8"]
-[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse! Tenta de.mp3" id="11_7t17q"]
+[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/Perfeito Missão co.mp3" id="10_ypjn8"]
+[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse Tenta de.mp3" id="11_7t17q"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="11_c2p07"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="12_iqc7q"]
-[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops! Esse não está.mp3" id="12_p1ahu"]
-[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase! Mas não é ess.mp3" id="13_6dks3"]
+[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops Esse não está.mp3" id="12_p1ahu"]
+[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase Mas não é ess.mp3" id="13_6dks3"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="13_cg2n5"]
-[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez!.mp3" id="14_46fn7"]
+[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez.mp3" id="14_46fn7"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="14_iqc7q"]
 [ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="15_0b30w"]
 [ext_resource type="Script" uid="uid://cci1sonsj0y3o" path="res://scripts/generic/professor_robo.gd" id="16_wgyqq"]
@@ -77,8 +77,8 @@ stream = ExtResource("11_c2p07")
 stream = ExtResource("7_kedla")
 volume_db = 10.0
 
-[node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=123438342]
-stream = ExtResource("8_civ8k")
+[node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=622667430]
+stream = ExtResource("8_kedla")
 volume_db = 10.0
 
 [node name="VozVitoria3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=909974916]

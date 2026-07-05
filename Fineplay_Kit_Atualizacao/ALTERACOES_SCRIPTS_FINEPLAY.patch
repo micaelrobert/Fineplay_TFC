@@ -1,0 +1,5949 @@
+diff -ruN /mnt/data/fineplay_work/scripts_original/formas_e_cores/nivel_classificacao_base.gd /mnt/data/fineplay_work/scripts/formas_e_cores/nivel_classificacao_base.gd
+--- /mnt/data/fineplay_work/scripts_original/formas_e_cores/nivel_classificacao_base.gd	2026-06-12 11:29:24.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/formas_e_cores/nivel_classificacao_base.gd	2026-07-05 04:11:02.730802875 +0000
+@@ -1,56 +1,20 @@
+ extends Node2D
+ 
+-
+-# ============================================================
+-# OBSERVAÇÃO IMPORTANTE
+-# ============================================================
+-# A responsividade agora é controlada pelo AutoLoad:
+-# ResponsividadeUniversal.gd
+-#
+-# Este script NÃO centraliza AreaJogo
+-# nem redimensiona FundoResponsivo.
+-#
+-# A cena ainda precisa manter os nós:
+-# - AreaJogo
+-# - FundoResponsivo
+-# ============================================================
+-
+-
+-# ============================================================
+-# MANAGERS GENÉRICOS
+-# ============================================================
+-@onready var hint_manager: Node = get_node_or_null("HintManager")
+-@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+-
+-
+-# ============================================================
+-# ELEMENTOS DA FASE
+-# ============================================================
+-@onready var area_jogo: Node2D = $AreaJogo
+-@onready var robo = $AreaJogo/ProfessorRobo
+-@onready var confetes = $AreaJogo/CPUParticles2D
+-
+-
+-# ============================================================
+-# NAVEGAÇÃO
+-# ============================================================
+ @export_file("*.tscn") var proxima_fase_cena: String
+-var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+ 
++var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+ 
+-# ============================================================
+-# FALLBACK DE SONS LOCAIS
+-# Usado apenas se o FeedbackAudio ainda não estiver configurado.
+-# ============================================================
+-@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+-@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+-@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+-@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+-
++@onready var hint_manager: Node = get_node_or_null("HintManager")
++@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
++@onready var area_jogo: Node2D = get_node_or_null("AreaJogo") as Node2D
++@onready var robo: Node = get_node_or_null("AreaJogo/ProfessorRobo")
++@onready var confetes: CPUParticles2D = get_node_or_null("AreaJogo/CPUParticles2D") as CPUParticles2D
++
++@onready var som_acerto: Node = get_node_or_null("SonsLocais/SomAcerto")
++@onready var som_vitoria: Node = get_node_or_null("SonsLocais/SomVitoria")
++@onready var som_erro: Node = get_node_or_null("SonsLocais/SomErro")
++@onready var som_click_forma: Node = get_node_or_null("SonsLocais/SomClickNaForma")
+ 
+-# ============================================================
+-# CONTROLE DA FASE
+-# ============================================================
+ var total_pecas := 0
+ var acertos_atuais := 0
+ var nivel_concluido := false
+@@ -62,199 +26,214 @@
+ 
+ 
+ func _inicializar_fase_com_seguranca() -> void:
+-	# Aguarda a cena montar completamente.
+ 	await get_tree().process_frame
+-
+-	# Aguarda mais um frame para o AutoLoad ResponsividadeUniversal
+-	# ajustar AreaJogo e FundoResponsivo.
+ 	await get_tree().process_frame
+-
+ 	_inicializar_fase()
+ 
+ 
+ func _inicializar_fase() -> void:
+-	randomizar_layout()
++	if not area_jogo:
++		push_error("Nível de classificação: nó AreaJogo não encontrado.")
++		return
+ 
+-	# CRÍTICO:
+-	# Depois de randomizar, atualiza a posição inicial real das peças.
+-	# Isso impede que uma peça volte para a posição antiga de outra peça.
++	randomizar_layout()
+ 	atualizar_posicoes_iniciais_das_pecas()
+-
+ 	configurar_pecas_da_fase()
+ 	iniciar_musica_fundo()
+ 	configurar_hint_manager()
+ 
+-	print("Nível iniciado com ", total_pecas, " peças.")
++	if total_pecas <= 0:
++		push_warning("Nível de classificação iniciado sem peças configuradas.")
++	else:
++		print("Nível de classificação iniciado com ", total_pecas, " peças.")
+ 
+ 
+-# ============================================================
+-# CONFIGURAÇÃO DOS MANAGERS
+-# ============================================================
+ func configurar_hint_manager() -> void:
+ 	if not hint_manager:
+-		push_warning("HintManager não encontrado nesta fase. O jogo funciona, mas sem pistas progressivas.")
++		push_warning(
++			"HintManager não encontrado nesta fase. O jogo funciona, mas sem pistas progressivas."
++		)
+ 		return
+ 
+ 	if hint_manager.has_method("reiniciar_sistema"):
+-		hint_manager.reiniciar_sistema()
++		hint_manager.call("reiniciar_sistema")
++
++
++func registrar_interacao_no_hint() -> void:
++	if hint_manager and hint_manager.has_method("registrar_interacao"):
++		hint_manager.call("registrar_interacao")
++	elif hint_manager and hint_manager.has_method("resetar_timer_sem_limpar_visual"):
++		hint_manager.call("resetar_timer_sem_limpar_visual")
+ 
+ 
+ func registrar_acao_no_hint_sem_resetar() -> void:
+-	# Clique e erro não devem limpar pistas nem zerar o tempo.
+ 	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+-		hint_manager.registrar_acao_sem_resetar_pista()
++		hint_manager.call("registrar_acao_sem_resetar_pista")
+ 
+ 
+ func registrar_acerto_no_hint() -> void:
+-	# Somente acerto deve limpar pista e reiniciar tempo.
+ 	if hint_manager and hint_manager.has_method("registrar_acerto"):
+-		hint_manager.registrar_acerto()
++		hint_manager.call("registrar_acerto")
+ 	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+-		hint_manager.resetar_pistas()
++		hint_manager.call("resetar_pistas")
++
++
++func pausar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("pausar_pistas"):
++		hint_manager.call("pausar_pistas")
++
++
++func retomar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("retomar_pistas"):
++		hint_manager.call("retomar_pistas")
+ 
+ 
+ func finalizar_hint_manager() -> void:
+ 	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+-		hint_manager.finalizar_nivel()
++		hint_manager.call("finalizar_nivel")
+ 
+ 
+-# ============================================================
+-# CONFIGURAÇÃO DA FASE
+-# ============================================================
+ func configurar_pecas_da_fase() -> void:
+ 	total_pecas = 0
+ 	acertos_atuais = 0
+ 	nivel_concluido = false
+ 
+-	for filho in area_jogo.get_children():
+-		if filho.has_signal("peca_encaixada"):
+-			total_pecas += 1
+-
+-			if not filho.peca_encaixada.is_connected(_on_peca_acertou):
+-				filho.peca_encaixada.connect(_on_peca_acertou)
+-
+-			if filho.has_signal("peca_clicada"):
+-				if not filho.peca_clicada.is_connected(_on_peca_clicada):
+-					filho.peca_clicada.connect(_on_peca_clicada)
+-
+-			if filho.has_signal("peca_errou"):
+-				if not filho.peca_errou.is_connected(_on_peca_errou):
+-					filho.peca_errou.connect(_on_peca_errou)
++	for filho in _pegar_pecas_da_fase():
++		if not filho.has_signal("peca_encaixada"):
++			continue
++
++		total_pecas += 1
++		_conectar_sinal_se_existir(filho, "peca_encaixada", Callable(self, "_on_peca_acertou"))
++		_conectar_sinal_se_existir(filho, "peca_clicada", Callable(self, "_on_peca_clicada"))
++		_conectar_sinal_se_existir(filho, "peca_errou", Callable(self, "_on_peca_errou"))
++		_conectar_sinal_se_existir(
++			filho, "arraste_iniciado", Callable(self, "_on_arraste_iniciado")
++		)
++		_conectar_sinal_se_existir(
++			filho, "arraste_finalizado", Callable(self, "_on_arraste_finalizado")
++		)
+ 
+ 
+-func randomizar_layout() -> void:
+-	var slots_da_fase := []
+-
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("slots"):
+-			slots_da_fase.append(filho)
++func _conectar_sinal_se_existir(node: Node, nome_sinal: StringName, callable: Callable) -> void:
++	if not node.has_signal(nome_sinal):
++		return
+ 
+-	var pos_slots := []
++	if not node.is_connected(nome_sinal, callable):
++		node.connect(nome_sinal, callable)
+ 
+-	for slot in slots_da_fase:
+-		pos_slots.append(slot.global_position)
+ 
+-	pos_slots.shuffle()
++func _pegar_pecas_da_fase() -> Array[Node]:
++	var pecas: Array[Node] = []
++	if not area_jogo:
++		return pecas
+ 
+-	for i in range(slots_da_fase.size()):
+-		slots_da_fase[i].global_position = pos_slots[i]
++	for node in get_tree().get_nodes_in_group("pecas"):
++		if node is Node and area_jogo.is_ancestor_of(node):
++			pecas.append(node)
+ 
++	return pecas
+ 
+-	var pecas_da_fase := []
+ 
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("pecas"):
+-			pecas_da_fase.append(filho)
++func _pegar_slots_da_fase() -> Array[Node]:
++	var slots: Array[Node] = []
++	if not area_jogo:
++		return slots
+ 
+-	var pos_pecas := []
++	for node in get_tree().get_nodes_in_group("slots"):
++		if node is Node and area_jogo.is_ancestor_of(node):
++			slots.append(node)
+ 
+-	for peca in pecas_da_fase:
+-		pos_pecas.append(peca.global_position)
++	return slots
+ 
+-	pos_pecas.shuffle()
+ 
+-	for i in range(pecas_da_fase.size()):
+-		pecas_da_fase[i].global_position = pos_pecas[i]
++func randomizar_layout() -> void:
++	_randomizar_posicoes(_pegar_slots_da_fase())
++	_randomizar_posicoes(_pegar_pecas_da_fase())
+ 
+ 
+-func atualizar_posicoes_iniciais_das_pecas() -> void:
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("pecas"):
+-			_atualizar_posicao_inicial_da_peca(filho)
++func _randomizar_posicoes(nodes: Array[Node]) -> void:
++	if nodes.size() <= 1:
++		return
+ 
++	var posicoes: Array[Vector2] = []
++	for node in nodes:
++		if node is Node2D:
++			posicoes.append((node as Node2D).global_position)
++
++	posicoes.shuffle()
++	var indice := 0
++	for node in nodes:
++		if node is Node2D and indice < posicoes.size():
++			(node as Node2D).global_position = posicoes[indice]
++			indice += 1
+ 
+-func _atualizar_posicao_inicial_da_peca(peca: Node) -> void:
+-	if peca.has_method("atualizar_posicao_inicial"):
+-		peca.atualizar_posicao_inicial()
+-		return
+ 
+-	if _objeto_tem_propriedade(peca, "posicao_inicial"):
+-		peca.set("posicao_inicial", peca.global_position)
++func atualizar_posicoes_iniciais_das_pecas() -> void:
++	for peca in _pegar_pecas_da_fase():
++		if peca.has_method("atualizar_posicao_inicial"):
++			peca.call("atualizar_posicao_inicial")
++		elif _objeto_tem_propriedade(peca, "posicao_inicial") and peca is Node2D:
++			peca.set("posicao_inicial", (peca as Node2D).global_position)
+ 
+ 
+-func _objeto_tem_propriedade(objeto: Object, nome_propriedade: String) -> bool:
++func _objeto_tem_propriedade(objeto: Object, nome_propriedade: StringName) -> bool:
+ 	for propriedade in objeto.get_property_list():
+-		if propriedade.name == nome_propriedade:
++		if StringName(propriedade.name) == nome_propriedade:
+ 			return true
+-
+ 	return false
+ 
+ 
+ func iniciar_musica_fundo() -> void:
+-	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
++	var musica := get_node_or_null("/root/AudioManager/MusicaFundo")
++	if musica and not bool(musica.get("playing")) and musica.has_method("play"):
++		musica.call("play")
+ 
+-	if musica and not musica.playing:
+-		musica.play()
+ 
+-
+-# ============================================================
+-# FEEDBACK DE ÁUDIO
+-# ============================================================
+ func tocar_click_forma() -> void:
+ 	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+-		feedback_audio.tocar_click_forma()
+-		return
+-
+-	if som_click_forma:
+-		som_click_forma.play()
++		feedback_audio.call("tocar_click_forma")
++	elif som_click_forma and som_click_forma.has_method("play"):
++		som_click_forma.call("play")
+ 
+ 
+ func tocar_acerto() -> void:
+ 	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+-		feedback_audio.tocar_acerto()
+-		return
+-
+-	if som_acerto:
+-		som_acerto.play()
++		feedback_audio.call("tocar_acerto")
++	elif som_acerto and som_acerto.has_method("play"):
++		som_acerto.call("play")
+ 
+ 
+ func tocar_erro_pedagogico() -> void:
+ 	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+-		feedback_audio.tocar_erro_pedagogico()
+-		return
+-
+-	if som_erro:
+-		som_erro.play()
++		feedback_audio.call("tocar_erro_pedagogico")
++	elif som_erro and som_erro.has_method("play"):
++		som_erro.call("play")
+ 
+ 
+ func tocar_vitoria_pedagogica() -> void:
+ 	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+-		feedback_audio.tocar_vitoria_pedagogica()
++		feedback_audio.call("tocar_vitoria_pedagogica")
++	elif som_vitoria and som_vitoria.has_method("play"):
++		som_vitoria.call("play")
++
++
++func _on_arraste_iniciado() -> void:
++	if nivel_concluido:
+ 		return
++	registrar_interacao_no_hint()
++	pausar_hint_manager()
++
+ 
+-	if som_vitoria:
+-		som_vitoria.play()
++func _on_arraste_finalizado() -> void:
++	if nivel_concluido:
++		return
++	retomar_hint_manager()
+ 
+ 
+-# ============================================================
+-# EVENTOS DAS PEÇAS
+-# ============================================================
+ func _on_peca_clicada() -> void:
+ 	if nivel_concluido:
+ 		return
+-
+-	# Clique não deve resetar pista.
+-	registrar_acao_no_hint_sem_resetar()
++	registrar_interacao_no_hint()
+ 	tocar_click_forma()
+ 
+ 
+@@ -262,35 +241,26 @@
+ 	if nivel_concluido:
+ 		return
+ 
+-	# Erro não deve resetar pista.
+ 	registrar_acao_no_hint_sem_resetar()
+ 	tocar_erro_pedagogico()
+-
+ 	if robo and robo.has_method("errar"):
+-		robo.errar()
++		robo.call("errar")
+ 
+ 
+ func _on_peca_acertou() -> void:
+ 	if nivel_concluido:
+ 		return
+ 
+-	# Somente acerto reseta pista.
+ 	registrar_acerto_no_hint()
+-
+ 	acertos_atuais += 1
+-
+ 	tocar_acerto()
+ 
+-	if acertos_atuais < total_pecas:
+-		if robo and robo.has_method("comemorar"):
+-			robo.comemorar()
+-	else:
++	if acertos_atuais >= total_pecas:
+ 		concluir_nivel()
++	elif robo and robo.has_method("comemorar"):
++		robo.call("comemorar")
+ 
+ 
+-# ============================================================
+-# VITÓRIA
+-# ============================================================
+ func concluir_nivel() -> void:
+ 	if nivel_concluido:
+ 		return
+@@ -298,29 +268,25 @@
+ 	nivel_concluido = true
+ 	finalizar_hint_manager()
+ 
+-	print("GANHOU O JOGO!")
+-
+ 	if confetes:
+ 		confetes.emitting = true
+ 
+ 	tocar_vitoria_pedagogica()
+-
+ 	if robo and robo.has_method("vitoria"):
+-		robo.vitoria()
++		robo.call("vitoria")
+ 	elif robo and robo.has_method("comemorar"):
+-		robo.comemorar()
++		robo.call("comemorar")
+ 
+ 	await get_tree().create_timer(1.4).timeout
+ 	mostrar_vitoria_padrao()
+ 
+ 
+ func mostrar_vitoria_padrao() -> void:
+-	var tela = cena_vitoria.instantiate()
+-	add_child(tela)
++	if not cena_vitoria:
++		push_error("TelaVitoria não pôde ser carregada.")
++		return
+ 
+-	# Ao chamar o configurar logo após o add_child, 
+-	# a Godot faz a alteração ANTES de desenhar a tela pro jogador!
++	var tela := cena_vitoria.instantiate()
++	add_child(tela)
+ 	if tela.has_method("configurar"):
+-		tela.configurar(proxima_fase_cena)
+-	else:
+-		push_warning("TelaVitoria não possui o método configurar().")
++		tela.call("configurar", proxima_fase_cena)
+diff -ruN /mnt/data/fineplay_work/scripts_original/formas_e_cores/objeto_arrastavel.gd /mnt/data/fineplay_work/scripts/formas_e_cores/objeto_arrastavel.gd
+--- /mnt/data/fineplay_work/scripts_original/formas_e_cores/objeto_arrastavel.gd	2026-06-11 17:53:50.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/formas_e_cores/objeto_arrastavel.gd	2026-07-05 04:12:02.622964016 +0000
+@@ -1,206 +1,226 @@
+ extends Area2D
+ 
+-# ============================================================
+-# SINAIS
+-# ============================================================
+ signal peca_encaixada
+ signal peca_clicada
+ signal peca_errou
++signal arraste_iniciado
++signal arraste_finalizado
+ 
+-
+-# ============================================================
+-# CONFIGURAÇÃO
+-# ============================================================
+ @export var slot_correto_nome: String = ""
+-
+-
+-# ============================================================
+-# TEXTURAS DE ROSTO
+-# ============================================================
+ @export var textura_brava: Texture2D
+ @export var textura_feliz: Texture2D
++@export var manter_deslocamento_do_toque := true
++@export_range(1.0, 2.0, 0.05) var escala_durante_arraste := 1.2
+ 
+-
+-# ============================================================
+-# REFERÊNCIAS
+-# ============================================================
+ var sprite_rosto: Sprite2D = null
+-
+-
+-# ============================================================
+-# VARIÁVEIS INTERNAS
+-# ============================================================
+ var sendo_arrastado := false
+ var posicao_inicial := Vector2.ZERO
+ var esta_travado := false
+ var tween_movimento: Tween = null
++var ponteiro_ativo := -999
++var deslocamento_arraste := Vector2.ZERO
++var escala_inicial := Vector2.ONE
++
++const PONTEIRO_MOUSE := -1
++const PONTEIRO_NENHUM := -999
+ 
+ 
+ func _ready() -> void:
+ 	await get_tree().process_frame
+-
+ 	posicao_inicial = global_position
++	escala_inicial = scale
++	input_pickable = true
+ 
+ 	if has_node("Rosto"):
+-		sprite_rosto = get_node("Rosto")
+-
+-		if textura_brava:
++		sprite_rosto = get_node("Rosto") as Sprite2D
++		if sprite_rosto and textura_brava:
+ 			sprite_rosto.texture = textura_brava
+ 
+ 
+-func _process(_delta: float) -> void:
+-	if sendo_arrastado and not esta_travado:
+-		global_position = get_global_mouse_position()
++func _exit_tree() -> void:
++	_parar_tween_movimento()
+ 
+ 
+-func _on_input_event(_viewport, event, _shape_idx) -> void:
+-	if esta_travado:
++func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
++	if esta_travado or sendo_arrastado:
+ 		return
+ 
+ 	if event is InputEventMouseButton:
+-		if event.button_index == MOUSE_BUTTON_LEFT:
+-			if event.pressed:
+-				iniciar_arraste()
+-			else:
+-				finalizar_arraste()
++		var mouse_event := event as InputEventMouseButton
++		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
++			_iniciar_arraste_com_ponteiro(
++				PONTEIRO_MOUSE, _viewport_para_global(mouse_event.position)
++			)
++			get_viewport().set_input_as_handled()
++
++	elif event is InputEventScreenTouch:
++		var touch_event := event as InputEventScreenTouch
++		if touch_event.pressed:
++			_iniciar_arraste_com_ponteiro(
++				touch_event.index, _viewport_para_global(touch_event.position)
++			)
++			get_viewport().set_input_as_handled()
++
++
++func _input(event: InputEvent) -> void:
++	if not sendo_arrastado or esta_travado:
++		return
++
++	if event is InputEventMouseMotion and ponteiro_ativo == PONTEIRO_MOUSE:
++		_mover_para_ponteiro(_viewport_para_global((event as InputEventMouseMotion).position))
++
++	elif event is InputEventMouseButton and ponteiro_ativo == PONTEIRO_MOUSE:
++		var mouse_event := event as InputEventMouseButton
++		if mouse_event.button_index == MOUSE_BUTTON_LEFT and not mouse_event.pressed:
++			_mover_para_ponteiro(_viewport_para_global(mouse_event.position))
++			finalizar_arraste()
++
++	elif event is InputEventScreenDrag:
++		var drag_event := event as InputEventScreenDrag
++		if drag_event.index == ponteiro_ativo:
++			_mover_para_ponteiro(_viewport_para_global(drag_event.position))
++
++	elif event is InputEventScreenTouch:
++		var touch_event := event as InputEventScreenTouch
++		if touch_event.index == ponteiro_ativo and not touch_event.pressed:
++			_mover_para_ponteiro(_viewport_para_global(touch_event.position))
++			finalizar_arraste()
+ 
+ 
+ func iniciar_arraste() -> void:
+-	if esta_travado:
++	_iniciar_arraste_com_ponteiro(PONTEIRO_MOUSE, get_global_mouse_position())
++
++
++func _iniciar_arraste_com_ponteiro(id_ponteiro: int, posicao_ponteiro: Vector2) -> void:
++	if esta_travado or sendo_arrastado:
+ 		return
+ 
+ 	_parar_tween_movimento()
+-
++	ponteiro_ativo = id_ponteiro
++	deslocamento_arraste = (
++		global_position - posicao_ponteiro if manter_deslocamento_do_toque else Vector2.ZERO
++	)
+ 	sendo_arrastado = true
+ 	z_index = 10
+-	scale = Vector2(1.2, 1.2)
++	scale = escala_inicial * escala_durante_arraste
+ 
+-	emit_signal("peca_clicada")
++	peca_clicada.emit()
++	arraste_iniciado.emit()
++
++
++func _mover_para_ponteiro(posicao_ponteiro: Vector2) -> void:
++	global_position = posicao_ponteiro + deslocamento_arraste
+ 
+ 
+ func finalizar_arraste() -> void:
+-	if esta_travado:
++	if esta_travado or not sendo_arrastado:
+ 		return
+ 
+ 	sendo_arrastado = false
++	ponteiro_ativo = PONTEIRO_NENHUM
+ 	verificar_encaixe()
++	arraste_finalizado.emit()
+ 
+ 
+ func verificar_encaixe() -> void:
+-	var areas = get_overlapping_areas()
++	var areas := get_overlapping_areas()
+ 	var encontrou_slot := false
++	var slot_correto: Area2D = null
+ 
+ 	for area in areas:
+-		if area.is_in_group("slots"):
+-			encontrou_slot = true
++		if not area.is_in_group("slots"):
++			continue
+ 
+-			if area.name == slot_correto_nome:
+-				encaixar(area.global_position)
+-				return
+-
+-	# Se encontrou algum slot, mas não era o correto:
+-	# aí sim é erro pedagógico com som/voz.
+-	if encontrou_slot:
+-		emit_signal("peca_errou")
++		encontrou_slot = true
++		if area.name == slot_correto_nome:
++			slot_correto = area
++			break
++
++	if slot_correto:
++		encaixar(slot_correto.global_position)
++	elif encontrou_slot:
++		peca_errou.emit()
+ 		voltar_ao_inicio()
+-		return
+-
+-	# Se soltou fora de qualquer slot:
+-	# apenas volta para a posição inicial, sem emitir erro.
+-	voltar_ao_inicio_sem_erro()
++	else:
++		voltar_ao_inicio_sem_erro()
+ 
+ 
+ func encaixar(posicao_alvo: Vector2) -> void:
+ 	_parar_tween_movimento()
+-
+ 	esta_travado = true
+ 	sendo_arrastado = false
+-	scale = Vector2(1.0, 1.0)
++	ponteiro_ativo = PONTEIRO_NENHUM
++	scale = escala_inicial
+ 	z_index = 0
+ 
+ 	if sprite_rosto and textura_feliz:
+ 		sprite_rosto.texture = textura_feliz
+ 
+-	tween_movimento = get_tree().create_tween()
+-	tween_movimento.tween_property(
+-		self,
+-		"global_position",
+-		posicao_alvo,
+-		0.2
+-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+-
+-	emit_signal("peca_encaixada")
++	tween_movimento = create_tween()
++	(
++		tween_movimento
++		. tween_property(self, "global_position", posicao_alvo, 0.2)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
++	)
++	peca_encaixada.emit()
+ 
+ 
+ func voltar_ao_inicio() -> void:
+-	# Usado quando a peça foi colocada em um SLOT ERRADO.
+-	_parar_tween_movimento()
+-
+-	sendo_arrastado = false
+-	scale = Vector2(1.0, 1.0)
+-	z_index = 0
++	_retornar_para_posicao_inicial(0.65)
+ 
+-	if sprite_rosto and textura_brava:
+-		sprite_rosto.texture = textura_brava
+ 
+-	tween_movimento = get_tree().create_tween()
+-	tween_movimento.tween_property(
+-		self,
+-		"global_position",
+-		posicao_inicial,
+-		0.65
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
++func voltar_ao_inicio_sem_erro() -> void:
++	_retornar_para_posicao_inicial(0.3)
+ 
+ 
+-func voltar_ao_inicio_sem_erro() -> void:
+-	# Usado quando a peça foi solta fora de qualquer slot.
+-	# Não emite peca_errou e não deve gerar voz de erro.
++func _retornar_para_posicao_inicial(duracao: float) -> void:
+ 	_parar_tween_movimento()
+-
+ 	sendo_arrastado = false
+-	scale = Vector2(1.0, 1.0)
++	ponteiro_ativo = PONTEIRO_NENHUM
++	scale = escala_inicial
+ 	z_index = 0
+ 
+ 	if sprite_rosto and textura_brava:
+ 		sprite_rosto.texture = textura_brava
+ 
+-	tween_movimento = get_tree().create_tween()
+-	tween_movimento.tween_property(
+-		self,
+-		"global_position",
+-		posicao_inicial,
+-		0.3
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
++	tween_movimento = create_tween()
++	(
++		tween_movimento
++		. tween_property(self, "global_position", posicao_inicial, duracao)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_OUT)
++	)
+ 
+ 
+ func _parar_tween_movimento() -> void:
+ 	if tween_movimento and tween_movimento.is_valid():
+ 		tween_movimento.kill()
+-
+ 	tween_movimento = null
+ 
+ 
+-# ============================================================
+-# SUPORTE À RANDOMIZAÇÃO
+-# ============================================================
++func _viewport_para_global(posicao_viewport: Vector2) -> Vector2:
++	return get_viewport().get_canvas_transform().affine_inverse() * posicao_viewport
++
++
+ func atualizar_posicao_inicial() -> void:
+ 	posicao_inicial = global_position
+ 
+ 
+-# ============================================================
+-# MÉTODOS PARA O SISTEMA DE PISTAS
+-# ============================================================
+ func get_slot_correto() -> Node:
+-	if slot_correto_nome == "":
++	if slot_correto_nome.is_empty():
+ 		return null
+ 
+-	var pai = get_parent()
++	var pai := get_parent()
++	if pai:
++		var direto := pai.get_node_or_null(slot_correto_nome)
++		if direto:
++			return direto
+ 
+-	if pai and pai.has_node(slot_correto_nome):
+-		return pai.get_node(slot_correto_nome)
++		return pai.find_child(slot_correto_nome, true, false)
+ 
+ 	return null
+ 
+ 
+ func esta_disponivel_para_pista() -> bool:
+-	return not esta_travado
++	return not esta_travado and not sendo_arrastado
+diff -ruN /mnt/data/fineplay_work/scripts_original/generic/FeedbackAudio.gd /mnt/data/fineplay_work/scripts/generic/FeedbackAudio.gd
+--- /mnt/data/fineplay_work/scripts_original/generic/FeedbackAudio.gd	2026-06-11 17:47:20.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/generic/FeedbackAudio.gd	2026-07-05 04:11:20.359289932 +0000
+@@ -2,148 +2,180 @@
+ 
+ class_name FeedbackAudioManager
+ 
+-# ============================================================
+-# FEEDBACK AUDIO MANAGER
+-# Gerenciador universal de sons e vozes dos minigames.
+-#
+-# Responsabilidades:
+-# - tocar som de clique;
+-# - tocar som de acerto;
+-# - tocar som de erro;
+-# - tocar som de vitória;
+-# - tocar voz aleatória de erro;
+-# - tocar voz aleatória de vitória;
+-# - parar vozes anteriores quando necessário.
+-#
+-# Este script NÃO valida regras do jogo.
+-# Este script NÃO controla input.
+-# Este script NÃO controla vitória.
+-# Ele apenas centraliza feedback sonoro.
+-# ============================================================
+-
+-
+-# ============================================================
+-# REFERÊNCIA AO CONTAINER DE SONS
+-# ============================================================
+ @export_node_path("Node") var sons_locais_path: NodePath
+ 
+-@onready var sons_locais: Node = get_node_or_null(sons_locais_path)
++@export_group("Controle de vozes")
++@export_range(0.0, 5.0, 0.1) var intervalo_minimo_voz_erro := 0.8
++@export var recuperar_streams_ausentes := true
++@export_dir var pasta_vozes_vitoria := "res://assets/voices"
++@export_dir var pasta_vozes_erro := "res://assets/voices/voice_error"
+ 
++@onready var sons_locais: Node = get_node_or_null(sons_locais_path)
+ 
+-# ============================================================
+-# SONS FIXOS
+-# ============================================================
+ var som_click_objeto: Node = null
+ var som_click_forma: Node = null
+ var som_acerto: Node = null
+ var som_erro: Node = null
+ var som_vitoria: Node = null
+ 
+-
+-# ============================================================
+-# VOZES
+-# ============================================================
+-var vozes_erro: Array = []
+-var vozes_vitoria: Array = []
++var vozes_erro: Array[Node] = []
++var vozes_vitoria: Array[Node] = []
++var ultimo_indice_erro := -1
++var ultimo_indice_vitoria := -1
++var ultimo_erro_com_voz_ms := -1000000
+ 
+ 
+-# ============================================================
+-# INICIALIZAÇÃO
+-# ============================================================
+ func _ready() -> void:
+ 	configurar_referencias()
+ 
+ 
+ func configurar_referencias() -> void:
++	_resolver_sons_locais()
++
+ 	if not sons_locais:
+-		push_warning("FeedbackAudioManager: sons_locais_path não foi configurado ou não encontrou o nó SonsLocais.")
++		push_warning("FeedbackAudioManager: não foi possível localizar o nó SonsLocais.")
+ 		return
+ 
+-	som_click_objeto = sons_locais.get_node_or_null("SomClickObjeto")
+-	som_click_forma = sons_locais.get_node_or_null("SomClickNaForma")
+-	som_acerto = sons_locais.get_node_or_null("SomAcerto")
+-	som_erro = sons_locais.get_node_or_null("SomErro")
+-	som_vitoria = sons_locais.get_node_or_null("SomVitoria")
++	som_click_objeto = _como_player(sons_locais.get_node_or_null("SomClickObjeto"))
++	som_click_forma = _como_player(sons_locais.get_node_or_null("SomClickNaForma"))
++	som_acerto = _como_player(sons_locais.get_node_or_null("SomAcerto"))
++	som_erro = _como_player(sons_locais.get_node_or_null("SomErro"))
++	som_vitoria = _como_player(sons_locais.get_node_or_null("SomVitoria"))
+ 
+ 	vozes_erro.clear()
+ 	vozes_vitoria.clear()
+ 
+-	adicionar_voz_se_existir(vozes_erro, "VozErro1")
+-	adicionar_voz_se_existir(vozes_erro, "VozErro2")
+-	adicionar_voz_se_existir(vozes_erro, "VozErro3")
+-	adicionar_voz_se_existir(vozes_erro, "VozErro4")
+-
+-	adicionar_voz_se_existir(vozes_vitoria, "VozVitoria1")
+-	adicionar_voz_se_existir(vozes_vitoria, "VozVitoria2")
+-	adicionar_voz_se_existir(vozes_vitoria, "VozVitoria3")
+-	adicionar_voz_se_existir(vozes_vitoria, "VozVitoria4")
++	for indice in range(1, 5):
++		_adicionar_player_se_existir(vozes_erro, "VozErro%d" % indice)
++		_adicionar_player_se_existir(vozes_vitoria, "VozVitoria%d" % indice)
++
++	if recuperar_streams_ausentes:
++		_recuperar_streams_da_pasta(vozes_vitoria, pasta_vozes_vitoria, false)
++		_recuperar_streams_da_pasta(vozes_erro, pasta_vozes_erro, true)
++
++
++func _resolver_sons_locais() -> void:
++	if sons_locais and is_instance_valid(sons_locais):
++		return
++
++	var cena_atual := get_tree().current_scene
++	if cena_atual:
++		sons_locais = cena_atual.find_child("SonsLocais", true, false)
++
+ 
++func _como_player(node: Node) -> Node:
++	if node is AudioStreamPlayer or node is AudioStreamPlayer2D:
++		return node
++	return null
+ 
+-func adicionar_voz_se_existir(lista: Array, nome_node: String) -> void:
++
++func _adicionar_player_se_existir(lista: Array, nome_node: String) -> void:
+ 	if not sons_locais:
+ 		return
+ 
+-	var voz = sons_locais.get_node_or_null(nome_node)
++	var node := sons_locais.get_node_or_null(nome_node)
++	if node and (node is AudioStreamPlayer or node is AudioStreamPlayer2D):
++		lista.append(node)
++
+ 
+-	if voz:
+-		lista.append(voz)
++func _recuperar_streams_da_pasta(lista: Array, pasta: String, incluir_subpastas: bool) -> void:
++	var players_sem_stream: Array = []
++	for player in lista:
++		if _obter_stream(player) == null:
++			players_sem_stream.append(player)
+ 
++	if players_sem_stream.is_empty():
++		return
+ 
+-# ============================================================
+-# MÉTODO SEGURO PARA TOCAR ÁUDIO
+-# ============================================================
+-func tocar_audio(audio: Node) -> void:
+-	if not audio:
++	var caminhos := _listar_arquivos_audio(pasta, incluir_subpastas)
++	if caminhos.is_empty():
+ 		return
+ 
+-	if audio.has_method("play"):
+-		audio.play()
++	var indice_arquivo := 0
++	for player in players_sem_stream:
++		while indice_arquivo < caminhos.size():
++			var caminho: String = caminhos[indice_arquivo]
++			indice_arquivo += 1
++			var stream := load(caminho) as AudioStream
++			if stream:
++				player.set("stream", stream)
++				break
++
++
++func _listar_arquivos_audio(pasta: String, incluir_subpastas: bool) -> Array[String]:
++	var resultado: Array[String] = []
++	var dir := DirAccess.open(pasta)
++	if not dir:
++		return resultado
++
++	dir.list_dir_begin()
++	var nome := dir.get_next()
++	while not nome.is_empty():
++		if nome.begins_with("."):
++			nome = dir.get_next()
++			continue
++
++		var caminho := pasta.path_join(nome)
++		if dir.current_is_dir():
++			if incluir_subpastas:
++				resultado.append_array(_listar_arquivos_audio(caminho, true))
++		elif nome.get_extension().to_lower() in ["mp3", "ogg", "wav"]:
++			resultado.append(caminho)
++
++		nome = dir.get_next()
++
++	dir.list_dir_end()
++	resultado.sort()
++	return resultado
+ 
+ 
+-func parar_audio(audio: Node) -> void:
+-	if not audio:
++func _obter_stream(audio: Variant) -> AudioStream:
++	if not audio or not is_instance_valid(audio):
++		return null
++	return audio.get("stream") as AudioStream
++
++
++func tocar_audio(audio: Variant, reiniciar: bool = true) -> void:
++	if not audio or not is_instance_valid(audio):
++		return
++	if not audio.has_method("play"):
++		return
++	if _obter_stream(audio) == null:
+ 		return
+ 
+-	if audio.has_method("stop"):
++	if reiniciar and audio.has_method("stop"):
+ 		audio.stop()
++	audio.play()
+ 
+ 
+-func audio_esta_tocando(audio: Node) -> bool:
+-	if not audio:
+-		return false
++func parar_audio(audio: Variant) -> void:
++	if audio and is_instance_valid(audio) and audio.has_method("stop"):
++		audio.stop()
+ 
+-	var valor_playing = audio.get("playing")
+ 
+-	if valor_playing == null:
++func audio_esta_tocando(audio: Variant) -> bool:
++	if not audio or not is_instance_valid(audio):
+ 		return false
+-
+-	return bool(valor_playing)
++	return bool(audio.get("playing"))
+ 
+ 
+-# ============================================================
+-# MÉTODOS PÚBLICOS — SONS SIMPLES
+-# ============================================================
+ func tocar_click_objeto() -> void:
+ 	tocar_audio(som_click_objeto)
+ 
+ 
+ func tocar_click_forma() -> void:
+-	if som_click_forma:
++	if som_click_forma and _obter_stream(som_click_forma):
+ 		tocar_audio(som_click_forma)
+ 	else:
+ 		tocar_audio(som_click_objeto)
+ 
+ 
+ func tocar_acerto() -> void:
+-	# CRÍTICO:
+-	# Se uma voz de erro estiver tocando, corta imediatamente.
+-	# O acerto deve tocar apenas o som simples de peça correta.
+-	parar_vozes_erro()
++	parar_todas_as_vozes()
+ 	tocar_audio(som_acerto)
+ 
+ 
+ func tocar_erro_simples() -> void:
+-	# Erro simples não toca voz.
+ 	tocar_audio(som_erro)
+ 
+ 
+@@ -152,51 +184,51 @@
+ 	tocar_audio(som_vitoria)
+ 
+ 
+-# ============================================================
+-# MÉTODOS PÚBLICOS — FEEDBACK PEDAGÓGICO
+-# ============================================================
+ func tocar_erro_pedagogico() -> void:
+-	# Evita sobreposição de vozes de erro.
+-	parar_vozes_erro()
+-
++	parar_vozes_vitoria()
+ 	tocar_audio(som_erro)
+-	tocar_voz_erro_aleatoria()
++
++	var agora := Time.get_ticks_msec()
++	if agora - ultimo_erro_com_voz_ms >= int(intervalo_minimo_voz_erro * 1000.0):
++		ultimo_erro_com_voz_ms = agora
++		tocar_voz_erro_aleatoria()
+ 
+ 
+ func tocar_vitoria_pedagogica() -> void:
+-	# Vitória deve interromper qualquer voz anterior,
+-	# inclusive voz de erro que ainda esteja tocando.
+ 	parar_todas_as_vozes()
+-
+ 	tocar_audio(som_vitoria)
+ 	tocar_voz_vitoria_aleatoria()
+ 
+ 
+-# ============================================================
+-# VOZES ALEATÓRIAS
+-# ============================================================
+ func tocar_voz_erro_aleatoria() -> void:
+-	if vozes_erro.is_empty():
+-		return
++	ultimo_indice_erro = _tocar_voz_aleatoria(vozes_erro, ultimo_indice_erro)
+ 
+-	parar_vozes_erro()
+ 
+-	var voz_escolhida = vozes_erro.pick_random()
+-	tocar_audio(voz_escolhida)
++func tocar_voz_vitoria_aleatoria() -> void:
++	ultimo_indice_vitoria = _tocar_voz_aleatoria(vozes_vitoria, ultimo_indice_vitoria)
+ 
+ 
+-func tocar_voz_vitoria_aleatoria() -> void:
+-	if vozes_vitoria.is_empty():
+-		return
++func _tocar_voz_aleatoria(lista: Array, ultimo_indice: int) -> int:
++	var disponiveis: Array = []
++	for player in lista:
++		if _obter_stream(player):
++			disponiveis.append(player)
+ 
+-	parar_vozes_vitoria()
++	if disponiveis.is_empty():
++		return -1
++
++	parar_vozes(lista)
++
++	var indice := randi_range(0, disponiveis.size() - 1)
++	if disponiveis.size() > 1 and indice == ultimo_indice:
++		indice = (indice + 1) % disponiveis.size()
+ 
+-	var voz_escolhida = vozes_vitoria.pick_random()
+-	tocar_audio(voz_escolhida)
++	tocar_audio(disponiveis[indice])
++	return indice
+ 
+ 
+-func parar_vozes(lista_vozes: Array) -> void:
+-	for voz in lista_vozes:
++func parar_vozes(lista: Array) -> void:
++	for voz in lista:
+ 		if audio_esta_tocando(voz):
+ 			parar_audio(voz)
+ 
+diff -ruN /mnt/data/fineplay_work/scripts_original/generic/HintManager.gd /mnt/data/fineplay_work/scripts/generic/HintManager.gd
+--- /mnt/data/fineplay_work/scripts_original/generic/HintManager.gd	2026-06-12 09:50:16.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/generic/HintManager.gd	2026-07-05 04:11:02.620496181 +0000
+@@ -2,12 +2,10 @@
+ 
+ class_name HintManager
+ 
+-enum ModoPista {
+-	ARRASTAR_PECAS,
+-	LIGAR_PARES,
+-	LIGAR_NUMEROS,
+-	CUSTOM
+-}
++signal pista_exibida(nivel: int, origem: Node, destino: Node)
++signal interacao_registrada
++
++enum ModoPista { ARRASTAR_PECAS, LIGAR_PARES, LIGAR_NUMEROS, CUSTOM }
+ 
+ @export var modo_pista: ModoPista = ModoPista.ARRASTAR_PECAS
+ 
+@@ -16,26 +14,27 @@
+ @export_node_path("Label") var texto_dica_path: NodePath
+ @export_node_path("Node") var robo_path: NodePath
+ 
+-@onready var area_jogo: Node2D = get_node_or_null(area_jogo_path)
+-@onready var camada_linhas: Node2D = get_node_or_null(camada_linhas_path)
+-@onready var texto_dica: Label = get_node_or_null(texto_dica_path)
+-@onready var robo: Node = get_node_or_null(robo_path)
+-
++@export_group("Tempos das pistas")
+ @export var ativar_pistas := true
+-@export var tempo_pista_1 := 8.0
+-@export var tempo_pista_2 := 15.0
+-@export var tempo_pista_3 := 25.0
++@export_range(0.5, 120.0, 0.5) var tempo_pista_1 := 8.0
++@export_range(1.0, 180.0, 0.5) var tempo_pista_2 := 15.0
++@export_range(1.5, 240.0, 0.5) var tempo_pista_3 := 25.0
++@export var limpar_pista_ao_interagir := true
+ 
++@export_group("Destaque visual")
+ @export var cor_amarela_pista: Color = Color(1.8, 1.55, 0.15, 1.0)
+-@export var cor_normal: Color = Color(1.0, 1.0, 1.0, 1.0)
+ @export var escala_origem_pista := 1.10
+ @export var escala_destino_pista := 1.16
+-
+ @export var largura_linha_dica := 10.0
+ @export var largura_linha_dica_sombra := 22.0
+ @export var cor_linha_dica: Color = Color(1.0, 0.85, 0.05, 1.0)
+ @export var cor_linha_dica_sombra: Color = Color(0.0, 0.0, 0.0, 0.28)
+ 
++@onready var area_jogo: Node2D = get_node_or_null(area_jogo_path) as Node2D
++@onready var camada_linhas: Node2D = get_node_or_null(camada_linhas_path) as Node2D
++@onready var texto_dica: Label = get_node_or_null(texto_dica_path) as Label
++@onready var robo: Node = get_node_or_null(robo_path)
++
+ var tempo_sem_acao := 0.0
+ var nivel_pista_atual := 0
+ var pista_ativa := false
+@@ -55,58 +54,76 @@
+ var linha_dica: Line2D = null
+ var linha_dica_sombra: Line2D = null
+ 
+-var modulates_originais := {}
+-var escalas_originais := {}
++var modulates_originais: Dictionary = {}
++var escalas_originais: Dictionary = {}
+ 
+ var callback_buscar_origem: Callable
+ var callback_buscar_destino: Callable
+ 
+ 
+ func _ready() -> void:
++	_normalizar_tempos()
++	_resolver_referencias()
++
+ 	if texto_dica:
+ 		texto_dica.visible = false
+ 
+-	_resolver_referencias()
++
++func _exit_tree() -> void:
++	_limpar_animacoes_e_visuais()
+ 
+ 
+ func _process(delta: float) -> void:
+-	if not ativar_pistas:
++	if not ativar_pistas or sistema_pausado or nivel_concluido:
+ 		return
+ 
+-	if sistema_pausado:
+-		return
++	tempo_sem_acao += maxf(delta, 0.0)
++	verificar_pistas_por_inatividade()
+ 
+-	if nivel_concluido:
+-		return
+ 
+-	tempo_sem_acao += delta
+-	verificar_pistas_por_inatividade()
++func _normalizar_tempos() -> void:
++	tempo_pista_1 = maxf(tempo_pista_1, 0.5)
++	tempo_pista_2 = maxf(tempo_pista_2, tempo_pista_1 + 0.5)
++	tempo_pista_3 = maxf(tempo_pista_3, tempo_pista_2 + 0.5)
+ 
+ 
+ func _resolver_referencias() -> void:
+-	var cena_atual = get_tree().current_scene
++	var cena_atual := get_tree().current_scene
++
++	if not _node_valido(area_jogo) and cena_atual:
++		area_jogo = cena_atual.find_child("AreaJogo", true, false) as Node2D
+ 
+-	if not area_jogo and cena_atual:
+-		var area_encontrada = cena_atual.find_child("AreaJogo", true, false)
+-		if area_encontrada and area_encontrada is Node2D:
+-			area_jogo = area_encontrada
+-
+-	if not camada_linhas and cena_atual:
+-		var camada_encontrada = cena_atual.find_child("CamadaLinhas", true, false)
+-		if camada_encontrada and camada_encontrada is Node2D:
+-			camada_linhas = camada_encontrada
++	if not _node_valido(camada_linhas) and cena_atual:
++		camada_linhas = cena_atual.find_child("CamadaLinhas", true, false) as Node2D
++
++	if not _node_valido(robo) and cena_atual:
++		robo = cena_atual.find_child("ProfessorRobo", true, false)
+ 
+ 	if camada_linhas:
+ 		camada_linhas.z_index = 900
+ 		camada_linhas.z_as_relative = false
+ 
+ 
++# Registra uma ação real do jogador. Por padrão, reinicia o relógio de
++# inatividade e limpa a pista visual anterior, porque o usuário retomou a tarefa.
+ func registrar_interacao() -> void:
+-	pass
++	if nivel_concluido:
++		return
++
++	tempo_sem_acao = 0.0
++	interacao_registrada.emit()
+ 
++	if limpar_pista_ao_interagir and pista_ativa:
++		_limpar_pista_visual_sem_alterar_estado()
++		nivel_pista_atual = 0
++		pista_ativa = false
+ 
++
++# Mantém a pista que já está visível, mas reinicia o relógio de inatividade.
++# É útil durante uma tentativa, um arraste ou um erro em que a orientação deve
++# permanecer na tela.
+ func registrar_acao_sem_resetar_pista() -> void:
+-	pass
++	resetar_timer_sem_limpar_visual()
+ 
+ 
+ func registrar_acerto() -> void:
+@@ -114,27 +131,36 @@
+ 
+ 
+ func resetar_timer_sem_limpar_visual() -> void:
+-	pass
++	if nivel_concluido:
++		return
++
++	tempo_sem_acao = 0.0
++	interacao_registrada.emit()
+ 
+ 
+ func pausar_pistas() -> void:
+ 	sistema_pausado = true
+ 
+ 
+-func retomar_pistas() -> void:
++func retomar_pistas(reiniciar_timer: bool = true) -> void:
+ 	sistema_pausado = false
+ 
++	if reiniciar_timer:
++		resetar_timer_sem_limpar_visual()
++
+ 
+ func finalizar_nivel() -> void:
+ 	nivel_concluido = true
++	sistema_pausado = true
+ 	resetar_pistas()
+ 
+ 
+ func reiniciar_sistema() -> void:
+ 	nivel_concluido = false
+ 	sistema_pausado = false
+-	resetar_pistas()
++	_normalizar_tempos()
+ 	_resolver_referencias()
++	resetar_pistas()
+ 
+ 
+ func configurar_callbacks(buscar_origem: Callable, buscar_destino: Callable) -> void:
+@@ -144,66 +170,62 @@
+ 
+ 
+ func forcar_pista(nivel: int) -> void:
+-	if nivel_concluido:
++	if nivel_concluido or not ativar_pistas:
+ 		return
+ 
+-	if nivel <= 1:
++	var nivel_seguro := clampi(nivel, 1, 3)
++
++	if nivel_seguro == 1:
+ 		resetar_pistas()
+-		mostrar_pista(1)
+-		tempo_sem_acao = tempo_pista_1
+-		return
++	else:
++		_limpar_pista_visual_sem_alterar_estado()
+ 
+-	if nivel == 2:
+-		mostrar_pista(2)
+-		tempo_sem_acao = tempo_pista_2
+-		return
++	mostrar_pista(nivel_seguro)
+ 
+-	if nivel >= 3:
+-		mostrar_pista(3)
+-		tempo_sem_acao = tempo_pista_3
+-		return
++	match nivel_seguro:
++		1:
++			tempo_sem_acao = tempo_pista_1
++		2:
++			tempo_sem_acao = tempo_pista_2
++		3:
++			tempo_sem_acao = tempo_pista_3
+ 
+ 
+ func verificar_pistas_por_inatividade() -> void:
+ 	if nivel_pista_atual == 0 and tempo_sem_acao >= tempo_pista_1:
+ 		mostrar_pista(1)
+-		return
+-
+-	if nivel_pista_atual == 1 and tempo_sem_acao >= tempo_pista_2:
++	elif nivel_pista_atual == 1 and tempo_sem_acao >= tempo_pista_2:
+ 		mostrar_pista(2)
+-		return
+-
+-	if nivel_pista_atual == 2 and tempo_sem_acao >= tempo_pista_3:
++	elif nivel_pista_atual == 2 and tempo_sem_acao >= tempo_pista_3:
+ 		mostrar_pista(3)
+-		return
+ 
+ 
+ func mostrar_pista(nivel: int) -> void:
+-	if nivel_concluido:
+-		return
+-
+-	if sistema_pausado:
++	if nivel_concluido or sistema_pausado or not ativar_pistas:
+ 		return
+ 
+ 	_resolver_referencias()
++	_limpar_pista_visual_sem_alterar_estado()
+ 
+-	nivel_pista_atual = nivel
++	nivel_pista_atual = clampi(nivel, 1, 3)
+ 	pista_ativa = true
+ 
+ 	if texto_dica:
+ 		texto_dica.visible = false
+ 
+-	if nivel == 1:
+-		pista_1_origem_piscando()
+-	elif nivel == 2:
+-		pista_2_destino_piscando_e_movendo()
+-	elif nivel == 3:
+-		pista_3_linha_amarela()
++	match nivel_pista_atual:
++		1:
++			pista_1_origem_piscando()
++		2:
++			pista_2_destino_piscando_e_movendo()
++		3:
++			pista_3_linha_amarela()
++
++	pista_exibida.emit(nivel_pista_atual, origem_dica, destino_dica)
+ 
+ 
+ func pista_1_origem_piscando() -> void:
+-	if not origem_dica or not is_instance_valid(origem_dica):
+-		origem_dica = buscar_origem_para_pista()
++	origem_dica = buscar_origem_para_pista()
+ 
+ 	if origem_dica:
+ 		destacar_origem_piscando(origem_dica)
+@@ -212,7 +234,7 @@
+ 
+ 
+ func pista_2_destino_piscando_e_movendo() -> void:
+-	if not origem_dica or not is_instance_valid(origem_dica):
++	if not _node_valido(origem_dica):
+ 		origem_dica = buscar_origem_para_pista()
+ 
+ 	destino_dica = buscar_destino_para_pista(origem_dica)
+@@ -224,10 +246,10 @@
+ 
+ 
+ func pista_3_linha_amarela() -> void:
+-	if not origem_dica or not is_instance_valid(origem_dica):
++	if not _node_valido(origem_dica):
+ 		origem_dica = buscar_origem_para_pista()
+ 
+-	if not destino_dica or not is_instance_valid(destino_dica):
++	if not _node_valido(destino_dica):
+ 		destino_dica = buscar_destino_para_pista(origem_dica)
+ 
+ 	if origem_dica and destino_dica:
+@@ -238,39 +260,33 @@
+ 
+ func buscar_origem_para_pista() -> Node:
+ 	if modo_pista == ModoPista.CUSTOM:
+-		if callback_buscar_origem.is_valid():
+-			return callback_buscar_origem.call()
+-		return null
++		return callback_buscar_origem.call() if callback_buscar_origem.is_valid() else null
+ 
+-	if modo_pista == ModoPista.ARRASTAR_PECAS:
+-		return buscar_peca_disponivel()
+-
+-	if modo_pista == ModoPista.LIGAR_PARES:
+-		return buscar_ponto_saida_ligar_pares()
+-
+-	if modo_pista == ModoPista.LIGAR_NUMEROS:
+-		return buscar_numero_inicial_ligar_numeros()
++	match modo_pista:
++		ModoPista.ARRASTAR_PECAS:
++			return buscar_peca_disponivel()
++		ModoPista.LIGAR_PARES:
++			return buscar_ponto_saida_ligar_pares()
++		ModoPista.LIGAR_NUMEROS:
++			return buscar_numero_inicial_ligar_numeros()
+ 
+ 	return null
+ 
+ 
+ func buscar_destino_para_pista(origem: Node) -> Node:
+-	if not origem:
++	if not _node_valido(origem):
+ 		return null
+ 
+ 	if modo_pista == ModoPista.CUSTOM:
+-		if callback_buscar_destino.is_valid():
+-			return callback_buscar_destino.call(origem)
+-		return null
+-
+-	if modo_pista == ModoPista.ARRASTAR_PECAS:
+-		return buscar_slot_da_peca(origem)
++		return callback_buscar_destino.call(origem) if callback_buscar_destino.is_valid() else null
+ 
+-	if modo_pista == ModoPista.LIGAR_PARES:
+-		return buscar_destino_ligar_pares(origem)
+-
+-	if modo_pista == ModoPista.LIGAR_NUMEROS:
+-		return buscar_destino_ligar_numeros(origem)
++	match modo_pista:
++		ModoPista.ARRASTAR_PECAS:
++			return buscar_slot_da_peca(origem)
++		ModoPista.LIGAR_PARES:
++			return buscar_destino_ligar_pares(origem)
++		ModoPista.LIGAR_NUMEROS:
++			return buscar_destino_ligar_numeros(origem)
+ 
+ 	return null
+ 
+@@ -279,11 +295,11 @@
+ 	if not area_jogo:
+ 		return null
+ 
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("pecas") and peca_esta_disponivel(filho):
++	for filho in _nos_do_grupo_na_area("pecas"):
++		if peca_esta_disponivel(filho):
+ 			return filho
+ 
+-	for filho in area_jogo.get_children():
++	for filho in area_jogo.find_children("*", "Area2D", true, false):
+ 		if filho.has_signal("peca_encaixada") and peca_esta_disponivel(filho):
+ 			return filho
+ 
+@@ -291,276 +307,252 @@
+ 
+ 
+ func peca_esta_disponivel(peca: Node) -> bool:
+-	if not peca:
++	if not _node_valido(peca):
+ 		return false
+ 
+ 	if peca.has_method("esta_disponivel_para_pista"):
+-		return peca.esta_disponivel_para_pista()
++		return bool(peca.call("esta_disponivel_para_pista"))
+ 
+-	var valor_travado = peca.get("esta_travado")
+-	if valor_travado != null:
+-		return not bool(valor_travado)
+-
+-	var valor_encaixada = peca.get("encaixada")
+-	if valor_encaixada != null:
+-		return not bool(valor_encaixada)
+-
+-	var valor_ja_encaixada = peca.get("ja_encaixada")
+-	if valor_ja_encaixada != null:
+-		return not bool(valor_ja_encaixada)
++	for nome_propriedade in ["esta_travado", "encaixada", "ja_encaixada", "travado"]:
++		if _objeto_tem_propriedade(peca, nome_propriedade):
++			return not bool(peca.get(nome_propriedade))
+ 
+ 	return true
+ 
+ 
+ func buscar_slot_da_peca(peca: Node) -> Node:
+-	if not peca:
++	if not _node_valido(peca):
+ 		return null
+ 
+ 	if peca.has_method("get_slot_correto"):
+-		return peca.get_slot_correto()
++		var slot_por_metodo: Node = peca.call("get_slot_correto")
++		if _node_valido(slot_por_metodo):
++			return slot_por_metodo
+ 
+-	var nome_slot = peca.get("slot_correto_nome")
++	if not _objeto_tem_propriedade(peca, "slot_correto_nome"):
++		return null
+ 
+-	if nome_slot != null and String(nome_slot) != "":
+-		if area_jogo:
+-			return area_jogo.get_node_or_null(String(nome_slot))
++	var nome_slot := String(peca.get("slot_correto_nome"))
++	if nome_slot.is_empty() or not area_jogo:
++		return null
+ 
+-	return null
++	var slot := area_jogo.get_node_or_null(nome_slot)
++	if slot:
++		return slot
+ 
++	return area_jogo.find_child(nome_slot, true, false)
+ 
+-func buscar_ponto_saida_ligar_pares() -> Node:
+-	var pontos = pegar_pontos_da_fase()
+ 
+-	for ponto in pontos:
+-		if ponto.tipo == ponto.Tipo.SAIDA and not ponto.esta_conectado_saida:
++func buscar_ponto_saida_ligar_pares() -> Node:
++	for ponto in pegar_pontos_da_fase():
++		if _tipo_ponto(ponto) == 0 and not _bool_propriedade(ponto, "esta_conectado_saida"):
+ 			return ponto
+ 
+ 	return null
+ 
+ 
+ func buscar_destino_ligar_pares(ponto_saida: Node) -> Node:
+-	if not ponto_saida:
++	if not _node_valido(ponto_saida):
+ 		return null
+ 
+-	var pontos = pegar_pontos_da_fase()
++	var id_origem := int(ponto_saida.get("id_par"))
+ 
+-	for ponto in pontos:
+-		if ponto.tipo == ponto.Tipo.CHEGADA:
+-			if not ponto.esta_conectado_chegada and ponto.id_par == ponto_saida.id_par:
++	for ponto in pegar_pontos_da_fase():
++		if _tipo_ponto(ponto) == 1:
++			if (
++				not _bool_propriedade(ponto, "esta_conectado_chegada")
++				and int(ponto.get("id_par")) == id_origem
++			):
+ 				return ponto
+ 
+ 	return null
+ 
+ 
+ func buscar_numero_inicial_ligar_numeros() -> Node:
+-	var pontos = pegar_pontos_da_fase()
+ 	var melhor_ponto: Node = null
+-	var menor_valor := 999999
++	var menor_valor := 2147483647
+ 
+-	for ponto in pontos:
+-		if ponto.esta_conectado_saida:
++	for ponto in pegar_pontos_da_fase():
++		if _bool_propriedade(ponto, "esta_conectado_saida"):
+ 			continue
+ 
+-		var destino = buscar_destino_ligar_numeros(ponto)
+-
++		var destino := buscar_destino_ligar_numeros(ponto)
+ 		if destino:
+-			if ponto.valor_numero < menor_valor:
+-				menor_valor = ponto.valor_numero
++			var valor := int(ponto.get("valor_numero"))
++			if valor < menor_valor:
++				menor_valor = valor
+ 				melhor_ponto = ponto
+ 
+ 	return melhor_ponto
+ 
+ 
+ func buscar_destino_ligar_numeros(ponto_saida: Node) -> Node:
+-	if not ponto_saida:
++	if not _node_valido(ponto_saida):
+ 		return null
+ 
+-	var pontos = pegar_pontos_da_fase()
+-	var valor_destino = ponto_saida.valor_numero + 1
++	var valor_destino := int(ponto_saida.get("valor_numero")) + 1
+ 
+-	for ponto in pontos:
++	for ponto in pegar_pontos_da_fase():
+ 		if ponto == ponto_saida:
+ 			continue
+ 
+-		if ponto.valor_numero == valor_destino:
+-			if not ponto.esta_conectado_chegada:
+-				return ponto
++		if (
++			int(ponto.get("valor_numero")) == valor_destino
++			and not _bool_propriedade(ponto, "esta_conectado_chegada")
++		):
++			return ponto
+ 
+ 	return null
+ 
+ 
+-func pegar_pontos_da_fase() -> Array:
+-	var pontos := []
+-
+-	if not area_jogo:
+-		return pontos
+-
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("pontos"):
+-			pontos.append(filho)
+-
+-	return pontos
+-
+-
+-func destacar_origem_piscando(origem: Node) -> void:
+-	if not origem or not origem is CanvasItem:
+-		return
++func pegar_pontos_da_fase() -> Array[Node]:
++	return _nos_do_grupo_na_area("pontos")
+ 
+-	var canvas_item := origem as CanvasItem
+ 
+-	if not modulates_originais.has(origem):
+-		modulates_originais[origem] = canvas_item.modulate
++func _nos_do_grupo_na_area(nome_grupo: StringName) -> Array[Node]:
++	var resultado: Array[Node] = []
+ 
+-	if origem is Node2D and not escalas_originais.has(origem):
+-		escalas_originais[origem] = origem.scale
++	if not area_jogo:
++		return resultado
+ 
+-	if tween_origem_cor:
+-		tween_origem_cor.kill()
++	for node in get_tree().get_nodes_in_group(nome_grupo):
++		if node is Node and area_jogo.is_ancestor_of(node):
++			resultado.append(node)
+ 
+-	if tween_origem_escala:
+-		tween_origem_escala.kill()
++	return resultado
+ 
+-	tween_origem_cor = create_tween()
+-	tween_origem_cor.set_loops()
+-	tween_origem_cor.tween_property(canvas_item, "modulate", cor_amarela_pista, 0.35)
+-	tween_origem_cor.tween_property(canvas_item, "modulate", cor_normal, 0.35)
+ 
+-	if origem is Node2D:
+-		tween_origem_escala = create_tween()
+-		tween_origem_escala.set_loops()
+-		tween_origem_escala.tween_property(origem, "scale", escalas_originais[origem] * escala_origem_pista, 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+-		tween_origem_escala.tween_property(origem, "scale", escalas_originais[origem], 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
++func destacar_origem_piscando(origem: Node) -> void:
++	_destacar_node_piscando(origem, escala_origem_pista, true)
+ 
+ 
+ func destacar_destino_piscando_e_movendo(destino: Node) -> void:
+-	if not destino or not destino is CanvasItem:
+-		return
+-
+-	var canvas_item := destino as CanvasItem
+-
+-	if not modulates_originais.has(destino):
+-		modulates_originais[destino] = canvas_item.modulate
+-
+-	if destino is Node2D and not escalas_originais.has(destino):
+-		escalas_originais[destino] = destino.scale
+-
+-	if tween_destino_cor:
+-		tween_destino_cor.kill()
++	_destacar_node_piscando(destino, escala_destino_pista, false)
+ 
+-	if tween_destino_escala:
+-		tween_destino_escala.kill()
+ 
+-	tween_destino_cor = create_tween()
+-	tween_destino_cor.set_loops()
+-	tween_destino_cor.tween_property(canvas_item, "modulate", cor_amarela_pista, 0.32)
+-	tween_destino_cor.tween_property(canvas_item, "modulate", cor_normal, 0.32)
++func _destacar_node_piscando(node: Node, multiplicador_escala: float, origem: bool) -> void:
++	if not _node_valido(node) or not node is CanvasItem:
++		return
+ 
+-	if destino is Node2D:
+-		tween_destino_escala = create_tween()
+-		tween_destino_escala.set_loops()
+-		tween_destino_escala.tween_property(destino, "scale", escalas_originais[destino] * escala_destino_pista, 0.32).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+-		tween_destino_escala.tween_property(destino, "scale", escalas_originais[destino], 0.32).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
++	var canvas_item := node as CanvasItem
++	if not modulates_originais.has(node):
++		modulates_originais[node] = canvas_item.modulate
++
++	if node is Node2D and not escalas_originais.has(node):
++		escalas_originais[node] = (node as Node2D).scale
++
++	var cor_original: Color = modulates_originais[node]
++	var tween_cor := create_tween().set_loops()
++	tween_cor.tween_property(canvas_item, "modulate", cor_amarela_pista, 0.34)
++	tween_cor.tween_property(canvas_item, "modulate", cor_original, 0.34)
++
++	var tween_escala: Tween = null
++	if node is Node2D:
++		var node_2d := node as Node2D
++		var escala_original: Vector2 = escalas_originais[node]
++		tween_escala = create_tween().set_loops()
++		(
++			tween_escala
++			. tween_property(node_2d, "scale", escala_original * multiplicador_escala, 0.34)
++			. set_trans(Tween.TRANS_SINE)
++			. set_ease(Tween.EASE_IN_OUT)
++		)
++		(
++			tween_escala
++			. tween_property(node_2d, "scale", escala_original, 0.34)
++			. set_trans(Tween.TRANS_SINE)
++			. set_ease(Tween.EASE_IN_OUT)
++		)
++
++	if origem:
++		tween_origem_cor = tween_cor
++		tween_origem_escala = tween_escala
++	else:
++		tween_destino_cor = tween_cor
++		tween_destino_escala = tween_escala
+ 
+ 
+ func criar_linha_dica(origem: Node, destino: Node) -> void:
+ 	remover_linha_dica()
++	_resolver_referencias()
+ 
+ 	if not camada_linhas:
+-		push_warning("HintManager: CamadaLinhas não configurada.")
++		push_warning(
++			"HintManager: CamadaLinhas não configurada; a pista de nível 3 não será desenhada."
++		)
+ 		return
+ 
+-	if not origem or not destino:
++	if not origem is Node2D or not destino is Node2D:
+ 		return
+ 
+ 	origem_dica = origem
+ 	destino_dica = destino
+ 
+-	linha_dica_sombra = Line2D.new()
+-	linha_dica_sombra.name = "LinhaDicaSombra"
+-	linha_dica_sombra.width = largura_linha_dica_sombra
+-	linha_dica_sombra.default_color = cor_linha_dica_sombra
+-	linha_dica_sombra.begin_cap_mode = Line2D.LINE_CAP_ROUND
+-	linha_dica_sombra.end_cap_mode = Line2D.LINE_CAP_ROUND
+-	linha_dica_sombra.joint_mode = Line2D.LINE_JOINT_ROUND
+-	linha_dica_sombra.z_index = 998
+-	linha_dica_sombra.z_as_relative = false
++	linha_dica_sombra = _criar_line2d(
++		"LinhaDicaSombra", largura_linha_dica_sombra, cor_linha_dica_sombra, 998
++	)
+ 	camada_linhas.add_child(linha_dica_sombra)
+ 
+-	linha_dica = Line2D.new()
+-	linha_dica.name = "LinhaDica"
+-	linha_dica.width = largura_linha_dica
+-	linha_dica.default_color = cor_linha_dica
+-	linha_dica.begin_cap_mode = Line2D.LINE_CAP_ROUND
+-	linha_dica.end_cap_mode = Line2D.LINE_CAP_ROUND
+-	linha_dica.joint_mode = Line2D.LINE_JOINT_ROUND
+-	linha_dica.z_index = 999
+-	linha_dica.z_as_relative = false
++	linha_dica = _criar_line2d("LinhaDica", largura_linha_dica, cor_linha_dica, 999)
+ 	camada_linhas.add_child(linha_dica)
+ 
+ 	_atualizar_linha_dica_animada(0.0)
+ 
+-	if tween_linha_dica:
+-		tween_linha_dica.kill()
+-
+-	if tween_linha_largura:
+-		tween_linha_largura.kill()
+-
+-	tween_linha_dica = create_tween()
+-	tween_linha_dica.set_loops()
+-	tween_linha_dica.tween_method(_atualizar_linha_dica_animada, 0.0, 1.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+-	tween_linha_dica.tween_method(_atualizar_linha_dica_animada, 1.0, 0.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
++	tween_linha_dica = create_tween().set_loops()
++	(
++		tween_linha_dica
++		. tween_method(_atualizar_linha_dica_animada, 0.0, 1.0, 0.7)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_IN_OUT)
++	)
++	(
++		tween_linha_dica
++		. tween_method(_atualizar_linha_dica_animada, 1.0, 0.0, 0.7)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_IN_OUT)
++	)
+ 
+-	tween_linha_largura = create_tween()
+-	tween_linha_largura.set_loops()
++	tween_linha_largura = create_tween().set_loops()
+ 	tween_linha_largura.tween_property(linha_dica, "width", largura_linha_dica + 5.0, 0.35)
+ 	tween_linha_largura.tween_property(linha_dica, "width", largura_linha_dica, 0.35)
+ 
+ 
+-func _atualizar_linha_dica_animada(progresso: float) -> void:
+-	if not linha_dica or not is_instance_valid(linha_dica):
+-		return
++func _criar_line2d(nome_linha: String, largura: float, cor: Color, indice_z: int) -> Line2D:
++	var linha := Line2D.new()
++	linha.name = nome_linha
++	linha.width = largura
++	linha.default_color = cor
++	linha.begin_cap_mode = Line2D.LINE_CAP_ROUND
++	linha.end_cap_mode = Line2D.LINE_CAP_ROUND
++	linha.joint_mode = Line2D.LINE_JOINT_ROUND
++	linha.z_index = indice_z
++	linha.z_as_relative = false
++	return linha
+ 
+-	if not linha_dica_sombra or not is_instance_valid(linha_dica_sombra):
+-		return
+ 
+-	if not camada_linhas or not is_instance_valid(camada_linhas):
+-		return
+-
+-	if not origem_dica or not is_instance_valid(origem_dica):
+-		return
+-
+-	if not destino_dica or not is_instance_valid(destino_dica):
++func _atualizar_linha_dica_animada(progresso: float) -> void:
++	if not _node_valido(linha_dica) or not _node_valido(linha_dica_sombra):
+ 		return
+-
+-	if not origem_dica is Node2D or not destino_dica is Node2D:
++	if not _node_valido(camada_linhas) or not origem_dica is Node2D or not destino_dica is Node2D:
+ 		return
+ 
+-	var origem_local: Vector2 = camada_linhas.to_local(origem_dica.global_position)
+-	var destino_local: Vector2 = camada_linhas.to_local(destino_dica.global_position)
+-	var ponto_animado: Vector2 = origem_local.lerp(destino_local, clamp(progresso, 0.0, 1.0))
+-
+-	linha_dica.clear_points()
+-	linha_dica.add_point(origem_local)
+-	linha_dica.add_point(ponto_animado)
++	var origem_local := camada_linhas.to_local((origem_dica as Node2D).global_position)
++	var destino_local := camada_linhas.to_local((destino_dica as Node2D).global_position)
++	var ponto_animado := origem_local.lerp(destino_local, clampf(progresso, 0.0, 1.0))
+ 
+-	linha_dica_sombra.clear_points()
+-	linha_dica_sombra.add_point(origem_local)
+-	linha_dica_sombra.add_point(ponto_animado)
++	linha_dica.points = PackedVector2Array([origem_local, ponto_animado])
++	linha_dica_sombra.points = PackedVector2Array([origem_local, ponto_animado])
+ 
+ 
+ func remover_linha_dica() -> void:
+-	if tween_linha_dica:
+-		tween_linha_dica.kill()
+-		tween_linha_dica = null
+-
+-	if tween_linha_largura:
+-		tween_linha_largura.kill()
+-		tween_linha_largura = null
++	_matar_tween(tween_linha_dica)
++	_matar_tween(tween_linha_largura)
++	tween_linha_dica = null
++	tween_linha_largura = null
+ 
+-	if linha_dica_sombra and is_instance_valid(linha_dica_sombra):
++	if _node_valido(linha_dica_sombra):
+ 		linha_dica_sombra.queue_free()
+-
+-	if linha_dica and is_instance_valid(linha_dica):
++	if _node_valido(linha_dica):
+ 		linha_dica.queue_free()
+ 
+ 	linha_dica_sombra = null
+@@ -571,62 +563,91 @@
+ 	tempo_sem_acao = 0.0
+ 	nivel_pista_atual = 0
+ 	pista_ativa = false
++	_limpar_pista_visual_sem_alterar_estado()
++
+ 
++func _limpar_pista_visual_sem_alterar_estado() -> void:
+ 	if texto_dica:
+ 		texto_dica.visible = false
+ 
+-	if tween_origem_cor:
+-		tween_origem_cor.kill()
+-		tween_origem_cor = null
+-
+-	if tween_origem_escala:
+-		tween_origem_escala.kill()
+-		tween_origem_escala = null
+-
+-	if tween_destino_cor:
+-		tween_destino_cor.kill()
+-		tween_destino_cor = null
+-
+-	if tween_destino_escala:
+-		tween_destino_escala.kill()
+-		tween_destino_escala = null
++	_matar_tween(tween_origem_cor)
++	_matar_tween(tween_origem_escala)
++	_matar_tween(tween_destino_cor)
++	_matar_tween(tween_destino_escala)
++
++	tween_origem_cor = null
++	tween_origem_escala = null
++	tween_destino_cor = null
++	tween_destino_escala = null
+ 
+ 	for node in modulates_originais.keys():
+-		if node and is_instance_valid(node) and node is CanvasItem:
+-			node.modulate = modulates_originais[node]
++		if _node_valido(node) and node is CanvasItem:
++			(node as CanvasItem).modulate = modulates_originais[node]
+ 
+ 	for node in escalas_originais.keys():
+-		if node and is_instance_valid(node):
+-			node.scale = escalas_originais[node]
++		if _node_valido(node) and node is Node2D:
++			(node as Node2D).scale = escalas_originais[node]
+ 
+ 	modulates_originais.clear()
+ 	escalas_originais.clear()
+-
+ 	origem_dica = null
+ 	destino_dica = null
+-
+ 	remover_linha_dica()
+ 
+ 
++func _limpar_animacoes_e_visuais() -> void:
++	_limpar_pista_visual_sem_alterar_estado()
++
++
+ func animar_robo_dica() -> void:
+-	if not robo:
++	if not _node_valido(robo):
+ 		return
+ 
+ 	if robo.has_method("dar_dica"):
+-		robo.dar_dica()
++		robo.call("dar_dica")
+ 	elif robo.has_method("pensar"):
+-		robo.pensar()
+-	elif robo.has_method("comemorar"):
+-		robo.comemorar()
++		robo.call("pensar")
+ 
+ 
+ func animar_robo_apontar() -> void:
+-	if not robo:
++	if not _node_valido(robo):
+ 		return
+ 
+ 	if robo.has_method("apontar"):
+-		robo.apontar()
++		robo.call("apontar")
+ 	elif robo.has_method("dar_dica"):
+-		robo.dar_dica()
++		robo.call("dar_dica")
+ 	elif robo.has_method("pensar"):
+-		robo.pensar()
++		robo.call("pensar")
++
++
++func _objeto_tem_propriedade(objeto: Object, nome_propriedade: StringName) -> bool:
++	if not objeto:
++		return false
++
++	for propriedade in objeto.get_property_list():
++		if StringName(propriedade.name) == nome_propriedade:
++			return true
++
++	return false
++
++
++func _bool_propriedade(objeto: Object, nome_propriedade: StringName) -> bool:
++	if not _objeto_tem_propriedade(objeto, nome_propriedade):
++		return false
++	return bool(objeto.get(nome_propriedade))
++
++
++func _tipo_ponto(ponto: Node) -> int:
++	if not _objeto_tem_propriedade(ponto, "tipo"):
++		return -1
++	return int(ponto.get("tipo"))
++
++
++func _node_valido(node: Variant) -> bool:
++	return node != null and is_instance_valid(node)
++
++
++func _matar_tween(tween: Tween) -> void:
++	if tween and tween.is_valid():
++		tween.kill()
+diff -ruN /mnt/data/fineplay_work/scripts_original/generic/ponto.gd /mnt/data/fineplay_work/scripts/generic/ponto.gd
+--- /mnt/data/fineplay_work/scripts_original/generic/ponto.gd	2025-11-24 19:12:12.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/generic/ponto.gd	2026-07-05 04:10:13.119536067 +0000
+@@ -1,19 +1,42 @@
+ extends Area2D
+ 
+-#config
+ @export var id_par: int = 0
+-
+ @export var valor_numero: int = 0
+ 
+-# tipos: entrada e saida / no modo entrada apenas ignora
+ enum Tipo { SAIDA, CHEGADA, AMBOS }
+ @export var tipo: Tipo = Tipo.SAIDA
+ 
+-var esta_conectado_saida = false 
+-var esta_conectado_chegada = false 
++var esta_conectado_saida := false
++var esta_conectado_chegada := false
++
++@onready var sprite: Sprite2D = get_node_or_null("Sprite2D") as Sprite2D
++var modulate_original := Color.WHITE
++
++
++func _ready() -> void:
++	input_pickable = true
++	if sprite:
++		modulate_original = sprite.modulate
++		_atualizar_visual_inicial()
++
+ 
+-@onready var sprite = $Sprite2D
++func _atualizar_visual_inicial() -> void:
++	if not sprite:
++		return
+ 
+-func _ready():
+ 	if tipo == Tipo.CHEGADA and valor_numero == 0:
+ 		sprite.modulate = Color(0, 0, 0, 0.5)
++	else:
++		sprite.modulate = modulate_original
++
++
++func resetar_conexoes() -> void:
++	esta_conectado_saida = false
++	esta_conectado_chegada = false
++	_atualizar_visual_inicial()
++
++
++func esta_disponivel_para_pista() -> bool:
++	if tipo == Tipo.CHEGADA:
++		return not esta_conectado_chegada
++	return not esta_conectado_saida
+diff -ruN /mnt/data/fineplay_work/scripts_original/generic/professor_robo.gd /mnt/data/fineplay_work/scripts/generic/professor_robo.gd
+--- /mnt/data/fineplay_work/scripts_original/generic/professor_robo.gd	2026-05-25 15:05:34.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/generic/professor_robo.gd	2026-07-05 04:11:02.660723889 +0000
+@@ -2,13 +2,17 @@
+ 
+ const POSE_DIR := "res://assets/kenney_toon-characters-1/Robot/PNG/Poses/"
+ 
++@export_group("Idle")
+ @export var deslocamento_idle_y: float = -5.0
+ @export var escala_idle: float = 1.025
+ @export var tempo_idle: float = 0.85
+ 
++@export_group("Feedback")
+ @export var deslocamento_vitoria_y: float = -26.0
+ @export var escala_acerto: float = 1.12
+ @export var escala_vitoria: float = 1.22
++@export var escala_dica: float = 1.08
++@export var inclinacao_dica_graus: float = 4.0
+ 
+ var pose_idle: Texture2D
+ var pose_talk: Texture2D
+@@ -39,11 +43,15 @@
+ 	rotacao_base = rotation
+ 
+ 	_carregar_poses()
+-
+-	texture = pose_idle
++	_set_pose(pose_idle)
+ 	iniciar_idle()
+ 
+ 
++func _exit_tree() -> void:
++	token_animacao += 1
++	_matar_tweens()
++
++
+ func _carregar_poses() -> void:
+ 	pose_idle = _carregar_pose("character_robot_idle.png")
+ 	pose_talk = _carregar_pose("character_robot_talk.png")
+@@ -59,9 +67,9 @@
+ 	var caminho := POSE_DIR + nome_arquivo
+ 
+ 	if ResourceLoader.exists(caminho):
+-		return load(caminho)
++		return load(caminho) as Texture2D
+ 
+-	print("Pose não encontrada: ", caminho)
++	push_warning("ProfessorRobo: pose não encontrada: " + caminho)
+ 	return null
+ 
+ 
+@@ -77,236 +85,285 @@
+ 
+ 
+ func _matar_tweens() -> void:
+-	if tween_idle:
++	if tween_idle and tween_idle.is_valid():
+ 		tween_idle.kill()
+-		tween_idle = null
++	tween_idle = null
+ 
+-	if tween_acao:
++	if tween_acao and tween_acao.is_valid():
+ 		tween_acao.kill()
+-		tween_acao = null
++	tween_acao = null
+ 
+ 
+-# ==========================================
+-# IDLE REGULAR
+-# ==========================================
+-func iniciar_idle() -> void:
+-	if bloqueado or em_acao:
++func _iniciar_acao(travar: bool = false) -> int:
++	if bloqueado and not travar:
++		return -1
++
++	token_animacao += 1
++	em_acao = true
++	bloqueado = travar
++	_matar_tweens()
++	_resetar_transformacao()
++	return token_animacao
++
++
++func _acao_valida(token: int) -> bool:
++	return is_inside_tree() and token >= 0 and token == token_animacao
++
++
++func _finalizar_acao(token: int, desbloquear: bool = true) -> void:
++	if not _acao_valida(token):
+ 		return
+ 
+-	if tween_idle:
+-		tween_idle.kill()
+-		tween_idle = null
++	if desbloquear:
++		bloqueado = false
+ 
++	em_acao = false
+ 	_resetar_transformacao()
++	_set_pose(pose_idle)
++	iniciar_idle()
+ 
+-	tween_idle = create_tween()
+-	tween_idle.set_loops()
+ 
+-	tween_idle.tween_property(
+-		self,
+-		"position",
+-		posicao_base + Vector2(0, deslocamento_idle_y),
+-		tempo_idle
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+-
+-	tween_idle.parallel().tween_property(
+-		self,
+-		"scale",
+-		escala_base * escala_idle,
+-		tempo_idle
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+-
+-	tween_idle.tween_property(
+-		self,
+-		"position",
+-		posicao_base,
+-		tempo_idle
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+-
+-	tween_idle.parallel().tween_property(
+-		self,
+-		"scale",
+-		escala_base,
+-		tempo_idle
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
++# ============================================================
++# IDLE
++# ============================================================
++func iniciar_idle() -> void:
++	if bloqueado or em_acao or not is_inside_tree():
++		return
+ 
+-	_animacao_poses_idle()
++	if tween_idle and tween_idle.is_valid():
++		tween_idle.kill()
+ 
++	_resetar_transformacao()
+ 
+-func _animacao_poses_idle() -> void:
+-	var token_local := token_animacao
++	tween_idle = create_tween().set_loops()
++	(
++		tween_idle
++		. tween_property(
++			self, "position", posicao_base + Vector2(0, deslocamento_idle_y), tempo_idle
++		)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_IN_OUT)
++	)
++	(
++		tween_idle
++		. parallel()
++		. tween_property(self, "scale", escala_base * escala_idle, tempo_idle)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_IN_OUT)
++	)
++	(
++		tween_idle
++		. tween_property(self, "position", posicao_base, tempo_idle)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_IN_OUT)
++	)
++	(
++		tween_idle
++		. parallel()
++		. tween_property(self, "scale", escala_base, tempo_idle)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_IN_OUT)
++	)
+ 
++	_animacao_poses_idle(token_animacao)
++
++
++func _animacao_poses_idle(token_inicial: int) -> void:
+ 	while is_inside_tree() and not bloqueado:
+-		if em_acao or token_local != token_animacao:
++		if em_acao or token_inicial != token_animacao:
+ 			return
+ 
+ 		_set_pose(pose_idle)
+ 		await get_tree().create_timer(1.8).timeout
+-
+-		if em_acao or token_local != token_animacao:
++		if em_acao or token_inicial != token_animacao:
+ 			return
+ 
+ 		_set_pose(pose_talk)
+ 		await get_tree().create_timer(0.35).timeout
+-
+-		if em_acao or token_local != token_animacao:
++		if em_acao or token_inicial != token_animacao:
+ 			return
+ 
+ 		_set_pose(pose_idle)
+ 		await get_tree().create_timer(1.4).timeout
+-
+-		if em_acao or token_local != token_animacao:
++		if em_acao or token_inicial != token_animacao:
+ 			return
+ 
+-		if pose_think:
+-			_set_pose(pose_think)
+-		else:
+-			_set_pose(pose_talk)
+-
++		_set_pose(pose_think if pose_think else pose_talk)
+ 		await get_tree().create_timer(0.45).timeout
+ 
+ 
+-# ==========================================
++# ============================================================
+ # ACERTO
+-# ==========================================
++# ============================================================
+ func comemorar() -> void:
+-	if bloqueado:
++	var token := _iniciar_acao()
++	if token < 0:
+ 		return
+ 
+-	token_animacao += 1
+-	em_acao = true
+-	_matar_tweens()
+-	_resetar_transformacao()
+-
+ 	_set_pose(pose_cheer0)
+-
+-	tween_acao = create_tween()
+-	tween_acao.set_parallel(true)
+-
+-	tween_acao.tween_property(
+-		self,
+-		"scale",
+-		escala_base * escala_acerto,
+-		0.12
+-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+-
+-	tween_acao.tween_property(
+-		self,
+-		"rotation",
+-		deg_to_rad(5),
+-		0.12
++	tween_acao = create_tween().set_parallel(true)
++	(
++		tween_acao
++		. tween_property(self, "scale", escala_base * escala_acerto, 0.12)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
+ 	)
+-
++	tween_acao.tween_property(self, "rotation", rotacao_base + deg_to_rad(5.0), 0.12)
+ 	await tween_acao.finished
++	if not _acao_valida(token):
++		return
+ 
+ 	_set_pose(pose_cheer1)
+-
+-	tween_acao = create_tween()
+-	tween_acao.set_parallel(true)
+-
++	tween_acao = create_tween().set_parallel(true)
+ 	tween_acao.tween_property(self, "scale", escala_base, 0.14)
+ 	tween_acao.tween_property(self, "rotation", rotacao_base, 0.14)
+-
+ 	await tween_acao.finished
+ 
+-	_set_pose(pose_idle)
+-	em_acao = false
+-	iniciar_idle()
++	_finalizar_acao(token)
+ 
+ 
+-# ==========================================
++# ============================================================
+ # ERRO
+-# ==========================================
++# ============================================================
+ func errar() -> void:
+-	if bloqueado:
++	var token := _iniciar_acao()
++	if token < 0:
+ 		return
+ 
+-	token_animacao += 1
+-	em_acao = true
+-	_matar_tweens()
+-	_resetar_transformacao()
+-
+-	if pose_hurt:
+-		_set_pose(pose_hurt)
+-	elif pose_think:
+-		_set_pose(pose_think)
++	_set_pose(pose_hurt if pose_hurt else pose_think)
+ 
+ 	tween_acao = create_tween()
+-
+ 	tween_acao.tween_property(self, "position", posicao_base + Vector2(-10, 0), 0.05)
+ 	tween_acao.tween_property(self, "position", posicao_base + Vector2(10, 0), 0.05)
+ 	tween_acao.tween_property(self, "position", posicao_base + Vector2(-6, 0), 0.05)
+ 	tween_acao.tween_property(self, "position", posicao_base + Vector2(6, 0), 0.05)
+ 	tween_acao.tween_property(self, "position", posicao_base, 0.05)
+-
+ 	await tween_acao.finished
++	if not _acao_valida(token):
++		return
++
+ 	await get_tree().create_timer(0.15).timeout
++	_finalizar_acao(token)
+ 
+-	_set_pose(pose_idle)
+-	em_acao = false
+-	iniciar_idle()
+ 
++# ============================================================
++# PISTAS — API usada pelo HintManager
++# ============================================================
++func pensar() -> void:
++	var token := _iniciar_acao()
++	if token < 0:
++		return
+ 
+-# ==========================================
+-# VITÓRIA / PASSOU DE FASE
+-# ==========================================
+-func vitoria() -> void:
+-	if bloqueado:
++	_set_pose(pose_think if pose_think else pose_talk)
++	tween_acao = create_tween().set_parallel(true)
++	(
++		tween_acao
++		. tween_property(self, "scale", escala_base * escala_dica, 0.18)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_OUT)
++	)
++	tween_acao.tween_property(
++		self, "rotation", rotacao_base - deg_to_rad(inclinacao_dica_graus), 0.18
++	)
++	await tween_acao.finished
++	if not _acao_valida(token):
+ 		return
+ 
+-	token_animacao += 1
+-	em_acao = true
+-	bloqueado = true
++	await get_tree().create_timer(0.45).timeout
++	_finalizar_acao(token)
+ 
+-	_matar_tweens()
+-	_resetar_transformacao()
+ 
+-	_set_pose(pose_show)
++func dar_dica() -> void:
++	var token := _iniciar_acao()
++	if token < 0:
++		return
+ 
++	_set_pose(pose_talk if pose_talk else pose_think)
+ 	tween_acao = create_tween()
+-	tween_acao.set_parallel(true)
++	(
++		tween_acao
++		. tween_property(self, "scale", escala_base * escala_dica, 0.16)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
++	)
++	tween_acao.tween_property(self, "scale", escala_base, 0.16)
++	await tween_acao.finished
++	if not _acao_valida(token):
++		return
+ 
+-	tween_acao.tween_property(
+-		self,
+-		"scale",
+-		escala_base * escala_vitoria,
+-		0.18
+-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
++	_set_pose(pose_think if pose_think else pose_talk)
++	await get_tree().create_timer(0.35).timeout
++	_finalizar_acao(token)
++
++
++func apontar() -> void:
++	var token := _iniciar_acao()
++	if token < 0:
++		return
+ 
++	_set_pose(pose_show if pose_show else pose_talk)
++	tween_acao = create_tween().set_parallel(true)
++	(
++		tween_acao
++		. tween_property(self, "scale", escala_base * escala_dica, 0.16)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
++	)
+ 	tween_acao.tween_property(
+-		self,
+-		"position",
+-		posicao_base + Vector2(0, deslocamento_vitoria_y),
+-		0.18
+-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
++		self, "rotation", rotacao_base + deg_to_rad(inclinacao_dica_graus), 0.16
++	)
++	await tween_acao.finished
++	if not _acao_valida(token):
++		return
++
++	await get_tree().create_timer(0.55).timeout
++	_finalizar_acao(token)
+ 
++
++# ============================================================
++# VITÓRIA
++# ============================================================
++func vitoria() -> void:
++	var token := _iniciar_acao(true)
++	if token < 0:
++		return
++
++	_set_pose(pose_show)
++	tween_acao = create_tween().set_parallel(true)
++	(
++		tween_acao
++		. tween_property(self, "scale", escala_base * escala_vitoria, 0.18)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
++	)
++	(
++		tween_acao
++		. tween_property(self, "position", posicao_base + Vector2(0, deslocamento_vitoria_y), 0.18)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
++	)
+ 	await tween_acao.finished
++	if not _acao_valida(token):
++		return
+ 
+ 	_set_pose(pose_cheer0)
+ 	await get_tree().create_timer(0.22).timeout
++	if not _acao_valida(token):
++		return
+ 
+ 	_set_pose(pose_cheer1)
+ 	await get_tree().create_timer(0.22).timeout
++	if not _acao_valida(token):
++		return
+ 
+-	if pose_jump:
+-		_set_pose(pose_jump)
+-	else:
+-		_set_pose(pose_cheer1)
+-
+-	tween_acao = create_tween()
+-	tween_acao.set_parallel(true)
+-
++	_set_pose(pose_jump if pose_jump else pose_cheer1)
++	tween_acao = create_tween().set_parallel(true)
+ 	tween_acao.tween_property(self, "scale", escala_base, 0.16)
+ 	tween_acao.tween_property(self, "position", posicao_base, 0.16)
+ 	tween_acao.tween_property(self, "rotation", rotacao_base, 0.16)
+-
+ 	await tween_acao.finished
+ 
+-	bloqueado = false
+-	em_acao = false
+-
+-	_set_pose(pose_idle)
+-	iniciar_idle()
++	_finalizar_acao(token)
+ 
+ 
+ func passar_fase() -> void:
+diff -ruN /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/LineRenderer.gd /mnt/data/fineplay_work/scripts/ligue_os_pontos/LineRenderer.gd
+--- /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/LineRenderer.gd	2026-06-11 18:21:50.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ligue_os_pontos/LineRenderer.gd	2026-07-05 04:11:02.805724260 +0000
+@@ -2,130 +2,85 @@
+ 
+ class_name LineRendererManager
+ 
+-# ============================================================
+-# LINE RENDERER MANAGER
+-# Gerenciador visual de linhas para minigames de ligação.
+-#
+-# Responsabilidades:
+-# - criar linha de preview;
+-# - criar sombra da linha;
+-# - atualizar a ponta da linha durante o arrasto;
+-# - transformar a linha atual em linha definitiva de acerto;
+-# - apagar linha atual em caso de erro/cancelamento;
+-# - limpar todas as linhas;
+-# - informar se existe linha aberta.
+-#
+-# Este script NÃO valida regra do jogo.
+-# Este script NÃO toca áudio.
+-# Este script NÃO controla input.
+-# Este script NÃO controla responsividade.
+-#
+-# A responsividade é controlada pelo AutoLoad:
+-# ResponsividadeUniversal.gd
+-# ============================================================
+-
+-
+-# ============================================================
+-# REFERÊNCIA DA CAMADA DE LINHAS
+-# ============================================================
+ @export_node_path("Node2D") var camada_linhas_path: NodePath
+ 
+-@onready var camada_linhas: Node2D = get_node_or_null(camada_linhas_path)
+-
+-
+-# ============================================================
+-# CONFIGURAÇÃO VISUAL DAS LINHAS DE PREVIEW
+-# ============================================================
++@export_group("Linha de pré-visualização")
+ @export var cor_linha_preview: Color = Color(1.0, 1.0, 1.0, 0.72)
+ @export var cor_linha_preview_sombra: Color = Color(0.0, 0.0, 0.0, 0.18)
+-
+ @export var largura_linha_preview: float = 8.0
+ @export var largura_linha_preview_sombra: float = 16.0
+-
+ @export var z_index_linha_preview: int = 60
+ @export var z_index_linha_preview_sombra: int = 59
+ 
+-
+-# ============================================================
+-# CONFIGURAÇÃO VISUAL DAS LINHAS FINAIS
+-# ============================================================
++@export_group("Linha de acerto")
+ @export var cor_linha_final: Color = Color(0.20, 0.85, 0.45, 0.42)
+ @export var cor_linha_final_sombra: Color = Color(0.0, 0.0, 0.0, 0.10)
+-
+ @export var largura_linha_final: float = 5.0
+ @export var largura_linha_final_sombra: float = 10.0
+-
+ @export var z_index_linha_final: int = 20
+ @export var z_index_linha_final_sombra: int = 19
+ 
++@onready var camada_linhas: Node2D = get_node_or_null(camada_linhas_path) as Node2D
+ 
+-# ============================================================
+-# ESTADO INTERNO
+-# ============================================================
+ var linha_atual: Line2D = null
+ var linha_sombra_atual: Line2D = null
+ 
+ 
+ func _ready() -> void:
+-	if not camada_linhas:
+-		push_warning("LineRendererManager: camada_linhas_path não foi configurado ou não encontrou CamadaLinhas.")
+-		return
++	_resolver_camada_linhas()
+ 
+-	_configurar_camada_linhas()
+ 
++func _exit_tree() -> void:
++	apagar_linha_atual()
+ 
+-# ============================================================
+-# CONFIGURAÇÃO INTERNA
+-# ============================================================
+-func _configurar_camada_linhas() -> void:
+-	if not camada_linhas:
++
++func _resolver_camada_linhas() -> void:
++	if camada_linhas and is_instance_valid(camada_linhas):
++		_configurar_camada_linhas()
+ 		return
+ 
++	var cena_atual := get_tree().current_scene
++	if cena_atual:
++		camada_linhas = cena_atual.find_child("CamadaLinhas", true, false) as Node2D
++
++	if camada_linhas:
++		_configurar_camada_linhas()
++	else:
++		push_warning("LineRendererManager: CamadaLinhas não foi encontrada.")
++
++
++func _configurar_camada_linhas() -> void:
+ 	camada_linhas.z_index = 50
+ 	camada_linhas.z_as_relative = false
+ 
+ 
+-func _criar_line2d(
+-	nome: String,
+-	largura: float,
+-	cor: Color,
+-	z_index_linha: int
+-) -> Line2D:
++func _criar_line2d(nome: String, largura: float, cor: Color, indice_z: int) -> Line2D:
+ 	var linha := Line2D.new()
+-
+ 	linha.name = nome
+-	linha.width = largura
++	linha.width = maxf(largura, 1.0)
+ 	linha.default_color = cor
+ 	linha.begin_cap_mode = Line2D.LINE_CAP_ROUND
+ 	linha.end_cap_mode = Line2D.LINE_CAP_ROUND
+ 	linha.joint_mode = Line2D.LINE_JOINT_ROUND
+-	linha.z_index = z_index_linha
++	linha.z_index = indice_z
+ 	linha.z_as_relative = false
+-
+ 	return linha
+ 
+ 
+ func _global_para_local_da_camada(posicao_global: Vector2) -> Vector2:
+-	if not camada_linhas:
+-		return posicao_global
+-
+-	return camada_linhas.to_local(posicao_global)
++	return camada_linhas.to_local(posicao_global) if camada_linhas else posicao_global
+ 
+ 
+-# ============================================================
+-# API PÚBLICA
+-# ============================================================
+ func existe_linha_aberta() -> bool:
+ 	return linha_atual != null and is_instance_valid(linha_atual)
+ 
+ 
+ func criar_linha(posicao_inicial: Vector2, posicao_final_inicial: Vector2) -> void:
++	_resolver_camada_linhas()
+ 	if not camada_linhas:
+-		push_warning("LineRendererManager: não foi possível criar linha porque CamadaLinhas não existe.")
+ 		return
+ 
+ 	apagar_linha_atual()
+-
+ 	var inicio_local := _global_para_local_da_camada(posicao_inicial)
+ 	var fim_local := _global_para_local_da_camada(posicao_final_inicial)
+ 
+@@ -135,55 +90,51 @@
+ 		cor_linha_preview_sombra,
+ 		z_index_linha_preview_sombra
+ 	)
+-
+-	linha_sombra_atual.add_point(inicio_local)
+-	linha_sombra_atual.add_point(fim_local)
++	linha_sombra_atual.points = PackedVector2Array([inicio_local, fim_local])
+ 	camada_linhas.add_child(linha_sombra_atual)
+ 
+ 	linha_atual = _criar_line2d(
+-		"LinhaPreview",
+-		largura_linha_preview,
+-		cor_linha_preview,
+-		z_index_linha_preview
++		"LinhaPreview", largura_linha_preview, cor_linha_preview, z_index_linha_preview
+ 	)
+-
+-	linha_atual.add_point(inicio_local)
+-	linha_atual.add_point(fim_local)
++	linha_atual.points = PackedVector2Array([inicio_local, fim_local])
+ 	camada_linhas.add_child(linha_atual)
+ 
+ 
+ func atualizar_linha(posicao_final: Vector2) -> void:
+ 	var fim_local := _global_para_local_da_camada(posicao_final)
+ 
+-	if linha_atual and is_instance_valid(linha_atual):
++	if linha_atual and is_instance_valid(linha_atual) and linha_atual.get_point_count() >= 2:
+ 		linha_atual.set_point_position(1, fim_local)
+-
+-	if linha_sombra_atual and is_instance_valid(linha_sombra_atual):
++	if (
++		linha_sombra_atual
++		and is_instance_valid(linha_sombra_atual)
++		and linha_sombra_atual.get_point_count() >= 2
++	):
+ 		linha_sombra_atual.set_point_position(1, fim_local)
+ 
+ 
+ func transformar_linha_em_acerto(posicao_final: Vector2) -> void:
++	if not existe_linha_aberta():
++		return
++
+ 	var fim_local := _global_para_local_da_camada(posicao_final)
+ 
+ 	if linha_sombra_atual and is_instance_valid(linha_sombra_atual):
+-		linha_sombra_atual.set_point_position(1, fim_local)
+-		linha_sombra_atual.width = largura_linha_final_sombra
++		if linha_sombra_atual.get_point_count() >= 2:
++			linha_sombra_atual.set_point_position(1, fim_local)
++		linha_sombra_atual.width = maxf(largura_linha_final_sombra, 1.0)
+ 		linha_sombra_atual.default_color = cor_linha_final_sombra
+ 		linha_sombra_atual.z_index = z_index_linha_final_sombra
+-		linha_sombra_atual.z_as_relative = false
+ 		linha_sombra_atual.name = "LinhaAcertoSombra"
+ 
+ 	if linha_atual and is_instance_valid(linha_atual):
+-		linha_atual.set_point_position(1, fim_local)
+-		linha_atual.width = largura_linha_final
++		if linha_atual.get_point_count() >= 2:
++			linha_atual.set_point_position(1, fim_local)
++		linha_atual.width = maxf(largura_linha_final, 1.0)
+ 		linha_atual.default_color = cor_linha_final
+ 		linha_atual.z_index = z_index_linha_final
+-		linha_atual.z_as_relative = false
+ 		linha_atual.name = "LinhaAcerto"
+ 
+-	# Importante:
+-	# Não damos queue_free aqui, porque a linha correta precisa permanecer na tela.
+-	# Apenas soltamos a referência para permitir uma nova linha.
+ 	linha_sombra_atual = null
+ 	linha_atual = null
+ 
+@@ -191,7 +142,6 @@
+ func apagar_linha_atual() -> void:
+ 	if linha_sombra_atual and is_instance_valid(linha_sombra_atual):
+ 		linha_sombra_atual.queue_free()
+-
+ 	if linha_atual and is_instance_valid(linha_atual):
+ 		linha_atual.queue_free()
+ 
+@@ -200,6 +150,7 @@
+ 
+ 
+ func limpar_todas_as_linhas() -> void:
++	_resolver_camada_linhas()
+ 	if not camada_linhas:
+ 		return
+ 
+diff -ruN /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/nivel_ligar_base.gd /mnt/data/fineplay_work/scripts/ligue_os_pontos/nivel_ligar_base.gd
+--- /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/nivel_ligar_base.gd	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ligue_os_pontos/nivel_ligar_base.gd	2026-07-05 04:15:00.021074502 +0000
+@@ -0,0 +1,468 @@
++extends Node2D
++
++@export var total_objetivos: int = 3
++@export_file("*.tscn") var proxima_fase_cena: String
++@export_range(1.0, 100.0, 1.0) var distancia_minima_arrasto: float = 18.0
++
++var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
++
++@onready var area_jogo: Node2D = get_node_or_null("AreaJogo") as Node2D
++@onready var hint_manager: Node = get_node_or_null("HintManager")
++@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
++@onready var line_renderer: Node = get_node_or_null("LineRenderer")
++@onready var robo: Node = get_node_or_null("AreaJogo/ProfessorRobo")
++@onready var confetes: CPUParticles2D = get_node_or_null("AreaJogo/CPUParticles2D") as CPUParticles2D
++
++@onready var som_click_objeto: Node = get_node_or_null("SonsLocais/SomClickObjeto")
++@onready var som_click_forma: Node = get_node_or_null("SonsLocais/SomClickNaForma")
++@onready var som_acerto: Node = get_node_or_null("SonsLocais/SomAcerto")
++@onready var som_erro: Node = get_node_or_null("SonsLocais/SomErro")
++@onready var som_vitoria: Node = get_node_or_null("SonsLocais/SomVitoria")
++
++var ponto_inicial: Node = null
++var acertos := 0
++var arrastou_linha := false
++var pos_inicio_interacao := Vector2.ZERO
++var nivel_concluido := false
++var ponteiro_ativo := -999
++
++const PONTEIRO_MOUSE := -1
++const PONTEIRO_NENHUM := -999
++
++
++func _ready() -> void:
++	randomize()
++	call_deferred("_inicializar_fase_com_seguranca")
++
++
++func _exit_tree() -> void:
++	apagar_linha_atual()
++
++
++func _inicializar_fase_com_seguranca() -> void:
++	await get_tree().process_frame
++	await get_tree().process_frame
++	_inicializar_fase()
++
++
++func _inicializar_fase() -> void:
++	if not area_jogo:
++		push_error("Ligue os Pontos: nó AreaJogo não encontrado.")
++		return
++
++	resetar_estado_do_nivel()
++	randomizar_posicoes()
++	configurar_managers()
++	iniciar_musica_fundo()
++	_validar_total_objetivos()
++	print(_mensagem_inicio())
++
++
++func _mensagem_inicio() -> String:
++	return "Minigame Ligue os Pontos iniciado."
++
++
++func resetar_estado_do_nivel() -> void:
++	ponto_inicial = null
++	acertos = 0
++	arrastou_linha = false
++	pos_inicio_interacao = Vector2.ZERO
++	nivel_concluido = false
++	ponteiro_ativo = PONTEIRO_NENHUM
++
++	for ponto in pegar_pontos_da_fase():
++		if ponto.has_method("resetar_conexoes"):
++			ponto.call("resetar_conexoes")
++		else:
++			_set_propriedade_se_existir(ponto, "esta_conectado_saida", false)
++			_set_propriedade_se_existir(ponto, "esta_conectado_chegada", false)
++
++
++func configurar_managers() -> void:
++	if hint_manager and hint_manager.has_method("reiniciar_sistema"):
++		hint_manager.call("reiniciar_sistema")
++	elif not hint_manager:
++		push_warning("HintManager não encontrado. O minigame funcionará sem pistas progressivas.")
++
++	if not feedback_audio:
++		push_warning("FeedbackAudio não encontrado. O minigame usará SonsLocais diretamente.")
++
++	if line_renderer and line_renderer.has_method("limpar_todas_as_linhas"):
++		line_renderer.call("limpar_todas_as_linhas")
++	elif not line_renderer:
++		push_warning(
++			"LineRenderer não encontrado. A validação funcionará, mas as linhas não serão exibidas."
++		)
++
++
++func registrar_interacao_no_hint() -> void:
++	if hint_manager and hint_manager.has_method("registrar_interacao"):
++		hint_manager.call("registrar_interacao")
++	elif hint_manager and hint_manager.has_method("resetar_timer_sem_limpar_visual"):
++		hint_manager.call("resetar_timer_sem_limpar_visual")
++
++
++func registrar_acao_no_hint_sem_resetar() -> void:
++	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
++		hint_manager.call("registrar_acao_sem_resetar_pista")
++
++
++func registrar_acerto_no_hint() -> void:
++	if hint_manager and hint_manager.has_method("registrar_acerto"):
++		hint_manager.call("registrar_acerto")
++	elif hint_manager and hint_manager.has_method("resetar_pistas"):
++		hint_manager.call("resetar_pistas")
++
++
++func pausar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("pausar_pistas"):
++		hint_manager.call("pausar_pistas")
++
++
++func retomar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("retomar_pistas"):
++		hint_manager.call("retomar_pistas")
++
++
++func finalizar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("finalizar_nivel"):
++		hint_manager.call("finalizar_nivel")
++
++
++func existe_linha_aberta() -> bool:
++	return (
++		bool(line_renderer.call("existe_linha_aberta"))
++		if line_renderer and line_renderer.has_method("existe_linha_aberta")
++		else ponto_inicial != null
++	)
++
++
++func iniciar_musica_fundo() -> void:
++	var musica := get_node_or_null("/root/AudioManager/MusicaFundo")
++	if musica and not bool(musica.get("playing")) and musica.has_method("play"):
++		musica.call("play")
++
++
++func tocar_click_forma() -> void:
++	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
++		feedback_audio.call("tocar_click_forma")
++	elif som_click_forma and som_click_forma.has_method("play"):
++		som_click_forma.call("play")
++	elif som_click_objeto and som_click_objeto.has_method("play"):
++		som_click_objeto.call("play")
++
++
++func tocar_acerto() -> void:
++	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
++		feedback_audio.call("tocar_acerto")
++	elif som_acerto and som_acerto.has_method("play"):
++		som_acerto.call("play")
++
++
++func tocar_erro_pedagogico() -> void:
++	registrar_acao_no_hint_sem_resetar()
++
++	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
++		feedback_audio.call("tocar_erro_pedagogico")
++	elif som_erro and som_erro.has_method("play"):
++		som_erro.call("play")
++
++	if robo and robo.has_method("errar"):
++		robo.call("errar")
++
++
++func tocar_vitoria_pedagogica() -> void:
++	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
++		feedback_audio.call("tocar_vitoria_pedagogica")
++	elif som_vitoria and som_vitoria.has_method("play"):
++		som_vitoria.call("play")
++
++
++func pegar_pontos_da_fase() -> Array[Node]:
++	var pontos: Array[Node] = []
++	if not area_jogo:
++		return pontos
++
++	for node in get_tree().get_nodes_in_group("pontos"):
++		if node is Node and area_jogo.is_ancestor_of(node):
++			pontos.append(node)
++	return pontos
++
++
++func randomizar_posicoes() -> void:
++	_randomizar_pontos_por_modo(pegar_pontos_da_fase())
++
++
++func _randomizar_pontos_por_modo(pontos: Array[Node]) -> void:
++	# Implementação padrão: mantém saídas e chegadas em seus respectivos lados.
++	var saidas: Array[Node] = []
++	var chegadas: Array[Node] = []
++
++	for ponto in pontos:
++		var tipo := int(ponto.get("tipo"))
++		if tipo == 0:
++			saidas.append(ponto)
++		elif tipo == 1:
++			chegadas.append(ponto)
++
++	_randomizar_lista_de_nodes(saidas)
++	_randomizar_lista_de_nodes(chegadas)
++
++
++func _randomizar_lista_de_nodes(nodes: Array[Node]) -> void:
++	var posicoes: Array[Vector2] = []
++	for node in nodes:
++		if node is Node2D:
++			posicoes.append((node as Node2D).global_position)
++
++	if posicoes.size() != nodes.size():
++		return
++
++	posicoes.shuffle()
++	for indice in range(nodes.size()):
++		(nodes[indice] as Node2D).global_position = posicoes[indice]
++
++
++func _input(event: InputEvent) -> void:
++	if nivel_concluido:
++		return
++
++	if event is InputEventMouseButton:
++		var mouse_event := event as InputEventMouseButton
++		if mouse_event.button_index != MOUSE_BUTTON_LEFT:
++			return
++		if mouse_event.pressed:
++			_processar_press(mouse_event.position, PONTEIRO_MOUSE)
++		elif ponteiro_ativo == PONTEIRO_MOUSE:
++			_processar_release(mouse_event.position, PONTEIRO_MOUSE)
++
++	elif event is InputEventMouseMotion and ponteiro_ativo == PONTEIRO_MOUSE:
++		_processar_movimento((event as InputEventMouseMotion).position, PONTEIRO_MOUSE)
++
++	elif event is InputEventScreenTouch:
++		var touch_event := event as InputEventScreenTouch
++		if touch_event.pressed:
++			_processar_press(touch_event.position, touch_event.index)
++		elif ponteiro_ativo == touch_event.index:
++			_processar_release(touch_event.position, touch_event.index)
++
++	elif event is InputEventScreenDrag:
++		var drag_event := event as InputEventScreenDrag
++		if ponteiro_ativo == drag_event.index:
++			_processar_movimento(drag_event.position, drag_event.index)
++
++
++func _processar_press(posicao_viewport: Vector2, id_ponteiro: int) -> void:
++	if ponteiro_ativo != PONTEIRO_NENHUM:
++		return
++
++	registrar_interacao_no_hint()
++	var posicao_global := _viewport_para_global(posicao_viewport)
++	var ponto := buscar_ponto_na_posicao(posicao_global)
++
++	if ponto_inicial:
++		if ponto and ponto != ponto_inicial:
++			finalizar_linha_com_ponto(ponto)
++			get_viewport().set_input_as_handled()
++		return
++
++	if ponto and tentar_iniciar_linha(ponto, posicao_global):
++		ponteiro_ativo = id_ponteiro
++		pos_inicio_interacao = posicao_global
++		arrastou_linha = false
++		get_viewport().set_input_as_handled()
++
++
++func _processar_movimento(posicao_viewport: Vector2, id_ponteiro: int) -> void:
++	if id_ponteiro != ponteiro_ativo or not ponto_inicial:
++		return
++
++	var posicao_global := _viewport_para_global(posicao_viewport)
++	if line_renderer and line_renderer.has_method("atualizar_linha"):
++		line_renderer.call("atualizar_linha", posicao_global)
++
++	if posicao_global.distance_to(pos_inicio_interacao) >= distancia_minima_arrasto:
++		arrastou_linha = true
++
++
++func _processar_release(posicao_viewport: Vector2, id_ponteiro: int) -> void:
++	if id_ponteiro != ponteiro_ativo:
++		return
++
++	ponteiro_ativo = PONTEIRO_NENHUM
++	var posicao_global := _viewport_para_global(posicao_viewport)
++
++	if ponto_inicial and arrastou_linha:
++		finalizar_linha_na_posicao(posicao_global)
++	else:
++		# No modo por clique, a linha permanece aberta aguardando o segundo ponto.
++		retomar_hint_manager()
++
++	arrastou_linha = false
++	get_viewport().set_input_as_handled()
++
++
++func buscar_ponto_sob_mouse() -> Node:
++	return buscar_ponto_na_posicao(get_global_mouse_position())
++
++
++func buscar_ponto_na_posicao(posicao_global: Vector2) -> Node:
++	var physics_space := get_world_2d().direct_space_state
++	var query := PhysicsPointQueryParameters2D.new()
++	query.position = posicao_global
++	query.collide_with_areas = true
++	query.collide_with_bodies = false
++
++	for resultado in physics_space.intersect_point(query, 32):
++		var collider: Object = resultado.get("collider")
++		if collider is Node and (collider as Node).is_in_group("pontos"):
++			return collider as Node
++	return null
++
++
++func tentar_iniciar_linha(ponto: Node, posicao_ponteiro: Variant = null) -> bool:
++	if not ponto or not _ponto_pode_iniciar(ponto):
++		return false
++
++	ponto_inicial = ponto
++	tocar_click_forma()
++	pausar_hint_manager()
++
++	var ponta_inicial: Vector2 = (ponto as Node2D).global_position
++	if posicao_ponteiro is Vector2:
++		ponta_inicial = posicao_ponteiro
++
++	if line_renderer and line_renderer.has_method("criar_linha"):
++		line_renderer.call("criar_linha", (ponto as Node2D).global_position, ponta_inicial)
++	return true
++
++
++func _ponto_pode_iniciar(ponto: Node) -> bool:
++	return int(ponto.get("tipo")) == 0 and not bool(ponto.get("esta_conectado_saida"))
++
++
++func finalizar_linha() -> void:
++	finalizar_linha_na_posicao(get_global_mouse_position())
++
++
++func finalizar_linha_na_posicao(posicao_global: Vector2) -> void:
++	var ponto_final := buscar_ponto_na_posicao(posicao_global)
++	if ponto_final:
++		finalizar_linha_com_ponto(ponto_final)
++	else:
++		cancelar_linha_atual(false)
++
++
++func finalizar_linha_com_ponto(ponto_final: Node) -> void:
++	if not ponto_inicial:
++		cancelar_linha_atual(false)
++		return
++
++	var acertou := (
++		ponto_final != null
++		and ponto_final != ponto_inicial
++		and _conexao_valida(ponto_inicial, ponto_final)
++	)
++	if acertou:
++		registrar_acerto_no_hint()
++		if line_renderer and line_renderer.has_method("transformar_linha_em_acerto"):
++			line_renderer.call(
++				"transformar_linha_em_acerto", (ponto_final as Node2D).global_position
++			)
++
++		_set_propriedade_se_existir(ponto_inicial, "esta_conectado_saida", true)
++		_set_propriedade_se_existir(ponto_final, "esta_conectado_chegada", true)
++		tocar_acerto()
++
++		ponto_inicial = null
++		arrastou_linha = false
++		ponteiro_ativo = PONTEIRO_NENHUM
++		retomar_hint_manager()
++		verificar_vitoria()
++	else:
++		if ponto_final and ponto_final != ponto_inicial:
++			tocar_erro_pedagogico()
++		cancelar_linha_atual(false)
++
++
++func _conexao_valida(origem: Node, destino: Node) -> bool:
++	return (
++		int(destino.get("tipo")) == 1
++		and not bool(destino.get("esta_conectado_chegada"))
++		and int(destino.get("id_par")) == int(origem.get("id_par"))
++	)
++
++
++func cancelar_linha_atual(registrar_interacao: bool = true) -> void:
++	if line_renderer and line_renderer.has_method("apagar_linha_atual"):
++		line_renderer.call("apagar_linha_atual")
++
++	ponto_inicial = null
++	arrastou_linha = false
++	ponteiro_ativo = PONTEIRO_NENHUM
++
++	if registrar_interacao:
++		registrar_interacao_no_hint()
++	retomar_hint_manager()
++
++
++func apagar_linha_atual() -> void:
++	cancelar_linha_atual(false)
++
++
++func verificar_vitoria() -> void:
++	acertos += 1
++	if acertos >= total_objetivos:
++		concluir_nivel()
++	elif robo and robo.has_method("comemorar"):
++		robo.call("comemorar")
++
++
++func concluir_nivel() -> void:
++	if nivel_concluido:
++		return
++
++	nivel_concluido = true
++	finalizar_hint_manager()
++	ponteiro_ativo = PONTEIRO_NENHUM
++
++	if confetes:
++		confetes.emitting = true
++
++	tocar_vitoria_pedagogica()
++	if robo and robo.has_method("vitoria"):
++		robo.call("vitoria")
++	elif robo and robo.has_method("comemorar"):
++		robo.call("comemorar")
++
++	await get_tree().create_timer(1.4).timeout
++	mostrar_tela_vitoria()
++
++
++func mostrar_tela_vitoria() -> void:
++	if not cena_vitoria:
++		push_error("Ligue os Pontos: TelaVitoria não pôde ser carregada.")
++		return
++
++	var tela := cena_vitoria.instantiate()
++	add_child(tela)
++	if tela.has_method("configurar"):
++		tela.call("configurar", proxima_fase_cena)
++
++
++func _validar_total_objetivos() -> void:
++	if total_objetivos <= 0:
++		push_warning("Ligue os Pontos: total_objetivos deve ser maior que zero.")
++
++
++func _viewport_para_global(posicao_viewport: Vector2) -> Vector2:
++	return get_viewport().get_canvas_transform().affine_inverse() * posicao_viewport
++
++
++func _set_propriedade_se_existir(objeto: Object, nome: StringName, valor: Variant) -> void:
++	if not objeto:
++		return
++	for propriedade in objeto.get_property_list():
++		if StringName(propriedade.name) == nome:
++			objeto.set(nome, valor)
++			return
+diff -ruN /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/nivel_ligar_numeros.gd /mnt/data/fineplay_work/scripts/ligue_os_pontos/nivel_ligar_numeros.gd
+--- /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/nivel_ligar_numeros.gd	2026-06-12 11:30:34.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ligue_os_pontos/nivel_ligar_numeros.gd	2026-07-05 04:11:02.854767108 +0000
+@@ -1,424 +1,31 @@
+-extends Node2D
++extends "res://scripts/ligue_os_pontos/nivel_ligar_base.gd"
+ 
+-# ============================================================
+-# OBSERVAÇÃO IMPORTANTE
+-# ============================================================
+-# A responsividade agora é controlada pelo AutoLoad:
+-# ResponsividadeUniversal.gd
+-#
+-# Este script NÃO centraliza AreaJogo,
+-# NÃO redimensiona FundoResponsivo
+-# e NÃO reposiciona CamadaLinhas.
+-#
+-# A cena precisa manter os nós:
+-# - FundoResponsivo
+-# - AreaJogo
+-# - CamadaLinhas
+-# - HintManager
+-# - FeedbackAudio
+-# - LineRenderer
+-# ============================================================
+ 
++func _mensagem_inicio() -> String:
++	return "Minigame Ligue os Números iniciado."
+ 
+-# ============================================================
+-# CONFIGURAÇÕES DA FASE
+-# ============================================================
+-@export var total_objetivos: int = 9
+-@export_file("*.tscn") var proxima_fase_cena: String
+ 
+-var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
++func _randomizar_pontos_por_modo(pontos: Array[Node]) -> void:
++	_randomizar_lista_de_nodes(pontos)
+ 
+ 
+-# ============================================================
+-# ESTRUTURA DA CENA
+-# ============================================================
+-@onready var area_jogo: Node2D = $AreaJogo
++func _ponto_pode_iniciar(ponto: Node) -> bool:
++	return not bool(ponto.get("esta_conectado_saida")) and _existe_sucessor_disponivel(ponto)
+ 
+ 
+-# ============================================================
+-# MANAGERS
+-# ============================================================
+-@onready var hint_manager: Node = get_node_or_null("HintManager")
+-@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+-@onready var line_renderer: Node = get_node_or_null("LineRenderer")
++func _conexao_valida(origem: Node, destino: Node) -> bool:
++	return (
++		int(destino.get("valor_numero")) == int(origem.get("valor_numero")) + 1
++		and not bool(destino.get("esta_conectado_chegada"))
++	)
+ 
+ 
+-# ============================================================
+-# REFERÊNCIAS DA FASE
+-# ============================================================
+-@onready var robo = $AreaJogo/ProfessorRobo
+-@onready var confetes = $AreaJogo/CPUParticles2D
+-
+-
+-# ============================================================
+-# FALLBACK DE SONS
+-# Usado apenas se o FeedbackAudio não estiver configurado.
+-# ============================================================
+-@onready var som_click_objeto = get_node_or_null("SonsLocais/SomClickObjeto")
+-@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+-@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+-@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+-@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+-
+-
+-# ============================================================
+-# CONTROLE DO JOGO
+-# ============================================================
+-var ponto_inicial = null
+-var acertos := 0
+-var arrastou_linha := false
+-var pos_inicio_interacao := Vector2.ZERO
+-var nivel_concluido := false
+-
+-@export var distancia_minima_arrasto: float = 18.0
+-
+-
+-func _ready() -> void:
+-	randomize()
+-	call_deferred("_inicializar_fase_com_seguranca")
+-
+-
+-func _inicializar_fase_com_seguranca() -> void:
+-	# Aguarda a cena montar completamente.
+-	await get_tree().process_frame
+-
+-	# Aguarda mais um frame para o ResponsividadeUniversal
+-	# ajustar AreaJogo e FundoResponsivo.
+-	await get_tree().process_frame
+-
+-	_inicializar_fase()
+-
+-
+-func _inicializar_fase() -> void:
+-	resetar_estado_do_nivel()
+-	randomizar_posicoes()
+-	configurar_managers()
+-	iniciar_musica_fundo()
+-
+-	print("Minigame Ligue os Números iniciado.")
+-
+-
+-func resetar_estado_do_nivel() -> void:
+-	ponto_inicial = null
+-	acertos = 0
+-	arrastou_linha = false
+-	pos_inicio_interacao = Vector2.ZERO
+-	nivel_concluido = false
+-
+-
+-# ============================================================
+-# CONFIGURAÇÃO DOS MANAGERS
+-# ============================================================
+-func configurar_managers() -> void:
+-	if hint_manager and hint_manager.has_method("reiniciar_sistema"):
+-		hint_manager.reiniciar_sistema()
+-
+-	if not hint_manager:
+-		push_warning("HintManager não encontrado. O minigame funciona, mas sem pistas progressivas.")
+-
+-	if not feedback_audio:
+-		push_warning("FeedbackAudio não encontrado. O minigame usará sons diretos de SonsLocais.")
+-
+-	if not line_renderer:
+-		push_warning("LineRenderer não encontrado. As linhas não serão desenhadas corretamente.")
+-	else:
+-		if line_renderer.has_method("limpar_todas_as_linhas"):
+-			line_renderer.limpar_todas_as_linhas()
+-
+-
+-func registrar_acao_no_hint_sem_resetar() -> void:
+-	# Clique, arraste e erro não devem limpar pistas nem zerar tempo.
+-	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+-		hint_manager.registrar_acao_sem_resetar_pista()
+-
+-
+-func registrar_acerto_no_hint() -> void:
+-	# Somente acerto deve limpar pista e reiniciar tempo.
+-	if hint_manager and hint_manager.has_method("registrar_acerto"):
+-		hint_manager.registrar_acerto()
+-	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+-		hint_manager.resetar_pistas()
+-
+-
+-func pausar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("pausar_pistas"):
+-		hint_manager.pausar_pistas()
+-
+-
+-func retomar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("retomar_pistas"):
+-		hint_manager.retomar_pistas()
+-
+-
+-func finalizar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+-		hint_manager.finalizar_nivel()
+-
+-
+-func existe_linha_aberta() -> bool:
+-	if line_renderer and line_renderer.has_method("existe_linha_aberta"):
+-		return line_renderer.existe_linha_aberta()
+-
++func _existe_sucessor_disponivel(origem: Node) -> bool:
++	var valor_esperado := int(origem.get("valor_numero")) + 1
++	for ponto in pegar_pontos_da_fase():
++		if (
++			int(ponto.get("valor_numero")) == valor_esperado
++			and not bool(ponto.get("esta_conectado_chegada"))
++		):
++			return true
+ 	return false
+-
+-
+-# ============================================================
+-# MÚSICA DE FUNDO
+-# ============================================================
+-func iniciar_musica_fundo() -> void:
+-	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+-
+-	if musica and not musica.playing:
+-		musica.play()
+-
+-
+-# ============================================================
+-# ÁUDIO
+-# ============================================================
+-func tocar_click_forma() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+-		feedback_audio.tocar_click_forma()
+-		return
+-
+-	if som_click_forma:
+-		som_click_forma.play()
+-	elif som_click_objeto:
+-		som_click_objeto.play()
+-
+-
+-func tocar_acerto() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+-		feedback_audio.tocar_acerto()
+-		return
+-
+-	if som_acerto:
+-		som_acerto.play()
+-
+-
+-func tocar_erro_pedagogico() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+-		feedback_audio.tocar_erro_pedagogico()
+-	else:
+-		if som_erro:
+-			som_erro.play()
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-
+-
+-func tocar_vitoria_pedagogica() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+-		feedback_audio.tocar_vitoria_pedagogica()
+-		return
+-
+-	if som_vitoria:
+-		som_vitoria.play()
+-
+-
+-# ============================================================
+-# PONTOS DA FASE
+-# ============================================================
+-func pegar_pontos_da_fase() -> Array:
+-	var pontos := []
+-
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("pontos"):
+-			pontos.append(filho)
+-
+-	return pontos
+-
+-
+-func randomizar_posicoes() -> void:
+-	# Lógica exclusiva de sequência: embaralha todos os pontos juntos.
+-	var todos_pontos := pegar_pontos_da_fase()
+-
+-	if todos_pontos.is_empty():
+-		push_warning("Nenhum ponto encontrado no grupo 'pontos'.")
+-		return
+-
+-	var posicoes := []
+-
+-	for ponto in todos_pontos:
+-		posicoes.append(ponto.global_position)
+-
+-	posicoes.shuffle()
+-
+-	for i in range(todos_pontos.size()):
+-		todos_pontos[i].global_position = posicoes[i]
+-
+-
+-# ============================================================
+-# INPUT
+-# ============================================================
+-func _input(event) -> void:
+-	if nivel_concluido:
+-		return
+-
+-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+-		registrar_acao_no_hint_sem_resetar()
+-
+-		var ponto = buscar_ponto_sob_mouse()
+-
+-		if existe_linha_aberta():
+-			if ponto and ponto != ponto_inicial:
+-				finalizar_linha_com_ponto(ponto)
+-			return
+-
+-		if ponto:
+-			pos_inicio_interacao = get_global_mouse_position()
+-			arrastou_linha = false
+-			tentar_iniciar_linha(ponto)
+-
+-	elif event is InputEventMouseMotion and existe_linha_aberta():
+-		var pos_mouse := get_global_mouse_position()
+-
+-		if line_renderer and line_renderer.has_method("atualizar_linha"):
+-			line_renderer.atualizar_linha(pos_mouse)
+-
+-		if pos_mouse.distance_to(pos_inicio_interacao) >= distancia_minima_arrasto:
+-			arrastou_linha = true
+-
+-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+-		if existe_linha_aberta() and arrastou_linha:
+-			finalizar_linha()
+-
+-
+-func buscar_ponto_sob_mouse():
+-	var physics_space = get_world_2d().direct_space_state
+-	var mouse_pos = get_global_mouse_position()
+-
+-	var query = PhysicsPointQueryParameters2D.new()
+-	query.position = mouse_pos
+-	query.collide_with_areas = true
+-	query.collide_with_bodies = false
+-
+-	var resultados = physics_space.intersect_point(query)
+-
+-	for res in resultados:
+-		if res.collider and res.collider.is_in_group("pontos"):
+-			return res.collider
+-
+-	return null
+-
+-
+-func tentar_iniciar_linha(ponto) -> void:
+-	if ponto == null:
+-		return
+-
+-	# Na sequência, a criança pode puxar a linha se o ponto ainda não for saída.
+-	if not ponto.esta_conectado_saida:
+-		ponto_inicial = ponto
+-
+-		tocar_click_forma()
+-		pausar_hint_manager()
+-
+-		if line_renderer and line_renderer.has_method("criar_linha"):
+-			line_renderer.criar_linha(ponto.global_position, get_global_mouse_position())
+-
+-
+-# ============================================================
+-# FINALIZAÇÃO DAS LIGAÇÕES
+-# ============================================================
+-func finalizar_linha() -> void:
+-	var ponto_final = buscar_ponto_sob_mouse()
+-
+-	if ponto_final:
+-		finalizar_linha_com_ponto(ponto_final)
+-	else:
+-		# Soltar fora de qualquer ponto apenas cancela a linha.
+-		# Não toca voz de erro.
+-		apagar_linha_atual()
+-
+-		ponto_inicial = null
+-		arrastou_linha = false
+-
+-
+-func finalizar_linha_com_ponto(ponto_final) -> void:
+-	var acertou := false
+-
+-	if ponto_inicial == null:
+-		apagar_linha_atual()
+-		ponto_inicial = null
+-		arrastou_linha = false
+-		return
+-
+-	if ponto_final and ponto_final != ponto_inicial:
+-		if ponto_final.valor_numero == ponto_inicial.valor_numero + 1:
+-			if not ponto_final.esta_conectado_chegada:
+-				acertou = true
+-
+-	if acertou:
+-		registrar_acerto_no_hint()
+-
+-		if line_renderer and line_renderer.has_method("transformar_linha_em_acerto"):
+-			line_renderer.transformar_linha_em_acerto(ponto_final.global_position)
+-
+-		ponto_inicial.esta_conectado_saida = true
+-		ponto_final.esta_conectado_chegada = true
+-
+-		tocar_acerto()
+-
+-		ponto_inicial = null
+-		arrastou_linha = false
+-
+-		retomar_hint_manager()
+-		verificar_vitoria()
+-	else:
+-		if ponto_final and ponto_final != ponto_inicial:
+-			tocar_erro_pedagogico()
+-
+-		apagar_linha_atual()
+-
+-		ponto_inicial = null
+-		arrastou_linha = false
+-
+-
+-func apagar_linha_atual() -> void:
+-	if line_renderer and line_renderer.has_method("apagar_linha_atual"):
+-		line_renderer.apagar_linha_atual()
+-
+-	retomar_hint_manager()
+-
+-
+-# ============================================================
+-# VITÓRIA
+-# ============================================================
+-func verificar_vitoria() -> void:
+-	acertos += 1
+-
+-	if acertos >= total_objetivos:
+-		concluir_nivel()
+-	else:
+-		if robo and robo.has_method("comemorar"):
+-			robo.comemorar()
+-
+-
+-func concluir_nivel() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	nivel_concluido = true
+-	finalizar_hint_manager()
+-
+-	if confetes:
+-		confetes.emitting = true
+-
+-	tocar_vitoria_pedagogica()
+-
+-	if robo and robo.has_method("vitoria"):
+-		robo.vitoria()
+-	elif robo and robo.has_method("comemorar"):
+-		robo.comemorar()
+-
+-	await get_tree().create_timer(1.4).timeout
+-	mostrar_tela_vitoria()
+-
+-
+-func mostrar_tela_vitoria() -> void:
+-	var tela = cena_vitoria.instantiate()
+-	add_child(tela)
+-
+-	if tela.has_method("configurar"):
+-		tela.configurar(proxima_fase_cena)
+-	else:
+-		push_warning("TelaVitoria não possui o método configurar().")
+diff -ruN /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/nivel_ligar_pares.gd /mnt/data/fineplay_work/scripts/ligue_os_pontos/nivel_ligar_pares.gd
+--- /mnt/data/fineplay_work/scripts_original/ligue_os_pontos/nivel_ligar_pares.gd	2026-06-12 11:30:44.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ligue_os_pontos/nivel_ligar_pares.gd	2026-07-05 04:11:02.850234615 +0000
+@@ -1,441 +1,5 @@
+-extends Node2D
++extends "res://scripts/ligue_os_pontos/nivel_ligar_base.gd"
+ 
+-# ============================================================
+-# OBSERVAÇÃO IMPORTANTE
+-# ============================================================
+-# A responsividade agora é controlada pelo AutoLoad:
+-# ResponsividadeUniversal.gd
+-#
+-# Este script NÃO centraliza AreaJogo,
+-# NÃO redimensiona FundoResponsivo
+-# e NÃO reposiciona CamadaLinhas.
+-#
+-# A cena precisa manter os nós:
+-# - FundoResponsivo
+-# - AreaJogo
+-# - CamadaLinhas
+-# - HintManager
+-# - FeedbackAudio
+-# - LineRenderer
+-# ============================================================
+ 
+-
+-# ==========================================
+-# CONFIGURAÇÕES DA FASE
+-# ==========================================
+-@export var total_objetivos: int = 3
+-@export_file("*.tscn") var proxima_fase_cena: String
+-
+-var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+-
+-
+-# ==========================================
+-# ESTRUTURA DA CENA
+-# ==========================================
+-@onready var area_jogo: Node2D = $AreaJogo
+-
+-
+-# ==========================================
+-# MANAGERS
+-# ==========================================
+-@onready var hint_manager: Node = get_node_or_null("HintManager")
+-@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+-@onready var line_renderer: Node = get_node_or_null("LineRenderer")
+-
+-
+-# ==========================================
+-# REFERÊNCIAS DA FASE
+-# ==========================================
+-@onready var robo = $AreaJogo/ProfessorRobo
+-@onready var confetes = $AreaJogo/CPUParticles2D
+-
+-
+-# ==========================================
+-# FALLBACK DE SONS
+-# Usado apenas se o FeedbackAudio não estiver configurado.
+-# ==========================================
+-@onready var som_click_objeto = get_node_or_null("SonsLocais/SomClickObjeto")
+-@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+-@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+-@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+-@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+-
+-
+-# ==========================================
+-# CONTROLE DO JOGO
+-# ==========================================
+-var ponto_inicial = null
+-var acertos := 0
+-var arrastou_linha := false
+-var pos_inicio_interacao := Vector2.ZERO
+-var nivel_concluido := false
+-
+-@export var distancia_minima_arrasto: float = 18.0
+-
+-
+-func _ready() -> void:
+-	randomize()
+-	call_deferred("_inicializar_fase_com_seguranca")
+-
+-
+-func _inicializar_fase_com_seguranca() -> void:
+-	# Aguarda a cena montar completamente.
+-	await get_tree().process_frame
+-
+-	# Aguarda mais um frame para o ResponsividadeUniversal
+-	# ajustar AreaJogo, FundoResponsivo e CamadaLinhas.
+-	await get_tree().process_frame
+-
+-	_inicializar_fase()
+-
+-
+-func _inicializar_fase() -> void:
+-	resetar_estado_do_nivel()
+-	randomizar_posicoes()
+-	configurar_managers()
+-	iniciar_musica_fundo()
+-
+-	print("Minigame Ligue os Pontos iniciado.")
+-
+-
+-func resetar_estado_do_nivel() -> void:
+-	ponto_inicial = null
+-	acertos = 0
+-	arrastou_linha = false
+-	pos_inicio_interacao = Vector2.ZERO
+-	nivel_concluido = false
+-
+-
+-# ==========================================
+-# CONFIGURAÇÃO DOS MANAGERS
+-# ==========================================
+-func configurar_managers() -> void:
+-	if hint_manager and hint_manager.has_method("reiniciar_sistema"):
+-		hint_manager.reiniciar_sistema()
+-
+-	if not hint_manager:
+-		push_warning("HintManager não encontrado. O minigame funciona, mas sem pistas progressivas.")
+-
+-	if not feedback_audio:
+-		push_warning("FeedbackAudio não encontrado. O minigame usará sons diretos de SonsLocais.")
+-
+-	if not line_renderer:
+-		push_warning("LineRenderer não encontrado. As linhas não serão desenhadas corretamente.")
+-	else:
+-		if line_renderer.has_method("limpar_todas_as_linhas"):
+-			line_renderer.limpar_todas_as_linhas()
+-
+-
+-func registrar_acao_no_hint_sem_resetar() -> void:
+-	# Clique, arraste e erro não devem limpar pistas nem zerar tempo.
+-	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+-		hint_manager.registrar_acao_sem_resetar_pista()
+-
+-
+-func registrar_acerto_no_hint() -> void:
+-	# Somente acerto deve limpar pista e reiniciar tempo.
+-	if hint_manager and hint_manager.has_method("registrar_acerto"):
+-		hint_manager.registrar_acerto()
+-	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+-		hint_manager.resetar_pistas()
+-
+-
+-func pausar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("pausar_pistas"):
+-		hint_manager.pausar_pistas()
+-
+-
+-func retomar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("retomar_pistas"):
+-		hint_manager.retomar_pistas()
+-
+-
+-func finalizar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+-		hint_manager.finalizar_nivel()
+-
+-
+-func existe_linha_aberta() -> bool:
+-	if line_renderer and line_renderer.has_method("existe_linha_aberta"):
+-		return line_renderer.existe_linha_aberta()
+-
+-	return false
+-
+-
+-# ==========================================
+-# MÚSICA DE FUNDO
+-# ==========================================
+-func iniciar_musica_fundo() -> void:
+-	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+-
+-	if musica and not musica.playing:
+-		musica.play()
+-
+-
+-# ==========================================
+-# ÁUDIO
+-# ==========================================
+-func tocar_click_forma() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+-		feedback_audio.tocar_click_forma()
+-		return
+-
+-	if som_click_forma:
+-		som_click_forma.play()
+-	elif som_click_objeto:
+-		som_click_objeto.play()
+-
+-
+-func tocar_acerto() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+-		feedback_audio.tocar_acerto()
+-		return
+-
+-	if som_acerto:
+-		som_acerto.play()
+-
+-
+-func tocar_erro_pedagogico() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+-		feedback_audio.tocar_erro_pedagogico()
+-	else:
+-		if som_erro:
+-			som_erro.play()
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-
+-
+-func tocar_vitoria_pedagogica() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+-		feedback_audio.tocar_vitoria_pedagogica()
+-		return
+-
+-	if som_vitoria:
+-		som_vitoria.play()
+-
+-
+-# ==========================================
+-# PONTOS DA FASE
+-# ==========================================
+-func pegar_pontos_da_fase() -> Array:
+-	var pontos := []
+-
+-	for filho in area_jogo.get_children():
+-		if filho.is_in_group("pontos"):
+-			pontos.append(filho)
+-
+-	return pontos
+-
+-
+-func randomizar_posicoes() -> void:
+-	var todos_pontos := pegar_pontos_da_fase()
+-
+-	if todos_pontos.is_empty():
+-		push_warning("Nenhum ponto encontrado no grupo 'pontos'.")
+-		return
+-
+-	var pontos_saida := []
+-	var pontos_chegada := []
+-
+-	for ponto in todos_pontos:
+-		if ponto.tipo == ponto.Tipo.SAIDA:
+-			pontos_saida.append(ponto)
+-		elif ponto.tipo == ponto.Tipo.CHEGADA:
+-			pontos_chegada.append(ponto)
+-
+-	var posicoes_saida := []
+-
+-	for p in pontos_saida:
+-		posicoes_saida.append(p.global_position)
+-
+-	posicoes_saida.shuffle()
+-
+-	for i in range(pontos_saida.size()):
+-		pontos_saida[i].global_position = posicoes_saida[i]
+-
+-	var posicoes_chegada := []
+-
+-	for p in pontos_chegada:
+-		posicoes_chegada.append(p.global_position)
+-
+-	posicoes_chegada.shuffle()
+-
+-	for i in range(pontos_chegada.size()):
+-		pontos_chegada[i].global_position = posicoes_chegada[i]
+-
+-
+-# ==========================================
+-# INPUT
+-# ==========================================
+-func _input(event) -> void:
+-	if nivel_concluido:
+-		return
+-
+-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+-		registrar_acao_no_hint_sem_resetar()
+-
+-		var ponto = buscar_ponto_sob_mouse()
+-
+-		if existe_linha_aberta():
+-			if ponto and ponto != ponto_inicial:
+-				finalizar_linha_com_ponto(ponto)
+-			return
+-
+-		if ponto:
+-			pos_inicio_interacao = get_global_mouse_position()
+-			arrastou_linha = false
+-			tentar_iniciar_linha(ponto)
+-
+-	elif event is InputEventMouseMotion and existe_linha_aberta():
+-		var pos_mouse := get_global_mouse_position()
+-
+-		if line_renderer and line_renderer.has_method("atualizar_linha"):
+-			line_renderer.atualizar_linha(pos_mouse)
+-
+-		if pos_mouse.distance_to(pos_inicio_interacao) >= distancia_minima_arrasto:
+-			arrastou_linha = true
+-
+-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+-		if existe_linha_aberta() and arrastou_linha:
+-			finalizar_linha()
+-
+-
+-func buscar_ponto_sob_mouse():
+-	var physics_space = get_world_2d().direct_space_state
+-	var mouse_pos = get_global_mouse_position()
+-
+-	var query = PhysicsPointQueryParameters2D.new()
+-	query.position = mouse_pos
+-	query.collide_with_areas = true
+-	query.collide_with_bodies = false
+-
+-	var resultados = physics_space.intersect_point(query)
+-
+-	for res in resultados:
+-		if res.collider and res.collider.is_in_group("pontos"):
+-			return res.collider
+-
+-	return null
+-
+-
+-func tentar_iniciar_linha(ponto) -> void:
+-	if ponto == null:
+-		return
+-
+-	if ponto.tipo == ponto.Tipo.SAIDA and not ponto.esta_conectado_saida:
+-		ponto_inicial = ponto
+-
+-		tocar_click_forma()
+-		pausar_hint_manager()
+-
+-		if line_renderer and line_renderer.has_method("criar_linha"):
+-			line_renderer.criar_linha(ponto.global_position, get_global_mouse_position())
+-
+-
+-# ==========================================
+-# FINALIZAÇÃO DAS LIGAÇÕES
+-# ==========================================
+-func finalizar_linha() -> void:
+-	var ponto_final = buscar_ponto_sob_mouse()
+-
+-	if ponto_final:
+-		finalizar_linha_com_ponto(ponto_final)
+-	else:
+-		# Soltar fora de qualquer ponto apenas cancela a linha.
+-		# Não toca voz de erro.
+-		apagar_linha_atual()
+-
+-		ponto_inicial = null
+-		arrastou_linha = false
+-
+-
+-func finalizar_linha_com_ponto(ponto_final) -> void:
+-	var acertou := false
+-
+-	if ponto_inicial == null:
+-		apagar_linha_atual()
+-		ponto_inicial = null
+-		arrastou_linha = false
+-		return
+-
+-	if ponto_final and ponto_final != ponto_inicial:
+-		if ponto_final.tipo == ponto_final.Tipo.CHEGADA and not ponto_final.esta_conectado_chegada:
+-			if ponto_final.id_par == ponto_inicial.id_par:
+-				acertou = true
+-
+-	if acertou:
+-		registrar_acerto_no_hint()
+-
+-		if line_renderer and line_renderer.has_method("transformar_linha_em_acerto"):
+-			line_renderer.transformar_linha_em_acerto(ponto_final.global_position)
+-
+-		ponto_inicial.esta_conectado_saida = true
+-		ponto_final.esta_conectado_chegada = true
+-
+-		tocar_acerto()
+-
+-		ponto_inicial = null
+-		arrastou_linha = false
+-
+-		retomar_hint_manager()
+-		verificar_vitoria()
+-	else:
+-		if ponto_final and ponto_final != ponto_inicial:
+-			tocar_erro_pedagogico()
+-
+-		apagar_linha_atual()
+-
+-		ponto_inicial = null
+-		arrastou_linha = false
+-
+-
+-func apagar_linha_atual() -> void:
+-	if line_renderer and line_renderer.has_method("apagar_linha_atual"):
+-		line_renderer.apagar_linha_atual()
+-
+-	retomar_hint_manager()
+-
+-
+-# ==========================================
+-# VITÓRIA
+-# ==========================================
+-func verificar_vitoria() -> void:
+-	acertos += 1
+-
+-	if acertos >= total_objetivos:
+-		concluir_nivel()
+-	else:
+-		if robo and robo.has_method("comemorar"):
+-			robo.comemorar()
+-
+-
+-func concluir_nivel() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	nivel_concluido = true
+-	finalizar_hint_manager()
+-
+-	if confetes:
+-		confetes.emitting = true
+-
+-	tocar_vitoria_pedagogica()
+-
+-	if robo and robo.has_method("vitoria"):
+-		robo.vitoria()
+-	elif robo and robo.has_method("comemorar"):
+-		robo.comemorar()
+-
+-	await get_tree().create_timer(1.4).timeout
+-	mostrar_tela_vitoria()
+-
+-
+-func mostrar_tela_vitoria() -> void:
+-	var tela = cena_vitoria.instantiate()
+-	add_child(tela)
+-
+-	if tela.has_method("configurar"):
+-		tela.configurar(proxima_fase_cena)
+-	else:
+-		push_warning("TelaVitoria não possui o método configurar().")
++func _mensagem_inicio() -> String:
++	return "Minigame Ligue os Pontos por correspondência iniciado."
+diff -ruN /mnt/data/fineplay_work/scripts_original/ordenacao/NivelOrdenacao.gd /mnt/data/fineplay_work/scripts/ordenacao/NivelOrdenacao.gd
+--- /mnt/data/fineplay_work/scripts_original/ordenacao/NivelOrdenacao.gd	2026-06-12 12:18:56.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ordenacao/NivelOrdenacao.gd	2026-07-05 04:11:02.789535209 +0000
+@@ -1,352 +1,10 @@
+-extends Node2D
++extends "res://scripts/ordenacao/nivel_ordenacao_base.gd"
+ 
+-# ============================================================
+-# OBSERVAÇÃO IMPORTANTE
+-# ============================================================
+-# A responsividade agora é controlada pelo AutoLoad:
+-# ResponsividadeUniversal.gd
+-#
+-# Este script NÃO centraliza AreaJogo
+-# nem redimensiona FundoResponsivo.
+-#
+-# A cena precisa manter os nós:
+-# - FundoResponsivo
+-# - AreaJogo
+-# - CamadaLinhas
+-# - HintManager
+-# - FeedbackAudio
+-# ============================================================
+ 
+-
+-# ==========================================
+-# NAVEGAÇÃO
+-# ==========================================
+-@export_file("*.tscn") var proxima_fase_cena: String
+-var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+-
+-
+-# ==========================================
+-# NÓS PRINCIPAIS
+-# ==========================================
+-@onready var area_jogo: Node2D = $AreaJogo
+-@onready var robo = $AreaJogo/ProfessorRobo
+-@onready var confetes = $AreaJogo/CPUParticles2D
+-
+-
+-# ==========================================
+-# MANAGERS
+-# ==========================================
+-@onready var hint_manager: Node = get_node_or_null("HintManager")
+-@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+-
+-
+-# ==========================================
+-# PEÇAS
+-# ==========================================
+-@onready var peca_p = $AreaJogo/Pecas/Peca_Pequena
+-@onready var peca_m = $AreaJogo/Pecas/Peca_Media
+-@onready var peca_g = $AreaJogo/Pecas/Peca_Grande
+-
+-
+-# ==========================================
+-# SLOTS / DESTINOS PARA PISTAS
+-# Configure no Inspector.
+-# ==========================================
+-@export_node_path("Node2D") var slot_pequeno_path: NodePath
+-@export_node_path("Node2D") var slot_medio_path: NodePath
+-@export_node_path("Node2D") var slot_grande_path: NodePath
+-
+-@onready var slot_pequeno: Node2D = get_node_or_null(slot_pequeno_path)
+-@onready var slot_medio: Node2D = get_node_or_null(slot_medio_path)
+-@onready var slot_grande: Node2D = get_node_or_null(slot_grande_path)
+-
+-
+-# ==========================================
+-# FALLBACK SONS LOCAIS
+-# ==========================================
+-@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+-@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+-@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+-@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+-
+-
+-# ==========================================
+-# ESTADO
+-# ==========================================
+-var nivel_concluido := false
+-var ordem_obrigatoria := []
+-
+-
+-func _ready() -> void:
+-	randomize()
+-	call_deferred("_inicializar_fase_com_seguranca")
+-
+-
+-func _inicializar_fase_com_seguranca() -> void:
+-	# Aguarda a cena montar completamente.
+-	await get_tree().process_frame
+-
+-	# Aguarda mais um frame para o ResponsividadeUniversal
+-	# ajustar AreaJogo e FundoResponsivo.
+-	await get_tree().process_frame
+-
+-	_inicializar_fase()
+-
+-
+-func _inicializar_fase() -> void:
+-	nivel_concluido = false
+-
+-	configurar_ordem_obrigatoria()
+-	randomizar_pecas()
+-	configurar_hint_manager()
+-	iniciar_musica_fundo()
+-
+-	print("Minigame de Ordenação iniciado.")
+-
+-
+-# ==========================================
+-# MÚSICA DE FUNDO
+-# ==========================================
+-func iniciar_musica_fundo() -> void:
+-	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+-
+-	if musica and not musica.playing:
+-		musica.play()
+-
+-
+-# ==========================================
+-# ORDEM OBRIGATÓRIA
+-# ==========================================
+ func configurar_ordem_obrigatoria() -> void:
+-	# Ordem normal: pequena -> média -> grande.
+ 	ordem_obrigatoria = [peca_p, peca_m, peca_g]
++	_limpar_nulos_da_ordem()
+ 
+ 
+-func obter_proxima_peca_obrigatoria() -> Node:
+-	for peca in ordem_obrigatoria:
+-		if peca and peca.slot_atual == null:
+-			return peca
+-
+-	return null
+-
+-
+-func peca_pode_ser_movida(peca: Node) -> bool:
+-	if nivel_concluido:
+-		return false
+-
+-	var proxima_peca = obter_proxima_peca_obrigatoria()
+-
+-	if not proxima_peca:
+-		return false
+-
+-	return peca == proxima_peca
+-
+-
+-func tentar_iniciar_peca(peca: Node) -> bool:
+-	# Clique não deve resetar pista.
+-	registrar_acao_no_hint_sem_resetar()
+-
+-	if peca_pode_ser_movida(peca):
+-		tocar_som_clique()
+-		return true
+-
+-	# Se a criança tenta pegar uma peça fora da ordem,
+-	tocar_som_erro()
+-	if hint_manager and hint_manager.has_method("forcar_pista"):
+-		hint_manager.forcar_pista(1)
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-	elif robo.has_method("dar_dica"):
+-		robo.dar_dica()
+-
+-	return false
+-
+-
+-# ==========================================
+-# HINT MANAGER
+-# ==========================================
+-func configurar_hint_manager() -> void:
+-	if not hint_manager:
+-		push_warning("HintManager não encontrado. Pistas desativadas.")
+-		return
+-
+-	if hint_manager.has_method("configurar_callbacks"):
+-		hint_manager.configurar_callbacks(
+-			Callable(self, "buscar_peca_para_pista"),
+-			Callable(self, "buscar_destino_da_peca_para_pista")
+-		)
+-
+-	if hint_manager.has_method("reiniciar_sistema"):
+-		hint_manager.reiniciar_sistema()
+-
+-
+-func registrar_acao_no_hint_sem_resetar() -> void:
+-	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+-		hint_manager.registrar_acao_sem_resetar_pista()
+-
+-
+-func registrar_acerto_no_hint() -> void:
+-	if hint_manager and hint_manager.has_method("registrar_acerto"):
+-		hint_manager.registrar_acerto()
+-	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+-		hint_manager.resetar_pistas()
+-
+-
+-func finalizar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+-		hint_manager.finalizar_nivel()
+-
+-
+-# ==========================================
+-# RANDOMIZAÇÃO
+-# ==========================================
+-func randomizar_pecas() -> void:
+-	var pecas = [peca_p, peca_m, peca_g]
+-	var posicoes := []
+-
+-	for p in pecas:
+-		if p:
+-			posicoes.append(p.global_position)
+-
+-	posicoes.shuffle()
+-
+-	var indice := 0
+-
+-	for p in pecas:
+-		if p:
+-			p.global_position = posicoes[indice]
+-
+-			if p.has_method("atualizar_posicao_inicial"):
+-				p.atualizar_posicao_inicial()
+-			else:
+-				p.posicao_inicial = p.global_position
+-
+-			indice += 1
+-
+-
+-# ==========================================
+-# ÁUDIO / FEEDBACK
+-# ==========================================
+-func tocar_som_clique() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+-		feedback_audio.tocar_click_forma()
+-		return
+-
+-	if som_click_forma:
+-		som_click_forma.play()
+-
+-
+-func tocar_som_acerto() -> void:
+-	# Somente acerto deve resetar pista.
+-	registrar_acerto_no_hint()
+-
+-	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+-		feedback_audio.tocar_acerto()
+-		return
+-
+-	if som_acerto:
+-		som_acerto.play()
+-
+-
+-func tocar_som_erro() -> void:
+-	# Erro não deve resetar pista.
+-	registrar_acao_no_hint_sem_resetar()
+-
+-	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+-		feedback_audio.tocar_erro_pedagogico()
+-	else:
+-		if som_erro:
+-			som_erro.play()
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-
+-
+-func tocar_som_vitoria() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+-		feedback_audio.tocar_vitoria_pedagogica()
+-		return
+-
+-	if som_vitoria:
+-		som_vitoria.play()
+-
+-
+-# ==========================================
+-# LÓGICA DO JOGO
+-# ==========================================
+-func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
+-	for peca in [peca_p, peca_m, peca_g]:
+-		if peca != peca_ignorada and peca.slot_atual == slot_verificado:
+-			return true
+-
+-	return false
+-
+-
+-func verificar_vitoria() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	if peca_p.slot_atual != null and peca_m.slot_atual != null and peca_g.slot_atual != null:
+-		vitoria()
+-	else:
+-		if robo and robo.has_method("comemorar"):
+-			robo.comemorar()
+-
+-
+-func vitoria() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	nivel_concluido = true
+-	finalizar_hint_manager()
+-
+-	print("Vitória! Ordenação concluída.")
+-
+-	if confetes:
+-		confetes.emitting = true
+-
+-	tocar_som_vitoria()
+-
+-	if robo and robo.has_method("vitoria"):
+-		robo.vitoria()
+-	elif robo and robo.has_method("comemorar"):
+-		robo.comemorar()
+-
+-	await get_tree().create_timer(1.4).timeout
+-	mostrar_vitoria_padrao()
+-
+-
+-func mostrar_vitoria_padrao() -> void:
+-	var tela = cena_vitoria.instantiate()
+-	add_child(tela)
+-
+-	await get_tree().process_frame
+-
+-	if tela.has_method("configurar"):
+-		tela.configurar(proxima_fase_cena)
+-	else:
+-		push_warning("TelaVitoria não possui o método configurar().")
+-
+-
+-# ==========================================
+-# CALLBACKS PARA HINTMANAGER
+-# ==========================================
+-func buscar_peca_para_pista() -> Node:
+-	return obter_proxima_peca_obrigatoria()
+-
+-
+-func buscar_destino_da_peca_para_pista(peca: Node) -> Node:
+-	if not peca:
+-		return null
+-
+-	if peca == peca_p:
+-		return slot_pequeno
+-
+-	if peca == peca_m:
+-		return slot_medio
+-
+-	if peca == peca_g:
+-		return slot_grande
+-
+-	return null
++func _mensagem_inicio() -> String:
++	return "Minigame de Ordenação iniciado: pequena, média e grande."
+diff -ruN /mnt/data/fineplay_work/scripts_original/ordenacao/ObjetoOrdenacao.gd /mnt/data/fineplay_work/scripts/ordenacao/ObjetoOrdenacao.gd
+--- /mnt/data/fineplay_work/scripts_original/ordenacao/ObjetoOrdenacao.gd	2026-06-12 09:50:50.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ordenacao/ObjetoOrdenacao.gd	2026-07-05 04:11:02.752455315 +0000
+@@ -1,240 +1,239 @@
+ extends Area2D
+ 
+-# ==========================================
+-# CONFIGURAÇÃO
+-# ==========================================
+ @export var nome_do_slot_correto: String = ""
++@export var manter_deslocamento_do_toque := true
+ 
+-
+-# ==========================================
+-# ESTADO
+-# ==========================================
+ var arrastando := false
+-var posicao_inicial: Vector2 = Vector2.ZERO
+-var slot_atual = null
++var posicao_inicial := Vector2.ZERO
++var slot_atual: Node = null
+ var travado := false
+-
+-var controlador = null
++var controlador: Node = null
+ var tween_movimento: Tween = null
++var ponteiro_ativo := -999
++var deslocamento_arraste := Vector2.ZERO
++
++const PONTEIRO_MOUSE := -1
++const PONTEIRO_NENHUM := -999
+ 
+ 
+-# ==========================================
+-# READY
+-# ==========================================
+ func _ready() -> void:
+ 	await get_tree().process_frame
+-
+ 	posicao_inicial = global_position
+ 	controlador = get_tree().current_scene
++	input_pickable = true
+ 
+ 
+-# ==========================================
+-# PROCESS
+-# ==========================================
+-func _process(_delta) -> void:
+-	if arrastando and not travado:
+-		global_position = get_global_mouse_position()
++func _exit_tree() -> void:
++	_parar_tween_movimento()
+ 
+ 
+-# ==========================================
+-# INPUT
+-# ==========================================
+-func _input_event(_viewport, event, _shape_idx) -> void:
+-	if travado:
++func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
++	if travado or arrastando:
+ 		return
+ 
+ 	if event is InputEventMouseButton:
+-		if event.button_index == MOUSE_BUTTON_LEFT:
+-			if event.pressed:
+-				iniciar_arraste()
+-			else:
+-				finalizar_arraste()
++		var mouse_event := event as InputEventMouseButton
++		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
++			_iniciar_arraste_com_ponteiro(
++				PONTEIRO_MOUSE, _viewport_para_global(mouse_event.position)
++			)
++			get_viewport().set_input_as_handled()
++
++	elif event is InputEventScreenTouch:
++		var touch_event := event as InputEventScreenTouch
++		if touch_event.pressed:
++			_iniciar_arraste_com_ponteiro(
++				touch_event.index, _viewport_para_global(touch_event.position)
++			)
++			get_viewport().set_input_as_handled()
++
++
++func _input(event: InputEvent) -> void:
++	if not arrastando or travado:
++		return
++
++	if event is InputEventMouseMotion and ponteiro_ativo == PONTEIRO_MOUSE:
++		_mover_para_ponteiro(_viewport_para_global((event as InputEventMouseMotion).position))
++
++	elif event is InputEventMouseButton and ponteiro_ativo == PONTEIRO_MOUSE:
++		var mouse_event := event as InputEventMouseButton
++		if mouse_event.button_index == MOUSE_BUTTON_LEFT and not mouse_event.pressed:
++			_mover_para_ponteiro(_viewport_para_global(mouse_event.position))
++			finalizar_arraste()
++
++	elif event is InputEventScreenDrag:
++		var drag_event := event as InputEventScreenDrag
++		if drag_event.index == ponteiro_ativo:
++			_mover_para_ponteiro(_viewport_para_global(drag_event.position))
++
++	elif event is InputEventScreenTouch:
++		var touch_event := event as InputEventScreenTouch
++		if touch_event.index == ponteiro_ativo and not touch_event.pressed:
++			_mover_para_ponteiro(_viewport_para_global(touch_event.position))
++			finalizar_arraste()
+ 
+ 
+ func iniciar_arraste() -> void:
+-	if travado:
++	_iniciar_arraste_com_ponteiro(PONTEIRO_MOUSE, get_global_mouse_position())
++
++
++func _iniciar_arraste_com_ponteiro(id_ponteiro: int, posicao_ponteiro: Vector2) -> void:
++	if travado or arrastando:
+ 		return
+ 
+-	if controlador == null:
++	if not controlador or not is_instance_valid(controlador):
+ 		controlador = get_tree().current_scene
+ 
+-	# Antes de permitir o arraste, verifica a ordem obrigatória.
+ 	if controlador and controlador.has_method("tentar_iniciar_peca"):
+-		var permitido = controlador.tentar_iniciar_peca(self)
+-
+-		if not permitido:
++		if not bool(controlador.call("tentar_iniciar_peca", self)):
+ 			return
+ 
+ 	_parar_tween_movimento()
+-
++	ponteiro_ativo = id_ponteiro
++	deslocamento_arraste = (
++		global_position - posicao_ponteiro if manter_deslocamento_do_toque else Vector2.ZERO
++	)
+ 	arrastando = true
+ 	z_index = 10
+ 
+ 
+-func finalizar_arraste() -> void:
+-	if travado:
+-		return
++func _mover_para_ponteiro(posicao_ponteiro: Vector2) -> void:
++	global_position = posicao_ponteiro + deslocamento_arraste
+ 
+-	if not arrastando:
++
++func finalizar_arraste() -> void:
++	if travado or not arrastando:
+ 		return
+ 
+ 	arrastando = false
++	ponteiro_ativo = PONTEIRO_NENHUM
+ 	z_index = 0
+-
+ 	verificar_soltura()
+ 
+ 
+-# ==========================================
+-# SOLTURA / ENCAIXE
+-# ==========================================
+ func verificar_soltura() -> void:
+-	var areas = get_overlapping_areas()
+-
++	var areas := get_overlapping_areas()
+ 	var encontrou_algum_slot := false
+-	var slot_correto = null
+-	var slot_errado = null
++	var slot_correto: Node = null
+ 
+ 	for area in areas:
+-		if _area_e_slot(area):
+-			encontrou_algum_slot = true
++		if not _area_e_slot(area):
++			continue
+ 
+-			if area.name == nome_do_slot_correto:
+-				slot_correto = area
+-			else:
+-				slot_errado = area
++		encontrou_algum_slot = true
++		if area.name == nome_do_slot_correto:
++			slot_correto = area
++			break
+ 
+-	# Prioridade absoluta: se encontrou o slot correto, tenta encaixar nele.
+-	# Isso evita erro quando a peça encosta em dois slots ao mesmo tempo.
+ 	if slot_correto:
+ 		if controlador and controlador.has_method("slot_esta_ocupado"):
+-			if controlador.slot_esta_ocupado(slot_correto, self):
++			if bool(controlador.call("slot_esta_ocupado", slot_correto, self)):
+ 				voltar_para_inicio_com_erro()
+ 				return
+ 
+ 		encaixar_no_slot(slot_correto)
+-		return
+-
+-	# Se encontrou slot, mas nenhum era o correto: erro pedagógico.
+-	if encontrou_algum_slot and slot_errado:
++	elif encontrou_algum_slot:
+ 		voltar_para_inicio_com_erro()
+-		return
+-
+-	# Soltou fora de qualquer slot: volta sem voz/som de erro.
+-	voltar_para_inicio_sem_erro()
++	else:
++		voltar_para_inicio_sem_erro()
+ 
+ 
+ func _area_e_slot(area: Node) -> bool:
+-	if area == null:
+-		return false
+-
+-	if area.is_in_group("slots"):
+-		return true
+-
+-	if area.name.begins_with("Slot"):
+-		return true
+-
+-	return false
++	return area != null and (area.is_in_group("slots") or area.name.begins_with("Slot"))
+ 
+ 
+-func encaixar_no_slot(area) -> void:
++func encaixar_no_slot(area: Node2D) -> void:
+ 	_parar_tween_movimento()
+-
+ 	slot_atual = area
+ 	travado = true
+ 	arrastando = false
++	ponteiro_ativo = PONTEIRO_NENHUM
+ 	z_index = 0
+ 
+-	var posicao_final: Vector2 = area.global_position
++	var posicao_final := area.global_position
+ 	posicao_final.y -= _obter_altura_da_peca(area)
+ 
+ 	tween_movimento = create_tween()
+-	tween_movimento.tween_property(
+-		self,
+-		"global_position",
+-		posicao_final,
+-		0.2
+-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
++	(
++		tween_movimento
++		. tween_property(self, "global_position", posicao_final, 0.2)
++		. set_trans(Tween.TRANS_BACK)
++		. set_ease(Tween.EASE_OUT)
++	)
+ 
+ 	if controlador and controlador.has_method("tocar_som_acerto"):
+-		controlador.tocar_som_acerto()
+-
++		controlador.call("tocar_som_acerto")
+ 	if controlador and controlador.has_method("verificar_vitoria"):
+-		controlador.verificar_vitoria()
+-
++		controlador.call("verificar_vitoria")
++	if controlador and controlador.has_method("notificar_fim_interacao"):
++		controlador.call("notificar_fim_interacao")
+ 
+-func _obter_altura_da_peca(area) -> float:
+-	var valor_altura = area.get("altura_da_peca")
+-
+-	if valor_altura != null:
+-		return float(valor_altura)
+ 
++func _obter_altura_da_peca(area: Node) -> float:
++	for propriedade in area.get_property_list():
++		if String(propriedade.name) == "altura_da_peca":
++			return float(area.get("altura_da_peca"))
+ 	return 40.0
+ 
+ 
+ func voltar_para_inicio_com_erro() -> void:
+-	_parar_tween_movimento()
+-
+-	slot_atual = null
+-	arrastando = false
+-	z_index = 0
+-
+-	tween_movimento = create_tween()
+-	tween_movimento.tween_property(
+-		self,
+-		"global_position",
+-		posicao_inicial,
+-		0.65
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
++	_retornar_para_inicio(0.65)
+ 
+ 	if controlador and controlador.has_method("tocar_som_erro"):
+-		controlador.tocar_som_erro()
++		controlador.call("tocar_som_erro")
++	if controlador and controlador.has_method("notificar_fim_interacao"):
++		controlador.call("notificar_fim_interacao")
+ 
+ 
+ func voltar_para_inicio_sem_erro() -> void:
+-	_parar_tween_movimento()
++	_retornar_para_inicio(0.45)
++
++	if controlador and controlador.has_method("notificar_fim_interacao"):
++		controlador.call("notificar_fim_interacao")
++
+ 
++func _retornar_para_inicio(duracao: float) -> void:
++	_parar_tween_movimento()
+ 	slot_atual = null
+ 	arrastando = false
++	ponteiro_ativo = PONTEIRO_NENHUM
+ 	z_index = 0
+ 
+ 	tween_movimento = create_tween()
+-	tween_movimento.tween_property(
+-		self,
+-		"global_position",
+-		posicao_inicial,
+-		0.45
+-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
++	(
++		tween_movimento
++		. tween_property(self, "global_position", posicao_inicial, duracao)
++		. set_trans(Tween.TRANS_SINE)
++		. set_ease(Tween.EASE_OUT)
++	)
+ 
+ 
+ func _parar_tween_movimento() -> void:
+ 	if tween_movimento and tween_movimento.is_valid():
+ 		tween_movimento.kill()
+-
+ 	tween_movimento = null
+ 
+ 
+-# ==========================================
+-# SUPORTE À RANDOMIZAÇÃO / PISTAS
+-# ==========================================
++func _viewport_para_global(posicao_viewport: Vector2) -> Vector2:
++	return get_viewport().get_canvas_transform().affine_inverse() * posicao_viewport
++
++
+ func atualizar_posicao_inicial() -> void:
+ 	posicao_inicial = global_position
+ 
+ 
+ func get_slot_correto() -> Node:
+-	if nome_do_slot_correto == "":
++	if nome_do_slot_correto.is_empty():
+ 		return null
+ 
+-	var pai = get_parent()
+-
+-	if pai and pai.has_node(nome_do_slot_correto):
+-		return pai.get_node(nome_do_slot_correto)
+-
+-	var cena_atual = get_tree().current_scene
+-
+-	if cena_atual:
+-		return cena_atual.find_child(nome_do_slot_correto, true, false)
++	var pai := get_parent()
++	if pai:
++		var direto := pai.get_node_or_null(nome_do_slot_correto)
++		if direto:
++			return direto
+ 
+-	return null
++	var cena_atual := get_tree().current_scene
++	return cena_atual.find_child(nome_do_slot_correto, true, false) if cena_atual else null
+ 
+ 
+ func esta_disponivel_para_pista() -> bool:
+diff -ruN /mnt/data/fineplay_work/scripts_original/ordenacao/nivel_ordenacao_base.gd /mnt/data/fineplay_work/scripts/ordenacao/nivel_ordenacao_base.gd
+--- /mnt/data/fineplay_work/scripts_original/ordenacao/nivel_ordenacao_base.gd	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ordenacao/nivel_ordenacao_base.gd	2026-07-05 04:11:02.787261707 +0000
+@@ -0,0 +1,377 @@
++extends Node2D
++
++@export_file("*.tscn") var proxima_fase_cena: String
++
++@export_node_path("Node2D") var slot_pequeno_path: NodePath
++@export_node_path("Node2D") var slot_medio_path: NodePath
++@export_node_path("Node2D") var slot_grande_path: NodePath
++@export_node_path("Node2D") var slot_gigante_path: NodePath
++
++var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
++
++@onready var area_jogo: Node2D = get_node_or_null("AreaJogo") as Node2D
++@onready var robo: Node = get_node_or_null("AreaJogo/ProfessorRobo")
++@onready var confetes: CPUParticles2D = get_node_or_null("AreaJogo/CPUParticles2D") as CPUParticles2D
++@onready var hint_manager: Node = get_node_or_null("HintManager")
++@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
++
++@onready var som_acerto: Node = get_node_or_null("SonsLocais/SomAcerto")
++@onready var som_vitoria: Node = get_node_or_null("SonsLocais/SomVitoria")
++@onready var som_erro: Node = get_node_or_null("SonsLocais/SomErro")
++@onready var som_click_forma: Node = get_node_or_null("SonsLocais/SomClickNaForma")
++
++var peca_p: Node = null
++var peca_m: Node = null
++var peca_g: Node = null
++var peca_gg: Node = null
++
++var slot_pequeno: Node = null
++var slot_medio: Node = null
++var slot_grande: Node = null
++var slot_gigante: Node = null
++
++var nivel_concluido := false
++var ordem_obrigatoria: Array[Node] = []
++var pecas_do_nivel: Array[Node] = []
++
++
++func _ready() -> void:
++	randomize()
++	call_deferred("_inicializar_fase_com_seguranca")
++
++
++func _inicializar_fase_com_seguranca() -> void:
++	await get_tree().process_frame
++	await get_tree().process_frame
++	_inicializar_fase()
++
++
++func _inicializar_fase() -> void:
++	if not area_jogo:
++		push_error("Ordenação: nó AreaJogo não encontrado.")
++		return
++
++	nivel_concluido = false
++	_resolver_pecas()
++	_resolver_slots()
++	configurar_ordem_obrigatoria()
++	randomizar_pecas()
++	configurar_hint_manager()
++	iniciar_musica_fundo()
++
++	if ordem_obrigatoria.is_empty():
++		push_error("Ordenação: nenhuma peça foi configurada na ordem obrigatória.")
++	else:
++		print(_mensagem_inicio())
++
++
++func _mensagem_inicio() -> String:
++	return "Minigame de Ordenação iniciado."
++
++
++func _resolver_pecas() -> void:
++	peca_p = get_node_or_null("AreaJogo/Pecas/Peca_Pequena")
++	peca_m = get_node_or_null("AreaJogo/Pecas/Peca_Media")
++	peca_g = get_node_or_null("AreaJogo/Pecas/Peca_Grande")
++	peca_gg = get_node_or_null("AreaJogo/Pecas/Peca_Gigante")
++
++	pecas_do_nivel.clear()
++	for peca in [peca_p, peca_m, peca_g, peca_gg]:
++		if peca:
++			pecas_do_nivel.append(peca)
++
++
++func _resolver_slots() -> void:
++	slot_pequeno = _resolver_slot_seguro(slot_pequeno_path, peca_p, "Slot_1")
++	slot_medio = _resolver_slot_seguro(slot_medio_path, peca_m, "Slot_2")
++	slot_grande = _resolver_slot_seguro(slot_grande_path, peca_g, "Slot_3")
++	slot_gigante = _resolver_slot_seguro(slot_gigante_path, peca_gg, "Slot_4")
++
++
++func _resolver_slot_seguro(caminho: NodePath, peca: Node, nome_fallback: String) -> Node:
++	var candidato := get_node_or_null(caminho) if not caminho.is_empty() else null
++	if _node_parece_slot(candidato):
++		return candidato
++
++	if candidato:
++		push_warning(
++			(
++				"Ordenação: o NodePath configurado para um slot aponta para '"
++				+ String(candidato.name)
++				+ "', que não parece ser um slot. Aplicando busca automática."
++			)
++		)
++
++	if peca and peca.has_method("get_slot_correto"):
++		var slot_da_peca: Node = peca.call("get_slot_correto")
++		if _node_parece_slot(slot_da_peca):
++			return slot_da_peca
++
++	var por_nome := area_jogo.find_child(nome_fallback, true, false) if area_jogo else null
++	if _node_parece_slot(por_nome):
++		return por_nome
++
++	return null
++
++
++func _node_parece_slot(node: Node) -> bool:
++	return (
++		node != null
++		and is_instance_valid(node)
++		and (node.is_in_group("slots") or node.name.begins_with("Slot"))
++	)
++
++
++func configurar_ordem_obrigatoria() -> void:
++	ordem_obrigatoria = [peca_p, peca_m, peca_g]
++	_limpar_nulos_da_ordem()
++
++
++func _limpar_nulos_da_ordem() -> void:
++	var ordem_limpa: Array[Node] = []
++	for peca in ordem_obrigatoria:
++		if peca:
++			ordem_limpa.append(peca)
++	ordem_obrigatoria = ordem_limpa
++
++
++func obter_proxima_peca_obrigatoria() -> Node:
++	for peca in ordem_obrigatoria:
++		if peca and _obter_slot_atual(peca) == null:
++			return peca
++	return null
++
++
++func peca_pode_ser_movida(peca: Node) -> bool:
++	return not nivel_concluido and peca != null and peca == obter_proxima_peca_obrigatoria()
++
++
++func tentar_iniciar_peca(peca: Node) -> bool:
++	registrar_interacao_no_hint()
++
++	if peca_pode_ser_movida(peca):
++		pausar_hint_manager()
++		tocar_som_clique()
++		return true
++
++	tocar_som_erro()
++	if hint_manager and hint_manager.has_method("forcar_pista"):
++		hint_manager.call("forcar_pista", 1)
++	return false
++
++
++func notificar_fim_interacao() -> void:
++	retomar_hint_manager()
++
++
++func configurar_hint_manager() -> void:
++	if not hint_manager:
++		push_warning("HintManager não encontrado. Pistas desativadas.")
++		return
++
++	if hint_manager.has_method("configurar_callbacks"):
++		hint_manager.call(
++			"configurar_callbacks",
++			Callable(self, "buscar_peca_para_pista"),
++			Callable(self, "buscar_destino_da_peca_para_pista")
++		)
++
++	if hint_manager.has_method("reiniciar_sistema"):
++		hint_manager.call("reiniciar_sistema")
++
++
++func registrar_interacao_no_hint() -> void:
++	if hint_manager and hint_manager.has_method("registrar_interacao"):
++		hint_manager.call("registrar_interacao")
++	elif hint_manager and hint_manager.has_method("resetar_timer_sem_limpar_visual"):
++		hint_manager.call("resetar_timer_sem_limpar_visual")
++
++
++func registrar_acao_no_hint_sem_resetar() -> void:
++	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
++		hint_manager.call("registrar_acao_sem_resetar_pista")
++
++
++func registrar_acerto_no_hint() -> void:
++	if hint_manager and hint_manager.has_method("registrar_acerto"):
++		hint_manager.call("registrar_acerto")
++	elif hint_manager and hint_manager.has_method("resetar_pistas"):
++		hint_manager.call("resetar_pistas")
++
++
++func pausar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("pausar_pistas"):
++		hint_manager.call("pausar_pistas")
++
++
++func retomar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("retomar_pistas"):
++		hint_manager.call("retomar_pistas")
++
++
++func finalizar_hint_manager() -> void:
++	if hint_manager and hint_manager.has_method("finalizar_nivel"):
++		hint_manager.call("finalizar_nivel")
++
++
++func randomizar_pecas() -> void:
++	var posicoes: Array[Vector2] = []
++	for peca in pecas_do_nivel:
++		if peca is Node2D:
++			posicoes.append((peca as Node2D).global_position)
++
++	if posicoes.size() != pecas_do_nivel.size():
++		push_warning("Ordenação: uma ou mais peças não são Node2D; randomização parcial cancelada.")
++		return
++
++	posicoes.shuffle()
++	for indice in range(pecas_do_nivel.size()):
++		var peca := pecas_do_nivel[indice]
++		(peca as Node2D).global_position = posicoes[indice]
++		if peca.has_method("atualizar_posicao_inicial"):
++			peca.call("atualizar_posicao_inicial")
++		elif _objeto_tem_propriedade(peca, "posicao_inicial"):
++			peca.set("posicao_inicial", (peca as Node2D).global_position)
++
++
++func iniciar_musica_fundo() -> void:
++	var musica := get_node_or_null("/root/AudioManager/MusicaFundo")
++	if musica and not bool(musica.get("playing")) and musica.has_method("play"):
++		musica.call("play")
++
++
++func tocar_som_clique() -> void:
++	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
++		feedback_audio.call("tocar_click_forma")
++	elif som_click_forma and som_click_forma.has_method("play"):
++		som_click_forma.call("play")
++
++
++func tocar_som_acerto() -> void:
++	registrar_acerto_no_hint()
++	retomar_hint_manager()
++
++	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
++		feedback_audio.call("tocar_acerto")
++	elif som_acerto and som_acerto.has_method("play"):
++		som_acerto.call("play")
++
++
++func tocar_som_erro() -> void:
++	registrar_acao_no_hint_sem_resetar()
++	retomar_hint_manager()
++
++	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
++		feedback_audio.call("tocar_erro_pedagogico")
++	elif som_erro and som_erro.has_method("play"):
++		som_erro.call("play")
++
++	if robo and robo.has_method("errar"):
++		robo.call("errar")
++
++
++func tocar_som_vitoria() -> void:
++	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
++		feedback_audio.call("tocar_vitoria_pedagogica")
++	elif som_vitoria and som_vitoria.has_method("play"):
++		som_vitoria.call("play")
++
++
++func slot_esta_ocupado(slot_verificado: Node, peca_ignorada: Node) -> bool:
++	if slot_verificado == null:
++		return false
++
++	for peca in pecas_do_nivel:
++		if peca != peca_ignorada and _obter_slot_atual(peca) == slot_verificado:
++			return true
++	return false
++
++
++func _obter_slot_atual(peca: Node) -> Node:
++	if peca and _objeto_tem_propriedade(peca, "slot_atual"):
++		return peca.get("slot_atual") as Node
++	return null
++
++
++func verificar_vitoria() -> void:
++	if nivel_concluido:
++		return
++
++	for peca in pecas_do_nivel:
++		if _obter_slot_atual(peca) == null:
++			if robo and robo.has_method("comemorar"):
++				robo.call("comemorar")
++			return
++
++	vitoria()
++
++
++func vitoria() -> void:
++	if nivel_concluido:
++		return
++
++	nivel_concluido = true
++	finalizar_hint_manager()
++
++	if confetes:
++		confetes.emitting = true
++
++	tocar_som_vitoria()
++	if robo and robo.has_method("vitoria"):
++		robo.call("vitoria")
++	elif robo and robo.has_method("comemorar"):
++		robo.call("comemorar")
++
++	await get_tree().create_timer(1.4).timeout
++	mostrar_vitoria_padrao()
++
++
++func mostrar_vitoria_padrao() -> void:
++	if not cena_vitoria:
++		push_error("Ordenação: TelaVitoria não pôde ser carregada.")
++		return
++
++	var tela := cena_vitoria.instantiate()
++	add_child(tela)
++	if tela.has_method("configurar"):
++		tela.call("configurar", proxima_fase_cena)
++
++
++func buscar_peca_para_pista() -> Node:
++	return obter_proxima_peca_obrigatoria()
++
++
++func buscar_destino_da_peca_para_pista(peca: Node) -> Node:
++	if not peca:
++		return null
++
++	var destino: Node = null
++	if peca == peca_p:
++		destino = slot_pequeno
++	elif peca == peca_m:
++		destino = slot_medio
++	elif peca == peca_g:
++		destino = slot_grande
++	elif peca == peca_gg:
++		destino = slot_gigante
++
++	if _node_parece_slot(destino):
++		return destino
++
++	# Fallback decisivo: corrige em tempo de execução um NodePath errado no
++	# Inspector, usando o nome de slot já configurado na própria peça.
++	if peca.has_method("get_slot_correto"):
++		var slot_da_peca: Node = peca.call("get_slot_correto")
++		if _node_parece_slot(slot_da_peca):
++			return slot_da_peca
++
++	return null
++
++
++func _objeto_tem_propriedade(objeto: Object, nome_propriedade: StringName) -> bool:
++	if not objeto:
++		return false
++	for propriedade in objeto.get_property_list():
++		if StringName(propriedade.name) == nome_propriedade:
++			return true
++	return false
+diff -ruN /mnt/data/fineplay_work/scripts_original/ordenacao/nivel_ordenar_animais.gd /mnt/data/fineplay_work/scripts/ordenacao/nivel_ordenar_animais.gd
+--- /mnt/data/fineplay_work/scripts_original/ordenacao/nivel_ordenar_animais.gd	2026-06-12 12:00:30.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ordenacao/nivel_ordenar_animais.gd	2026-07-05 04:11:02.790541945 +0000
+@@ -1,295 +1,10 @@
+-extends Node2D
+-
+-# ============================================================
+-# Ordenação 4 peças — menor para maior
+-# Responsividade controlada pelo AutoLoad ResponsividadeUniversal.gd
+-# ============================================================
+-
+-@export_file("*.tscn") var proxima_fase_cena: String
+-var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+-
+-@onready var area_jogo: Node2D = $AreaJogo
+-@onready var robo = $AreaJogo/ProfessorRobo
+-@onready var confetes = $AreaJogo/CPUParticles2D
+-
+-@onready var hint_manager: Node = get_node_or_null("HintManager")
+-@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+-
+-@onready var peca_p = $AreaJogo/Pecas/Peca_Pequena
+-@onready var peca_m = $AreaJogo/Pecas/Peca_Media
+-@onready var peca_g = $AreaJogo/Pecas/Peca_Grande
+-@onready var peca_gg = $AreaJogo/Pecas/Peca_Gigante
+-
+-@export_node_path("Node2D") var slot_pequeno_path: NodePath
+-@export_node_path("Node2D") var slot_medio_path: NodePath
+-@export_node_path("Node2D") var slot_grande_path: NodePath
+-@export_node_path("Node2D") var slot_gigante_path: NodePath
+-
+-@onready var slot_pequeno: Node2D = get_node_or_null(slot_pequeno_path)
+-@onready var slot_medio: Node2D = get_node_or_null(slot_medio_path)
+-@onready var slot_grande: Node2D = get_node_or_null(slot_grande_path)
+-@onready var slot_gigante: Node2D = get_node_or_null(slot_gigante_path)
+-
+-@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+-@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+-@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+-@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+-
+-var nivel_concluido := false
+-var ordem_obrigatoria := []
+-
+-
+-func _ready() -> void:
+-	randomize()
+-	call_deferred("_inicializar_fase_com_seguranca")
+-
+-
+-func _inicializar_fase_com_seguranca() -> void:
+-	await get_tree().process_frame
+-	await get_tree().process_frame
+-
+-	_inicializar_fase()
+-
+-
+-func _inicializar_fase() -> void:
+-	nivel_concluido = false
+-
+-	configurar_ordem_obrigatoria()
+-	randomizar_pecas()
+-	configurar_hint_manager()
+-	iniciar_musica_fundo()
+-
+-	print("Minigame de Ordenação 4 peças iniciado: menor para maior.")
+-
+-
+-func iniciar_musica_fundo() -> void:
+-	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+-
+-	if musica and not musica.playing:
+-		musica.play()
++extends "res://scripts/ordenacao/nivel_ordenacao_base.gd"
+ 
+ 
+ func configurar_ordem_obrigatoria() -> void:
+-	# Ordem normal: pequena -> média -> grande -> gigante.
+ 	ordem_obrigatoria = [peca_p, peca_m, peca_g, peca_gg]
++	_limpar_nulos_da_ordem()
+ 
+ 
+-func obter_proxima_peca_obrigatoria() -> Node:
+-	for peca in ordem_obrigatoria:
+-		if peca and peca.slot_atual == null:
+-			return peca
+-
+-	return null
+-
+-
+-func peca_pode_ser_movida(peca: Node) -> bool:
+-	if nivel_concluido:
+-		return false
+-
+-	var proxima_peca = obter_proxima_peca_obrigatoria()
+-
+-	if not proxima_peca:
+-		return false
+-
+-	return peca == proxima_peca
+-
+-
+-func tentar_iniciar_peca(peca: Node) -> bool:
+-	# Clique não deve resetar pista.
+-	registrar_acao_no_hint_sem_resetar()
+-
+-	if peca_pode_ser_movida(peca):
+-		tocar_som_clique()
+-		return true
+-
+-	# Se a criança tenta pegar uma peça fora da ordem,
+-	tocar_som_erro()
+-	if hint_manager and hint_manager.has_method("forcar_pista"):
+-		hint_manager.forcar_pista(1)
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-	elif robo.has_method("dar_dica"):
+-		robo.dar_dica()
+-
+-	return false
+-
+-
+-func configurar_hint_manager() -> void:
+-	if not hint_manager:
+-		push_warning("HintManager não encontrado. Pistas desativadas.")
+-		return
+-
+-	if hint_manager.has_method("configurar_callbacks"):
+-		hint_manager.configurar_callbacks(
+-			Callable(self, "buscar_peca_para_pista"),
+-			Callable(self, "buscar_destino_da_peca_para_pista")
+-		)
+-
+-	if hint_manager.has_method("reiniciar_sistema"):
+-		hint_manager.reiniciar_sistema()
+-
+-
+-func registrar_acao_no_hint_sem_resetar() -> void:
+-	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+-		hint_manager.registrar_acao_sem_resetar_pista()
+-
+-
+-func registrar_acerto_no_hint() -> void:
+-	if hint_manager and hint_manager.has_method("registrar_acerto"):
+-		hint_manager.registrar_acerto()
+-	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+-		hint_manager.resetar_pistas()
+-
+-
+-func finalizar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+-		hint_manager.finalizar_nivel()
+-
+-
+-func randomizar_pecas() -> void:
+-	var pecas = [peca_p, peca_m, peca_g, peca_gg]
+-	var posicoes := []
+-
+-	for p in pecas:
+-		if p:
+-			posicoes.append(p.global_position)
+-
+-	posicoes.shuffle()
+-
+-	var indice := 0
+-
+-	for p in pecas:
+-		if p:
+-			p.global_position = posicoes[indice]
+-
+-			if p.has_method("atualizar_posicao_inicial"):
+-				p.atualizar_posicao_inicial()
+-			else:
+-				p.posicao_inicial = p.global_position
+-
+-			indice += 1
+-
+-
+-func tocar_som_clique() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+-		feedback_audio.tocar_click_forma()
+-		return
+-
+-	if som_click_forma:
+-		som_click_forma.play()
+-
+-
+-func tocar_som_acerto() -> void:
+-	registrar_acerto_no_hint()
+-
+-	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+-		feedback_audio.tocar_acerto()
+-		return
+-
+-	if som_acerto:
+-		som_acerto.play()
+-
+-
+-func tocar_som_erro() -> void:
+-	# Erro no slot errado mantém a pista e o tempo.
+-	registrar_acao_no_hint_sem_resetar()
+-
+-	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+-		feedback_audio.tocar_erro_pedagogico()
+-	else:
+-		if som_erro:
+-			som_erro.play()
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-
+-
+-func tocar_som_vitoria() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+-		feedback_audio.tocar_vitoria_pedagogica()
+-		return
+-
+-	if som_vitoria:
+-		som_vitoria.play()
+-
+-
+-func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
+-	for peca in [peca_p, peca_m, peca_g, peca_gg]:
+-		if peca != peca_ignorada and peca.slot_atual == slot_verificado:
+-			return true
+-
+-	return false
+-
+-
+-func verificar_vitoria() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	if (
+-		peca_p.slot_atual != null
+-		and peca_m.slot_atual != null
+-		and peca_g.slot_atual != null
+-		and peca_gg.slot_atual != null
+-	):
+-		vitoria()
+-	else:
+-		if robo and robo.has_method("comemorar"):
+-			robo.comemorar()
+-
+-
+-func vitoria() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	nivel_concluido = true
+-	finalizar_hint_manager()
+-
+-	print("Vitória! Ordenação de animais concluída.")
+-
+-	if confetes:
+-		confetes.emitting = true
+-
+-	tocar_som_vitoria()
+-
+-	if robo and robo.has_method("vitoria"):
+-		robo.vitoria()
+-	elif robo and robo.has_method("comemorar"):
+-		robo.comemorar()
+-
+-	await get_tree().create_timer(1.4).timeout
+-	mostrar_vitoria_padrao()
+-
+-
+-func mostrar_vitoria_padrao() -> void:
+-	var tela = cena_vitoria.instantiate()
+-	add_child(tela)
+-
+-
+-	if tela.has_method("configurar"):
+-		tela.configurar(proxima_fase_cena)
+-	else:
+-		push_warning("TelaVitoria não possui o método configurar().")
+-
+-
+-func buscar_peca_para_pista() -> Node:
+-	return obter_proxima_peca_obrigatoria()
+-
+-
+-func buscar_destino_da_peca_para_pista(peca: Node) -> Node:
+-	if not peca:
+-		return null
+-
+-	if peca == peca_p:
+-		return slot_pequeno
+-
+-	if peca == peca_m:
+-		return slot_medio
+-
+-	if peca == peca_g:
+-		return slot_grande
+-
+-	if peca == peca_gg:
+-		return slot_gigante
+-
+-	return null
++func _mensagem_inicio() -> String:
++	return "Minigame de Ordenação 4 peças iniciado: menor para maior."
+diff -ruN /mnt/data/fineplay_work/scripts_original/ordenacao/nivel_ordenar_invertido.gd /mnt/data/fineplay_work/scripts/ordenacao/nivel_ordenar_invertido.gd
+--- /mnt/data/fineplay_work/scripts_original/ordenacao/nivel_ordenar_invertido.gd	2026-06-12 11:58:40.000000000 +0000
++++ /mnt/data/fineplay_work/scripts/ordenacao/nivel_ordenar_invertido.gd	2026-07-05 04:11:02.791445765 +0000
+@@ -1,294 +1,10 @@
+-extends Node2D
+-
+-# ============================================================
+-# Ordenação 4 peças — maior para menor
+-# Responsividade controlada pelo AutoLoad ResponsividadeUniversal.gd
+-# ============================================================
+-
+-@export_file("*.tscn") var proxima_fase_cena: String
+-var cena_vitoria: PackedScene = preload("res://scenes/telas/TelaVitoria.tscn")
+-
+-@onready var area_jogo: Node2D = $AreaJogo
+-@onready var robo = $AreaJogo/ProfessorRobo
+-@onready var confetes = $AreaJogo/CPUParticles2D
+-
+-@onready var hint_manager: Node = get_node_or_null("HintManager")
+-@onready var feedback_audio: Node = get_node_or_null("FeedbackAudio")
+-
+-@onready var peca_p = $AreaJogo/Pecas/Peca_Pequena
+-@onready var peca_m = $AreaJogo/Pecas/Peca_Media
+-@onready var peca_g = $AreaJogo/Pecas/Peca_Grande
+-@onready var peca_gg = $AreaJogo/Pecas/Peca_Gigante
+-
+-@export_node_path("Node2D") var slot_pequeno_path: NodePath
+-@export_node_path("Node2D") var slot_medio_path: NodePath
+-@export_node_path("Node2D") var slot_grande_path: NodePath
+-@export_node_path("Node2D") var slot_gigante_path: NodePath
+-
+-@onready var slot_pequeno: Node2D = get_node_or_null(slot_pequeno_path)
+-@onready var slot_medio: Node2D = get_node_or_null(slot_medio_path)
+-@onready var slot_grande: Node2D = get_node_or_null(slot_grande_path)
+-@onready var slot_gigante: Node2D = get_node_or_null(slot_gigante_path)
+-
+-@onready var som_acerto = get_node_or_null("SonsLocais/SomAcerto")
+-@onready var som_vitoria = get_node_or_null("SonsLocais/SomVitoria")
+-@onready var som_erro = get_node_or_null("SonsLocais/SomErro")
+-@onready var som_click_forma = get_node_or_null("SonsLocais/SomClickNaForma")
+-
+-var nivel_concluido := false
+-var ordem_obrigatoria := []
+-
+-
+-func _ready() -> void:
+-	randomize()
+-	call_deferred("_inicializar_fase_com_seguranca")
+-
+-
+-func _inicializar_fase_com_seguranca() -> void:
+-	await get_tree().process_frame
+-	await get_tree().process_frame
+-
+-	_inicializar_fase()
+-
+-
+-func _inicializar_fase() -> void:
+-	nivel_concluido = false
+-
+-	configurar_ordem_obrigatoria()
+-	randomizar_pecas()
+-	configurar_hint_manager()
+-	iniciar_musica_fundo()
+-
+-	print("Minigame de Ordenação 4 peças iniciado: maior para menor.")
+-
+-
+-func iniciar_musica_fundo() -> void:
+-	var musica = get_node_or_null("/root/AudioManager/MusicaFundo")
+-
+-	if musica and not musica.playing:
+-		musica.play()
++extends "res://scripts/ordenacao/nivel_ordenacao_base.gd"
+ 
+ 
+ func configurar_ordem_obrigatoria() -> void:
+-	# Ordem invertida: gigante -> grande -> média -> pequena.
+ 	ordem_obrigatoria = [peca_gg, peca_g, peca_m, peca_p]
++	_limpar_nulos_da_ordem()
+ 
+ 
+-func obter_proxima_peca_obrigatoria() -> Node:
+-	for peca in ordem_obrigatoria:
+-		if peca and peca.slot_atual == null:
+-			return peca
+-
+-	return null
+-
+-
+-func peca_pode_ser_movida(peca: Node) -> bool:
+-	if nivel_concluido:
+-		return false
+-
+-	var proxima_peca = obter_proxima_peca_obrigatoria()
+-
+-	if not proxima_peca:
+-		return false
+-
+-	return peca == proxima_peca
+-
+-
+-func tentar_iniciar_peca(peca: Node) -> bool:
+-	# Clique não deve resetar pista.
+-	registrar_acao_no_hint_sem_resetar()
+-
+-	if peca_pode_ser_movida(peca):
+-		tocar_som_clique()
+-		return true
+-
+-	# Se a criança tenta pegar uma peça fora da ordem,
+-	tocar_som_erro()
+-	if hint_manager and hint_manager.has_method("forcar_pista"):
+-		hint_manager.forcar_pista(1)
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-	elif robo.has_method("dar_dica"):
+-		robo.dar_dica()
+-
+-	return false
+-
+-
+-func configurar_hint_manager() -> void:
+-	if not hint_manager:
+-		push_warning("HintManager não encontrado. Pistas desativadas.")
+-		return
+-
+-	if hint_manager.has_method("configurar_callbacks"):
+-		hint_manager.configurar_callbacks(
+-			Callable(self, "buscar_peca_para_pista"),
+-			Callable(self, "buscar_destino_da_peca_para_pista")
+-		)
+-
+-	if hint_manager.has_method("reiniciar_sistema"):
+-		hint_manager.reiniciar_sistema()
+-
+-
+-func registrar_acao_no_hint_sem_resetar() -> void:
+-	if hint_manager and hint_manager.has_method("registrar_acao_sem_resetar_pista"):
+-		hint_manager.registrar_acao_sem_resetar_pista()
+-
+-
+-func registrar_acerto_no_hint() -> void:
+-	if hint_manager and hint_manager.has_method("registrar_acerto"):
+-		hint_manager.registrar_acerto()
+-	elif hint_manager and hint_manager.has_method("resetar_pistas"):
+-		hint_manager.resetar_pistas()
+-
+-
+-func finalizar_hint_manager() -> void:
+-	if hint_manager and hint_manager.has_method("finalizar_nivel"):
+-		hint_manager.finalizar_nivel()
+-
+-
+-func randomizar_pecas() -> void:
+-	var pecas = [peca_p, peca_m, peca_g, peca_gg]
+-	var posicoes := []
+-
+-	for p in pecas:
+-		if p:
+-			posicoes.append(p.global_position)
+-
+-	posicoes.shuffle()
+-
+-	var indice := 0
+-
+-	for p in pecas:
+-		if p:
+-			p.global_position = posicoes[indice]
+-
+-			if p.has_method("atualizar_posicao_inicial"):
+-				p.atualizar_posicao_inicial()
+-			else:
+-				p.posicao_inicial = p.global_position
+-
+-			indice += 1
+-
+-
+-func tocar_som_clique() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_click_forma"):
+-		feedback_audio.tocar_click_forma()
+-		return
+-
+-	if som_click_forma:
+-		som_click_forma.play()
+-
+-
+-func tocar_som_acerto() -> void:
+-	registrar_acerto_no_hint()
+-
+-	if feedback_audio and feedback_audio.has_method("tocar_acerto"):
+-		feedback_audio.tocar_acerto()
+-		return
+-
+-	if som_acerto:
+-		som_acerto.play()
+-
+-
+-func tocar_som_erro() -> void:
+-	# Erro no slot errado mantém a pista e o tempo.
+-	registrar_acao_no_hint_sem_resetar()
+-
+-	if feedback_audio and feedback_audio.has_method("tocar_erro_pedagogico"):
+-		feedback_audio.tocar_erro_pedagogico()
+-	else:
+-		if som_erro:
+-			som_erro.play()
+-
+-	if robo and robo.has_method("errar"):
+-		robo.errar()
+-
+-
+-func tocar_som_vitoria() -> void:
+-	if feedback_audio and feedback_audio.has_method("tocar_vitoria_pedagogica"):
+-		feedback_audio.tocar_vitoria_pedagogica()
+-		return
+-
+-	if som_vitoria:
+-		som_vitoria.play()
+-
+-
+-func slot_esta_ocupado(slot_verificado, peca_ignorada) -> bool:
+-	for peca in [peca_p, peca_m, peca_g, peca_gg]:
+-		if peca != peca_ignorada and peca.slot_atual == slot_verificado:
+-			return true
+-
+-	return false
+-
+-
+-func verificar_vitoria() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	if (
+-		peca_p.slot_atual != null
+-		and peca_m.slot_atual != null
+-		and peca_g.slot_atual != null
+-		and peca_gg.slot_atual != null
+-	):
+-		vitoria()
+-	else:
+-		if robo and robo.has_method("comemorar"):
+-			robo.comemorar()
+-
+-
+-func vitoria() -> void:
+-	if nivel_concluido:
+-		return
+-
+-	nivel_concluido = true
+-	finalizar_hint_manager()
+-
+-	print("Vitória! Ordenação invertida concluída.")
+-
+-	if confetes:
+-		confetes.emitting = true
+-
+-	tocar_som_vitoria()
+-
+-	if robo and robo.has_method("vitoria"):
+-		robo.vitoria()
+-	elif robo and robo.has_method("comemorar"):
+-		robo.comemorar()
+-
+-	await get_tree().create_timer(1.4).timeout
+-	mostrar_vitoria_padrao()
+-
+-
+-func mostrar_vitoria_padrao() -> void:
+-	var tela = cena_vitoria.instantiate()
+-	add_child(tela)
+-
+-	if tela.has_method("configurar"):
+-		tela.configurar(proxima_fase_cena)
+-	else:
+-		push_warning("TelaVitoria não possui o método configurar().")
+-
+-
+-func buscar_peca_para_pista() -> Node:
+-	return obter_proxima_peca_obrigatoria()
+-
+-
+-func buscar_destino_da_peca_para_pista(peca: Node) -> Node:
+-	if not peca:
+-		return null
+-
+-	if peca == peca_gg:
+-		return slot_gigante
+-
+-	if peca == peca_g:
+-		return slot_grande
+-
+-	if peca == peca_m:
+-		return slot_medio
+-
+-	if peca == peca_p:
+-		return slot_pequeno
+-
+-	return null
++func _mensagem_inicio() -> String:
++	return "Minigame de Ordenação 4 peças iniciado: maior para menor."

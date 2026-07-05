@@ -1,0 +1,11 @@
+FINEPLAY — KIT DE ATUALIZAÇÃO DOS SCRIPTS
+
+1. Feche a Godot.
+2. Faça backup da pasta scripts atual.
+3. Substitua a pasta scripts pela pasta scripts deste kit.
+4. Abra o projeto e aguarde a importação dos dois scripts-base novos.
+5. Siga GUIA_CONFIGURACAO_INSPECTOR_FINEPLAY.md.
+6. Execute CHECKLIST_TESTES_FINEPLAY.md.
+
+Nenhum arquivo .tscn foi alterado.
+O pacote original usado na auditoria não continha project.godot; portanto, os scripts foram validados por análise estrutural e parser GDScript, mas o teste de execução deve ser feito no projeto Godot original.

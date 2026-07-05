@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cxxwxs767r46j"
+path="res://.godot/imported/Muito bem Você ace (1).mp3-9aedcfdcc06256fbb52e0ed936c0e417.mp3str"
+
+[deps]
+
+source_file="res://assets/voices/Muito bem Você ace (1).mp3"
+dest_files=["res://.godot/imported/Muito bem Você ace (1).mp3-9aedcfdcc06256fbb52e0ed936c0e417.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

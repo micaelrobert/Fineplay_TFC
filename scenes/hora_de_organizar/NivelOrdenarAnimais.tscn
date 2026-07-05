@@ -6,22 +6,22 @@
 [ext_resource type="Texture2D" uid="uid://e0gv85kp7u5f" path="res://assets/podio/podio_2_inverso.png" id="5_opesv"]
 [ext_resource type="Texture2D" uid="uid://n47panb6t3me" path="res://assets/podio/podio_3.png" id="6_gyt82"]
 [ext_resource type="Script" uid="uid://d0d3aqh81brjm" path="res://scripts/ordenacao/ObjetoOrdenacao.gd" id="8_gr1bw"]
-[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/“Boa! Você conseguiu.mp3" id="8_ijsjs"]
+[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/Boa Você conseguiu.mp3" id="8_ijsjs"]
 [ext_resource type="Texture2D" uid="uid://7vkk253u18dp" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/chick.png" id="9_a1erb"]
 [ext_resource type="Texture2D" uid="uid://du23n6kud1744" path="res://assets/podio/podio_1_inverso.png" id="9_cdo1m"]
-[ext_resource type="AudioStream" uid="uid://ccy0or0ot5ovp" path="res://assets/voices/“Isso! Você venceu!”.mp3" id="9_opav5"]
+[ext_resource type="AudioStream" uid="uid://5dfotvwoqebn" path="res://assets/voices/Isso Você venceu.mp3" id="9_ijsjs"]
 [ext_resource type="Texture2D" uid="uid://bh3k7wyjfdap6" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/chicken.png" id="10_brtr5"]
-[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/“Muito bem! Você ace (1).mp3" id="10_dqjdw"]
+[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/Muito bem Você ace (1).mp3" id="10_dqjdw"]
 [ext_resource type="Texture2D" uid="uid://cpi8wk8smlq12" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/dog.png" id="11_tpjpo"]
-[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/“Perfeito! Missão co.mp3" id="11_xkbf2"]
+[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/Perfeito Missão co.mp3" id="11_xkbf2"]
 [ext_resource type="Texture2D" uid="uid://jxo8wkyi5lv3" path="res://assets/podio/podio_4.png" id="12_cdo1m"]
-[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse! Tenta de.mp3" id="12_htj7c"]
+[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse Tenta de.mp3" id="12_htj7c"]
 [ext_resource type="Texture2D" uid="uid://ddk7he8f6uh1q" path="res://assets/kenney_animal-pack-redux/PNG/Round (outline)/elephant.png" id="12_ijsjs"]
-[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops! Esse não está.mp3" id="13_f67vt"]
+[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops Esse não está.mp3" id="13_f67vt"]
 [ext_resource type="AudioStream" uid="uid://c7boqy8p8b4ns" path="res://assets/kenney_interface-sounds/Audio/click_005.ogg" id="13_opav5"]
-[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase! Mas não é ess.mp3" id="14_doa6q"]
+[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase Mas não é ess.mp3" id="14_doa6q"]
 [ext_resource type="AudioStream" uid="uid://bbmudtexbdmwn" path="res://assets/kenney_interface-sounds/Audio/confirmation_001.ogg" id="14_dqjdw"]
-[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez!.mp3" id="15_05qig"]
+[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez.mp3" id="15_05qig"]
 [ext_resource type="AudioStream" uid="uid://c3kulkw7qsbe" path="res://assets/kenney_interface-sounds/Audio/mixkit-achievement-bell-600.wav" id="15_xkbf2"]
 [ext_resource type="AudioStream" uid="uid://rk6akkw56rix" path="res://assets/kenney_interface-sounds/Audio/click_002.ogg" id="16_htj7c"]
 [ext_resource type="AudioStream" uid="uid://cye6kyexwyd7c" path="res://assets/kenney_interface-sounds/Audio/error_006.ogg" id="17_f67vt"]
@@ -107,8 +107,8 @@ stream = ExtResource("13_opav5")
 stream = ExtResource("8_ijsjs")
 volume_db = 10.0
 
-[node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1328231285]
-stream = ExtResource("9_opav5")
+[node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1643014718]
+stream = ExtResource("9_ijsjs")
 volume_db = 10.0
 
 [node name="VozVitoria3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=442913642]

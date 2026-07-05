@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ddef0q2iem7c3"
+path="res://.godot/imported/Não é esse Tenta de.mp3-6c0d8bc45a394deda83ca3b2fbf9598c.mp3str"
+
+[deps]
+
+source_file="res://assets/voices/voice_error/Não é esse Tenta de.mp3"
+dest_files=["res://.godot/imported/Não é esse Tenta de.mp3-6c0d8bc45a394deda83ca3b2fbf9598c.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

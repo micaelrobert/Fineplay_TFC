@@ -6,19 +6,19 @@
 [ext_resource type="Texture2D" uid="uid://dmdjf6b7wv514" path="res://assets/kenney_generic-items/PNG/Colored/bau (1).png" id="4_oat7j"]
 [ext_resource type="PackedScene" uid="uid://brrtkn3hdao4i" path="res://scenes/formas_e_cores/ObjetoArrastavel.tscn" id="5_5ebb7"]
 [ext_resource type="Texture2D" uid="uid://cp1a246jldjbc" path="res://assets/kenney_animal-pack-redux/PNG/Round/bear.png" id="8_4scfk"]
-[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/“Boa! Você conseguiu.mp3" id="9_3m0k0"]
+[ext_resource type="AudioStream" uid="uid://bi2w6764wdns7" path="res://assets/voices/Boa Você conseguiu.mp3" id="9_3m0k0"]
 [ext_resource type="Texture2D" uid="uid://r84xa31lkv1o" path="res://assets/kenney_animal-pack-redux/PNG/Round/horse.png" id="9_ct0w5"]
-[ext_resource type="AudioStream" uid="uid://ccy0or0ot5ovp" path="res://assets/voices/“Isso! Você venceu!”.mp3" id="10_oat7j"]
-[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/“Muito bem! Você ace (1).mp3" id="11_5ebb7"]
+[ext_resource type="AudioStream" uid="uid://5dfotvwoqebn" path="res://assets/voices/Isso Você venceu.mp3" id="10_ts84s"]
+[ext_resource type="AudioStream" uid="uid://cxxwxs767r46j" path="res://assets/voices/Muito bem Você ace (1).mp3" id="11_5ebb7"]
 [ext_resource type="Texture2D" uid="uid://b8bcmunuuvme2" path="res://assets/kenney_animal-pack-redux/PNG/Round/chicken.png" id="11_ym75o"]
-[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/“Perfeito! Missão co.mp3" id="12_smuph"]
-[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse! Tenta de.mp3" id="13_ts84s"]
+[ext_resource type="AudioStream" uid="uid://bpnqqnm48mi7i" path="res://assets/voices/Perfeito Missão co.mp3" id="12_smuph"]
+[ext_resource type="AudioStream" uid="uid://ddef0q2iem7c3" path="res://assets/voices/voice_error/Não é esse Tenta de.mp3" id="13_ts84s"]
 [ext_resource type="Texture2D" uid="uid://cqqpcehjgoj28" path="res://assets/kenney_animal-pack-redux/PNG/Round/cow.png" id="13_vljmd"]
-[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops! Esse não está.mp3" id="14_4scfk"]
+[ext_resource type="AudioStream" uid="uid://q1vm7dn0i574" path="res://assets/voices/voice_error/Ooops Esse não está.mp3" id="14_4scfk"]
 [ext_resource type="Texture2D" uid="uid://di33qet0vj8rm" path="res://assets/kenney_generic-items/PNG/Colored/genericItem_color_023.png" id="14_hdk2a"]
-[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase! Mas não é ess.mp3" id="15_ct0w5"]
+[ext_resource type="AudioStream" uid="uid://cjd5sr0jhi8cl" path="res://assets/voices/voice_error/Quase Mas não é ess.mp3" id="15_ct0w5"]
 [ext_resource type="Texture2D" uid="uid://c0ntup2qagdn3" path="res://assets/kenney_generic-items/PNG/Colored/genericItem_color_005.png" id="15_plmd5"]
-[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez!.mp3" id="16_30724"]
+[ext_resource type="AudioStream" uid="uid://b65u5hr0m4lqp" path="res://assets/voices/voice_error/Tenta outra vez.mp3" id="16_30724"]
 [ext_resource type="Texture2D" uid="uid://dbi8m2t1rwlvc" path="res://assets/kenney_generic-items/PNG/Colored/genericItem_color_022.png" id="16_h6h8c"]
 [ext_resource type="Texture2D" uid="uid://8bgroq657218" path="res://assets/kenney_generic-items/PNG/Colored/genericItem_color_001.png" id="17_qi856"]
 [ext_resource type="Texture2D" uid="uid://coynd6yd5fxiq" path="res://assets/kenney_toon-characters-1/Robot/PNG/Poses/character_robot_wide.png" id="18_374w3"]
@@ -95,7 +95,7 @@ stream = ExtResource("9_3m0k0")
 volume_db = 10.0
 
 [node name="VozVitoria2" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=1200759904]
-stream = ExtResource("10_oat7j")
+stream = ExtResource("10_ts84s")
 volume_db = 10.0
 
 [node name="VozVitoria3" type="AudioStreamPlayer2D" parent="SonsLocais" unique_id=989997926]

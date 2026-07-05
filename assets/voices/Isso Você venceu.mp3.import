@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://5dfotvwoqebn"
+path="res://.godot/imported/Isso Você venceu.mp3-5db883734c8201e0753a0d6eb85e2cda.mp3str"
+
+[deps]
+
+source_file="res://assets/voices/Isso Você venceu.mp3"
+dest_files=["res://.godot/imported/Isso Você venceu.mp3-5db883734c8201e0753a0d6eb85e2cda.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
